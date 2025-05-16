@@ -15,18 +15,35 @@
     }
   </script>
   <style>
+    :root {
+      --bg-color: #f0f0f0;
+      --text-color: #000;
+      --card-color: #fff;
+      --btn-bg: #007BFF;
+      --btn-hover: #0056b3;
+    }
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #fff;
+      --card-color: #2c2c2c;
+      --btn-bg: #444;
+      --btn-hover: #666;
+    }
     body {
       padding: 20px;
       font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
     }
     .container {
-      background: white;
+      background: var(--card-color);
       padding: 20px;
       border-radius: 10px;
       max-width: 600px;
       margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: background-color 0.3s;
     }
     h1 {
       text-align: center;
@@ -44,27 +61,32 @@
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      background-color: var(--card-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
     }
     .buttons {
       text-align: center;
       margin-top: 15px;
     }
-    .buttons button {
+    .buttons button, .toggle-theme {
       padding: 10px 20px;
       margin: 5px;
       border-radius: 5px;
       border: none;
-      background-color: #007BFF;
+      background-color: var(--btn-bg);
       color: white;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
-    .buttons button:hover {
-      background-color: #0056b3;
+    .buttons button:hover, .toggle-theme:hover {
+      background-color: var(--btn-hover);
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 30px;
+      animation: fadeIn 0.5s ease-in;
     }
     th, td {
       border: 1px solid #ccc;
@@ -78,22 +100,31 @@
       font-weight: bold;
       text-align: right;
     }
+    .feedback {
+      text-align: center;
+      font-weight: bold;
+      color: green;
+      margin-top: 10px;
+      display: none;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>SARIPAN</h1>
-
+    <button class="toggle-theme" onclick="toggleTheme()">🌗 Modo Claro/Escuro</button>
     <div class="field">
       <label>Data:</label>
       <input type="text" id="datetime" readonly />
     </div>
-
     <div class="field">
       <label>Dias Trabalhados:</label>
       <input type="number" id="daysWorked" value="0" readonly />
     </div>
-
     <div class="field">
       <label>Total a Receber:</label>
       <div style="display: flex; align-items: center;">
@@ -101,12 +132,10 @@
         <input type="number" id="totalToReceive" value="0" readonly style="flex: 1;" />
       </div>
     </div>
-
     <div class="field">
       <label>Serviços realizados:</label>
       <textarea id="observations" placeholder="Descreva o serviço realizado..."></textarea>
     </div>
-
     <div class="buttons">
       <button onclick="incrementDays()">Ponto</button>
       <button onclick="resetAll()">Zerar Tudo</button>
@@ -114,55 +143,39 @@
       <button onclick="exportToCSV()">Exportar CSV</button>
       <button onclick="exportToPDF()">Exportar PDF</button>
     </div>
-
+    <div class="feedback" id="feedbackMsg">✅ Serviço registrado!</div>
     <table>
       <thead>
-        <tr>
-          <th>Data</th>
-          <th>Serviço</th>
-        </tr>
+        <tr><th>Data</th><th>Serviço</th></tr>
       </thead>
       <tbody id="observationsTable"></tbody>
       <tfoot>
-        <tr>
-          <td colspan="2" id="tableTotalRow">Total a Receber: R$ 0</td>
-        </tr>
+        <tr><td colspan="2" id="tableTotalRow">Total a Receber: R$ 0</td></tr>
       </tfoot>
     </table>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     function updateDateTime() {
-      const now = new Date();
-      document.getElementById("datetime").value = now.toLocaleString();
+      document.getElementById("datetime").value = new Date().toLocaleString();
     }
-
     function updateTotalToReceive() {
-      const days = parseInt(document.getElementById("daysWorked").value);
-      const total = days * 100;
+      const dias = parseInt(document.getElementById("daysWorked").value);
+      const total = dias * 100;
       document.getElementById("totalToReceive").value = total;
       document.getElementById("tableTotalRow").innerText = "Total a Receber: R$ " + total;
     }
-
     function incrementDays() {
       const senha = prompt("Digite a senha:");
-      if (senha !== "1234") {
-        alert("Senha incorreta!");
-        return;
-      }
+      if (senha !== "1234") return alert("Senha incorreta!");
       const input = document.getElementById("daysWorked");
       input.value = parseInt(input.value) + 1;
       updateTotalToReceive();
       saveData();
     }
-
     function resetAll() {
       const senha = prompt("Digite a senha:");
-      if (senha !== "1234") {
-        alert("Senha incorreta!");
-        return;
-      }
+      if (senha !== "1234") return alert("Senha incorreta!");
       document.getElementById("daysWorked").value = 0;
       document.getElementById("totalToReceive").value = 0;
       document.getElementById("observations").value = "";
@@ -170,7 +183,6 @@
       document.getElementById("tableTotalRow").innerText = "Total a Receber: R$ 0";
       localStorage.removeItem("saripanData");
     }
-
     function addObservation() {
       const obs = document.getElementById("observations").value.trim();
       if (!obs) return;
@@ -178,9 +190,14 @@
       row.insertCell(0).innerText = new Date().toLocaleDateString();
       row.insertCell(1).innerText = obs;
       document.getElementById("observations").value = "";
+      showFeedback();
       saveData();
     }
-
+    function showFeedback() {
+      const msg = document.getElementById("feedbackMsg");
+      msg.style.display = "block";
+      setTimeout(() => msg.style.display = "none", 2000);
+    }
     function saveData() {
       const data = {
         daysWorked: document.getElementById("daysWorked").value,
@@ -195,7 +212,6 @@
       localStorage.setItem("saripanData", JSON.stringify(data));
       updateTotalToReceive();
     }
-
     function loadData() {
       const data = JSON.parse(localStorage.getItem("saripanData"));
       if (!data) return;
@@ -209,42 +225,17 @@
       });
       updateTotalToReceive();
     }
-
-    function exportToCSV() {
-      let csv = "Data,Serviço\\n";
-      document.querySelectorAll("#observationsTable tr").forEach(row => {
-        const date = row.cells[0].innerText;
-        const text = row.cells[1].innerText;
-        csv += `"${date}","${text}"\\n`;
-      });
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "servicos.csv";
-      link.click();
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("saripanTheme", document.body.classList.contains("dark") ? "dark" : "light");
     }
-
-    async function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text("Apontamento de Serviços", 105, 10, { align: "center" });
-      doc.setFontSize(12);
-      let y = 20;
-      document.querySelectorAll("#observationsTable tr").forEach(row => {
-        doc.text(row.cells[0].innerText + " - " + row.cells[1].innerText, 10, y);
-        y += 8;
-      });
-      y += 10;
-      const total = document.getElementById("totalToReceive").value;
-      doc.setFont(undefined, "bold");
-      doc.text("Total a Receber: R$ " + total, 200, y, { align: "right" });
-      doc.save("servicos.pdf");
+    function applySavedTheme() {
+      const theme = localStorage.getItem("saripanTheme");
+      if (theme === "dark") document.body.classList.add("dark");
     }
-
     setInterval(updateDateTime, 1000);
     window.onload = () => {
+      applySavedTheme();
       loadData();
       updateDateTime();
     };
