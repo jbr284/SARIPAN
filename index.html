@@ -4,241 +4,429 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SARIPAN</title>
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#007BFF" />
-  <link rel="icon" href="icon-192.png" />
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js');
-      });
-    }
-  </script>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=qCDuentNjnITxNqtWplHndD_i5iCMvoOWtM3oHmPjFE1NoZdRgA8G92DUt0M7gZP" charset="UTF-8"></script>
   <style>
-    :root {
-      --bg-color: #f0f0f0;
-      --text-color: #000;
-      --card-color: #fff;
-      --btn-bg: #007BFF;
-      --btn-hover: #0056b3;
-    }
-    body.dark {
-      --bg-color: #1e1e1e;
-      --text-color: #fff;
-      --card-color: #2c2c2c;
-      --btn-bg: #444;
-      --btn-hover: #666;
-    }
-    body {
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .container {
-      background: var(--card-color);
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      transition: background-color 0.3s;
-    }
-    h1 {
-      text-align: center;
-    }
-    .field {
-      margin-bottom: 15px;
-    }
-    .field label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    .field input, .field textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      background-color: var(--card-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .buttons {
-      text-align: center;
-      margin-top: 15px;
-    }
-    .buttons button, .toggle-theme {
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 5px;
-      border: none;
-      background-color: var(--btn-bg);
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .buttons button:hover, .toggle-theme:hover {
-      background-color: var(--btn-hover);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-      animation: fadeIn 0.5s ease-in;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-    }
-    th {
-      background-color: #007BFF;
-      color: white;
-    }
-    tfoot td {
-      font-weight: bold;
-      text-align: right;
-    }
-    .feedback {
-      text-align: center;
-      font-weight: bold;
-      color: green;
-      margin-top: 10px;
-      display: none;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef1f5; margin: 0; padding: 20px; }
+    .container { background-color: white; border-radius: 12px; padding: 30px; max-width: 960px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #007bff; margin-bottom: 20px; }
+    .subtitulo { text-align: center; margin-bottom: 10px; font-size: 16px; font-weight: bold; }
+    .nome-proprio { font-family: 'Pacifico', cursive; font-size: 18px; color: #333; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+    label { font-weight: 600; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px; box-sizing: border-box; }
+    textarea { min-height: 100px; resize: vertical; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+    .buttons button { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+    .btn-ponto { background: #28a745; color: white; }
+    .btn-fechar { background: #fd7e14; color: white; }
+    .btn-exportar { background: #17a2b8; color: white; }
+    table { width: 100%; margin-top: 30px; border-collapse: collapse; }
+    th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+    th { background-color: #007bff; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .total-box { font-weight: bold; font-size: 16px; padding-top: 10px; color: #007bff; text-align: right; }
+    .hidden { display: none; }
+    .inicio { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px; }
+    .inicio button { padding: 12px 24px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; background-color: #007bff; color: white; transition: background 0.3s; }
+    .inicio button:hover { background-color: #0056b3; }
+    /* Desabilitar inputs no modo acompanhamento */
+    .disabled { pointer-events: none; opacity: 0.6; }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div id="inicio" class="inicio">
     <h1>SARIPAN</h1>
-    <button class="toggle-theme" onclick="toggleTheme()">🌗 Modo Claro/Escuro</button>
-    <div class="field">
-      <label>Data:</label>
-      <input type="text" id="datetime" readonly />
-    </div>
-    <div class="field">
-      <label>Dias Trabalhados:</label>
-      <input type="number" id="daysWorked" value="0" readonly />
-    </div>
-    <div class="field">
-      <label>Total a Receber:</label>
-      <div style="display: flex; align-items: center;">
-        <span style="margin-right: 5px;">R$</span>
-        <input type="number" id="totalToReceive" value="0" readonly style="flex: 1;" />
-      </div>
-    </div>
-    <div class="field">
-      <label>Serviços realizados:</label>
-      <textarea id="observations" placeholder="Descreva o serviço realizado..."></textarea>
-    </div>
-    <div class="buttons">
-      <button onclick="incrementDays()">Ponto</button>
-      <button onclick="resetAll()">Zerar Tudo</button>
-      <button onclick="addObservation()">Registrar Serviço</button>
-      <button onclick="exportToCSV()">Exportar CSV</button>
-      <button onclick="exportToPDF()">Exportar PDF</button>
-    </div>
-    <div class="feedback" id="feedbackMsg">✅ Serviço registrado!</div>
-    <table>
-      <thead>
-        <tr><th>Data</th><th>Serviço</th></tr>
-      </thead>
-      <tbody id="observationsTable"></tbody>
-      <tfoot>
-        <tr><td colspan="2" id="tableTotalRow">Total a Receber: R$ 0</td></tr>
-      </tfoot>
-    </table>
+    <p class="subtitulo">Relatório de serviços</p>
+    <p><strong>Prestador:</strong> João Batista Rosa</p>
+    <p>Escolha o modo de acesso:</p>
+    <button onclick="entrarApontamento()">Apontamento</button>
+    <button onclick="entrarAcompanhamento()">Acompanhamento</button>
   </div>
 
+  <div id="app" class="container hidden">
+    <h1>SARIPAN</h1>
+    <p class="subtitulo">Apontamento de dias trabalhado: <span class="nome-proprio">João Batista Rosa</span></p>
+    <div class="grid">
+      <div><label for="currentDate">Data:</label><input type="text" id="currentDate" readonly /></div>
+      <div><label for="daysWorked">Dias Trabalhados:</label><input type="number" id="daysWorked" value="0" readonly /></div>
+      <div id="valorProtegido"><label>Total a Receber:</label><input type="text" id="totalToReceive" value="0" readonly /></div>
+    </div>
+
+    <label for="observations">Serviços realizados:</label>
+    <textarea id="observations" placeholder="Descreva o serviço realizado..."></textarea>
+    <label for="manualDate">Data manual (opcional):</label>
+    <input type="date" id="manualDate" />
+
+    <div class="buttons">
+      <button class="btn-ponto" onclick="registrarServico()">Ponto</button>
+      <button class="btn-ponto" onclick="registrarServico(true)">Apontar Manualmente</button>
+      <button class="btn-fechar" onclick="fecharQuinzena()">Fechar Quinzena</button>
+      <button class="btn-exportar" onclick="exportarCSV()">Exportar CSV</button>
+      <button class="btn-exportar" onclick="exportarPDF()">Exportar PDF</button>
+    </div>
+
+    <table>
+      <thead><tr><th>Data</th><th>Serviço</th><th>Confirmar</th></tr></thead>
+      <tbody id="observationsTable"></tbody>
+    </table>
+    <div id="tableTotalRow" class="total-box">Total a Receber: R$ <span id="valorTotalTexto">0</span></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
   <script>
-    function updateDateTime() {
-      document.getElementById("datetime").value = new Date().toLocaleString();
-    }
-    function updateTotalToReceive() {
-      const dias = parseInt(document.getElementById("daysWorked").value);
-      const total = dias * 100;
-      document.getElementById("totalToReceive").value = total;
-      document.getElementById("tableTotalRow").innerText = "Total a Receber: R$ " + total;
-    }
-    function incrementDays() {
-      const senha = prompt("Digite a senha:");
-      if (senha !== "1234") return alert("Senha incorreta!");
-      const input = document.getElementById("daysWorked");
-      input.value = parseInt(input.value) + 1;
-      updateTotalToReceive();
-      saveData();
-    }
-    function resetAll() {
-      const senha = prompt("Digite a senha:");
-      if (senha !== "1234") return alert("Senha incorreta!");
-      document.getElementById("daysWorked").value = 0;
-      document.getElementById("totalToReceive").value = 0;
-      document.getElementById("observations").value = "";
-      document.getElementById("observationsTable").innerHTML = "";
-      document.getElementById("tableTotalRow").innerText = "Total a Receber: R$ 0";
-      localStorage.removeItem("saripanData");
-    }
-    function addObservation() {
-      const obs = document.getElementById("observations").value.trim();
-      if (!obs) return;
-      const row = document.getElementById("observationsTable").insertRow();
-      row.insertCell(0).innerText = new Date().toLocaleDateString();
-      row.insertCell(1).innerText = obs;
-      document.getElementById("observations").value = "";
-      showFeedback();
-      saveData();
-    }
-    function showFeedback() {
-      const msg = document.getElementById("feedbackMsg");
-      msg.style.display = "block";
-      setTimeout(() => msg.style.display = "none", 2000);
-    }
-    function saveData() {
-      const data = {
-        daysWorked: document.getElementById("daysWorked").value,
-        observations: []
-      };
-      document.querySelectorAll("#observationsTable tr").forEach(row => {
-        data.observations.push({
-          date: row.cells[0].innerText,
-          text: row.cells[1].innerText
-        });
-      });
-      localStorage.setItem("saripanData", JSON.stringify(data));
-      updateTotalToReceive();
-    }
-    function loadData() {
-      const data = JSON.parse(localStorage.getItem("saripanData"));
-      if (!data) return;
-      document.getElementById("daysWorked").value = data.daysWorked;
-      const tbody = document.getElementById("observationsTable");
-      tbody.innerHTML = "";
-      data.observations.forEach(obs => {
-        const row = tbody.insertRow();
-        row.insertCell(0).innerText = obs.date;
-        row.insertCell(1).innerText = obs.text;
-      });
-      updateTotalToReceive();
-    }
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("saripanTheme", document.body.classList.contains("dark") ? "dark" : "light");
-    }
-    function applySavedTheme() {
-      const theme = localStorage.getItem("saripanTheme");
-      if (theme === "dark") document.body.classList.add("dark");
-    }
-    setInterval(updateDateTime, 1000);
-    window.onload = () => {
-      applySavedTheme();
-      loadData();
-      updateDateTime();
+    // Configuração do Firebase - substitua pelos seus dados
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY_AQUI",
+      authDomain: "SEU_AUTH_DOMAIN_AQUI",
+      databaseURL: "https://saripan-db-default-rtdb.firebaseio.com",
+      projectId: "saripan-db",
+      storageBucket: "SEU_STORAGE_BUCKET_AQUI",
+      messagingSenderId: "SEU_MESSAGING_SENDER_ID_AQUI",
+      appId: "SEU_APP_ID_AQUI"
     };
+
+    // Inicializa Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Estado
+    let modo = "";
+    const prestador = "João Batista Rosa";
+
+    document.getElementById("currentDate").value = new Date().toLocaleString("pt-BR");
+
+    // Ao iniciar, só tenta carregar localStorage (fallback)
+    carregarDoLocalStorage();
+
+    // --- Funções Modo ---
+    window.entrarApontamento = async function () {
+      const senha = prompt("Digite a senha de acesso:");
+      if (senha !== "0305") return alert("Senha incorreta!");
+
+      modo = "apontamento";
+      document.getElementById("inicio").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+
+      // Ativa campos e botões
+      habilitarEdicao(true);
+
+      // Carrega dados do Firebase (se houver)
+      await carregarDoFirebase();
+    };
+
+    window.entrarAcompanhamento = async function () {
+      modo = "acompanhamento";
+      document.getElementById("inicio").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+
+      document.getElementById("valorProtegido").classList.add("hidden");
+      document.getElementById("tableTotalRow").classList.add("hidden");
+      document.getElementById("observations").style.display = "none";
+      document.getElementById("manualDate").style.display = "none";
+      document.querySelector('label[for="observations"]').style.display = "none";
+      document.querySelector('label[for="manualDate"]').style.display = "none";
+
+      document.querySelectorAll(".btn-ponto, .btn-fechar").forEach(btn => {
+        btn.style.display = "none";
+      });
+
+      habilitarEdicao(false);
+
+      // Carrega dados do Firebase (se houver)
+      await carregarDoFirebase();
+    };
+
+    // Ativa/desativa campos e botões
+    function habilitarEdicao(habilitar) {
+      document.getElementById("observations").disabled = !habilitar;
+      document.getElementById("manualDate").disabled = !habilitar;
+      document.querySelectorAll(".btn-ponto, .btn-fechar").forEach(btn => {
+        btn.disabled = !habilitar;
+      });
+    }
+
+    // --- Registro de serviços ---
+    async function registrarServico(manual = false) {
+      if (modo !== "apontamento") return alert("Você não tem permissão para registrar.");
+
+      const obs = document.getElementById("observations").value.trim();
+      if (!obs) return alert("Preencha a descrição do serviço.");
+
+      let dataRegistro;
+      if (manual) {
+        const dataInput = document.getElementById("manualDate").value;
+        if (!dataInput) return alert("Selecione uma data manual.");
+        const partes = dataInput.split("-");
+        dataRegistro = `${partes[2]}/${partes[1]}/${partes[0]}`;
+      } else {
+        dataRegistro = new Date().toLocaleDateString();
+      }
+
+      // Insere na tabela
+      inserirLinhaTabela(dataRegistro, obs);
+
+      // Atualiza dias e total
+      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
+      document.getElementById("daysWorked").value = dias + 1;
+      atualizarValores();
+
+      // Limpa inputs
+      document.getElementById("observations").value = "";
+      document.getElementById("manualDate").value = "";
+
+      // Salvar no Firebase
+      await salvarNoFirebase();
+    }
+
+    // Função para inserir linha na tabela com confirmação de edição
+    function inserirLinhaTabela(dataRegistro, obs) {
+      const table = document.getElementById("observationsTable");
+      const row = document.createElement("tr");
+
+      // Criação das células
+      const cellData = document.createElement("td");
+      const cellText = document.createElement("td");
+      const cellConfirm = document.createElement("td");
+
+      // Preenche as células
+      cellData.innerText = dataRegistro;
+      cellText.innerText = obs;
+      const confirmButton = document.createElement("button");
+      confirmButton.innerText = "Confirmar";
+      confirmButton.onclick = function () {
+        const confirmSave = confirm("Você tem certeza que deseja salvar essa edição?");
+        if (confirmSave) {
+          salvarNoFirebase(); // Salva os dados no Firebase
+        }
+      };
+
+      cellConfirm.appendChild(confirmButton);
+      row.appendChild(cellData);
+      row.appendChild(cellText);
+      row.appendChild(cellConfirm);
+
+      // Faz com que a célula de serviço se torne editável
+      cellText.addEventListener("click", function () {
+        if (modo === "apontamento") {
+          const input = document.createElement("textarea");
+          input.value = cellText.innerText;
+
+          // Substitui o texto por um campo de input
+          cellText.innerHTML = '';
+          cellText.appendChild(input);
+
+          // Ao pressionar Enter, adiciona uma nova linha
+          input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+              e.preventDefault(); // Impede o comportamento padrão do Enter
+              input.value += "\n"; // Adiciona uma nova linha dentro do campo de input
+            }
+          });
+
+          // Ao perder o foco, o valor é atualizado na célula
+          input.addEventListener("blur", function () {
+            cellText.innerHTML = input.value;
+            // Atualiza os dados no Firebase
+            salvarNoFirebase();
+          });
+
+          // Faz o input ser selecionado automaticamente
+          input.focus();
+        }
+      });
+
+      // Insere a linha na tabela, de forma ordenada pela data
+      let inserido = false;
+      for (let i = 0; i < table.rows.length; i++) {
+        const dataExistente = table.rows[i].cells[0].innerText;
+        const [d1, m1, a1] = dataRegistro.split("/").map(Number);
+        const [d2, m2, a2] = dataExistente.split("/").map(Number);
+        const date1 = new Date(a1, m1 - 1, d1);
+        const date2 = new Date(a2, m2 - 1, d2);
+        if (date1 < date2) {
+          table.insertBefore(row, table.rows[i]);
+          inserido = true;
+          break;
+        }
+      }
+      if (!inserido) table.appendChild(row);
+    }
+
+    function atualizarValores() {
+      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
+      const valorDia = 100;
+      const total = dias * valorDia;
+      document.getElementById("totalToReceive").value = `R$ ${total.toFixed(2)}`;
+      document.getElementById("valorTotalTexto").innerText = total.toFixed(2);
+    }
+
+    async function fecharQuinzena() {
+      if (modo !== "apontamento") return alert("Você não tem permissão para fechar a quinzena.");
+      const confirmClose = confirm("Deseja realmente fechar a quinzena? Isso limpará os dados atuais.");
+      if (!confirmClose) return;
+
+      // Limpa tudo
+      document.getElementById("observationsTable").innerHTML = "";
+      document.getElementById("daysWorked").value = 0;
+      atualizarValores();
+
+      // Apaga dados Firebase
+      await database.ref('saripan').remove();
+    }
+
+    // --- Exportar ---
+    function exportarCSV() {
+      let csv = "Data,Serviço\n";
+      const rows = document.querySelectorAll("#observationsTable tr");
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("td");
+        csv += `"${cols[0].innerText}","${cols[1].innerText.replace(/"/g, '""')}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `saripan_${new Date().toISOString().split("T")[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(18);
+      doc.text("SARIPAN - Relatório de Serviços", 14, 20);
+      doc.setFontSize(12);
+      doc.text(`Prestador: ${prestador}`, 14, 30);
+
+      const rows = [];
+      const trs = document.querySelectorAll("#observationsTable tr");
+      trs.forEach(tr => {
+        const cols = tr.querySelectorAll("td");
+        rows.push([cols[0].innerText, cols[1].innerText]);
+      });
+
+      doc.autoTable({
+        head: [["Data", "Serviço"]],
+        body: rows,
+        startY: 40,
+        styles: { fontSize: 10 },
+      });
+
+      doc.text(`Total a Receber: R$ ${document.getElementById("valorTotalTexto").innerText}`, 14, doc.lastAutoTable.finalY + 10);
+
+      doc.save(`saripan_${new Date().toISOString().split("T")[0]}.pdf`);
+    }
+
+    // --- Persistência com Firebase ---
+    async function salvarNoFirebase() {
+      if (modo !== "apontamento") return;
+      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
+      const total = dias * 100;
+
+      // Pega dados da tabela
+      const observacoes = [];
+      document.querySelectorAll("#observationsTable tr").forEach(row => {
+        const data = row.cells[0].innerText;
+        const servico = row.cells[1].innerText;
+        observacoes.push({ data, servico });
+      });
+
+      const dados = {
+        prestador,
+        dias,
+        total,
+        observacoes
+      };
+
+      await database.ref('saripan').set(dados);
+    }
+
+    async function carregarDoFirebase() {
+      const snapshot = await database.ref('saripan').get();
+      if (!snapshot.exists()) {
+        // Sem dados no Firebase, tentar localStorage
+        carregarDoLocalStorage();
+        return;
+      }
+
+      const dados = snapshot.val();
+      if (!dados) return;
+
+      document.getElementById("daysWorked").value = dados.dias || 0;
+      atualizarValores();
+
+      const table = document.getElementById("observationsTable");
+      table.innerHTML = "";
+      if (dados.observacoes) {
+        dados.observacoes.forEach(item => {
+          inserirLinhaTabela(item.data, item.servico);
+        });
+      }
+    }
+
+    // --- Fallback localStorage para dados offline ---
+    function salvarNoLocalStorage() {
+      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
+      const total = dias * 100;
+
+      const observacoes = [];
+      document.querySelectorAll("#observationsTable tr").forEach(row => {
+        const data = row.cells[0].innerText;
+        const servico = row.cells[1].innerText;
+        observacoes.push({ data, servico });
+      });
+
+      const dados = {
+        prestador,
+        dias,
+        total,
+        observacoes
+      };
+
+      localStorage.setItem('saripan-dados', JSON.stringify(dados));
+    }
+
+    function carregarDoLocalStorage() {
+      const dadosStr = localStorage.getItem('saripan-dados');
+      if (!dadosStr) return;
+
+      const dados = JSON.parse(dadosStr);
+      if (!dados) return;
+
+      document.getElementById("daysWorked").value = dados.dias || 0;
+      atualizarValores();
+
+      const table = document.getElementById("observationsTable");
+      table.innerHTML = "";
+      if (dados.observacoes) {
+        dados.observacoes.forEach(item => {
+          inserirLinhaTabela(item.data, item.servico);
+        });
+      }
+    }
+
+    // Salva localStorage a cada mudança no input dias ou quando registrar serviço
+    document.getElementById("daysWorked").addEventListener("change", salvarNoLocalStorage);
+
+    // Também salva localStorage após registrar serviço
+    window.registrarServico = (function(orig) {
+      return async function(manual = false) {
+        await orig(manual);
+        salvarNoLocalStorage();
+      };
+    })(registrarServico);
+
   </script>
 </body>
 </html>
