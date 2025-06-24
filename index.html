@@ -1,431 +1,67 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SARIPAN</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef1f5; margin: 0; padding: 20px; }
-    .container { background-color: white; border-radius: 12px; padding: 30px; max-width: 960px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    h1 { text-align: center; color: #007bff; margin-bottom: 20px; }
-    .subtitulo { text-align: center; margin-bottom: 10px; font-size: 16px; font-weight: bold; }
-    .nome-proprio { font-family: 'Pacifico', cursive; font-size: 18px; color: #333; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
-    label { font-weight: 600; }
-    input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-top: 5px; box-sizing: border-box; }
-    textarea { min-height: 100px; resize: vertical; }
-    .buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
-    .buttons button { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-    .btn-ponto { background: #28a745; color: white; }
-    .btn-fechar { background: #fd7e14; color: white; }
-    .btn-exportar { background: #17a2b8; color: white; }
-    table { width: 100%; margin-top: 30px; border-collapse: collapse; }
-    th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-    th { background-color: #007bff; color: white; }
-    tr:nth-child(even) { background-color: #f9f9f9; }
-    .total-box { font-weight: bold; font-size: 16px; padding-top: 10px; color: #007bff; text-align: right; }
-    .hidden { display: none; }
-    .inicio { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px; }
-    .inicio button { padding: 12px 24px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; background-color: #007bff; color: white; transition: background 0.3s; }
-    .inicio button:hover { background-color: #0056b3; }
-    /* Desabilitar inputs no modo acompanhamento */
-    .disabled { pointer-events: none; opacity: 0.6; }
-  </style>
-</head>
-<body>
-  <div id="inicio" class="inicio">
-    <h1>SARIPAN</h1>
-    <p class="subtitulo">Relatório de serviços</p>
-    <p><strong>Prestador:</strong> João Batista Rosa</p>
-    <p>Escolha o modo de acesso:</p>
-    <button onclick="entrarApontamento()">Apontamento</button>
-    <button onclick="entrarAcompanhamento()">Acompanhamento</button>
-  </div>
+async function registrarServico(manual = false) {
+  if (modo !== "apontamento") return alert("Você não tem permissão para registrar.");
 
-  <div id="app" class="container hidden">
-    <h1>SARIPAN</h1>
-    <p class="subtitulo">Apontamento de dias trabalhado: <span class="nome-proprio">João Batista Rosa</span></p>
-    <div class="grid">
-      <div><label for="currentDate">Data:</label><input type="text" id="currentDate" readonly /></div>
-      <div><label for="daysWorked">Dias Trabalhados:</label><input type="number" id="daysWorked" value="0" readonly /></div>
-      <div id="valorProtegido"><label>Total a Receber:</label><input type="text" id="totalToReceive" value="0" readonly /></div>
-    </div>
+  const obs = document.getElementById("observations").value.trim();
+  if (!obs) return alert("Preencha a descrição do serviço.");
 
-    <label for="observations">Serviços realizados:</label>
-    <textarea id="observations" placeholder="Descreva o serviço realizado..."></textarea>
-    <label for="manualDate">Data manual (opcional):</label>
-    <input type="date" id="manualDate" />
+  let dataRegistro;
+  if (manual) {
+    const dataInput = document.getElementById("manualDate").value;
+    if (!dataInput) return alert("Selecione uma data manual.");
+    const partes = dataInput.split("-");
+    dataRegistro = `${partes[2]}/${partes[1]}/${partes[0]}`;
+  } else {
+    dataRegistro = new Date().toLocaleDateString();
+  }
 
-    <div class="buttons">
-      <button class="btn-ponto" onclick="registrarServico()">Ponto</button>
-      <button class="btn-ponto" onclick="registrarServico(true)">Apontar Manualmente</button>
-      <button class="btn-fechar" onclick="fecharQuinzena()">Fechar Quinzena</button>
-      <button class="btn-exportar" onclick="exportarCSV()">Exportar CSV</button>
-      <button class="btn-exportar" onclick="exportarPDF()">Exportar PDF</button>
-    </div>
+  // Pega o valor individual do dia e verifica se é um número válido
+  const valorDiaIndividual = parseFloat(document.getElementById("valorDiaIndividual").value);
+  if (isNaN(valorDiaIndividual) || valorDiaIndividual <= 0) {
+    return alert("Por favor, insira um valor válido para o dia.");
+  }
 
-    <table>
-      <thead><tr><th>Data</th><th>Serviço</th><th>Confirmar</th></tr></thead>
-      <tbody id="observationsTable"></tbody>
-    </table>
-    <div id="tableTotalRow" class="total-box">Total a Receber: R$ <span id="valorTotalTexto">0</span></div>
-  </div>
+  // Atualizando a tabela diretamente
+  const table = document.getElementById("observationsTable");
+  const row = document.createElement("tr");
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  const cellData = document.createElement("td");
+  const cellText = document.createElement("td");
+  const cellValor = document.createElement("td");
+  const cellConfirm = document.createElement("td");
 
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  const valorFormatado = valorDiaIndividual.toFixed(2); // Formatar o valor para 2 casas decimais
 
-  <script>
-    // Configuração do Firebase - substitua pelos seus dados
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY_AQUI",
-      authDomain: "SEU_AUTH_DOMAIN_AQUI",
-      databaseURL: "https://saripan-db-default-rtdb.firebaseio.com",
-      projectId: "saripan-db",
-      storageBucket: "SEU_STORAGE_BUCKET_AQUI",
-      messagingSenderId: "SEU_MESSAGING_SENDER_ID_AQUI",
-      appId: "SEU_APP_ID_AQUI"
-    };
+  // Preenche as células
+  cellData.innerText = dataRegistro;
+  cellText.innerText = obs;
+  cellValor.innerText = `R$ ${valorFormatado}`; // Exibir o valor do dia corretamente
 
-    // Inicializa Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // Estado
-    let modo = "";
-    const prestador = "João Batista Rosa";
-
-    document.getElementById("currentDate").value = new Date().toLocaleString("pt-BR");
-
-    // Ao iniciar, só tenta carregar localStorage (fallback)
-    carregarDoLocalStorage();
-
-    // --- Funções Modo ---
-    window.entrarApontamento = async function () {
-      const senha = prompt("Digite a senha de acesso:");
-      if (senha !== "0305") return alert("Senha incorreta!");
-
-      modo = "apontamento";
-      document.getElementById("inicio").classList.add("hidden");
-      document.getElementById("app").classList.remove("hidden");
-
-      // Ativa campos e botões
-      habilitarEdicao(true);
-
-      // Carrega dados do Firebase (se houver)
-      await carregarDoFirebase();
-    };
-
-    window.entrarAcompanhamento = async function () {
-      modo = "acompanhamento";
-      document.getElementById("inicio").classList.add("hidden");
-      document.getElementById("app").classList.remove("hidden");
-
-      document.getElementById("valorProtegido").classList.add("hidden");
-      document.getElementById("tableTotalRow").classList.add("hidden");
-      document.getElementById("observations").style.display = "none";
-      document.getElementById("manualDate").style.display = "none";
-      document.querySelector('label[for="observations"]').style.display = "none";
-      document.querySelector('label[for="manualDate"]').style.display = "none";
-
-      document.querySelectorAll(".btn-ponto, .btn-fechar").forEach(btn => {
-        btn.style.display = "none";
-      });
-
-      habilitarEdicao(false);
-
-      // Carrega dados do Firebase (se houver)
-      await carregarDoFirebase();
-    };
-
-    // Ativa/desativa campos e botões
-    function habilitarEdicao(habilitar) {
-      document.getElementById("observations").disabled = !habilitar;
-      document.getElementById("manualDate").disabled = !habilitar;
-      document.querySelectorAll(".btn-ponto, .btn-fechar").forEach(btn => {
-        btn.disabled = !habilitar;
-      });
+  const confirmButton = document.createElement("button");
+  confirmButton.innerText = "Confirmar";
+  confirmButton.onclick = function () {
+    const confirmSave = confirm("Você tem certeza que deseja salvar essa edição?");
+    if (confirmSave) {
+      salvarNoFirebase(); // Salva os dados no Firebase
     }
+  };
 
-    // --- Registro de serviços ---
-    async function registrarServico(manual = false) {
-      if (modo !== "apontamento") return alert("Você não tem permissão para registrar.");
+  cellConfirm.appendChild(confirmButton);
+  row.appendChild(cellData);
+  row.appendChild(cellText);
+  row.appendChild(cellValor);
+  row.appendChild(cellConfirm);
 
-      const obs = document.getElementById("observations").value.trim();
-      if (!obs) return alert("Preencha a descrição do serviço.");
+  table.appendChild(row); // Insere a nova linha na tabela
 
-      let dataRegistro;
-      if (manual) {
-        const dataInput = document.getElementById("manualDate").value;
-        if (!dataInput) return alert("Selecione uma data manual.");
-        const partes = dataInput.split("-");
-        dataRegistro = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      } else {
-        dataRegistro = new Date().toLocaleDateString();
-      }
+  // Atualiza os dias e total
+  const dias = parseInt(document.getElementById("daysWorked").value) || 0;
+  document.getElementById("daysWorked").value = dias + 1;
+  atualizarValores();
 
-      // Insere na tabela
-      inserirLinhaTabela(dataRegistro, obs);
+  // Limpa os campos
+  document.getElementById("observations").value = "";
+  document.getElementById("manualDate").value = "";
 
-      // Atualiza dias e total
-      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
-      document.getElementById("daysWorked").value = dias + 1;
-      atualizarValores();
-
-      // Limpa inputs
-      document.getElementById("observations").value = "";
-      document.getElementById("manualDate").value = "";
-
-      // Salvar no Firebase
-      await salvarNoFirebase();
-    }
-
-    // Função para inserir linha na tabela com confirmação de edição
-    function inserirLinhaTabela(dataRegistro, obs) {
-      const table = document.getElementById("observationsTable");
-      const row = document.createElement("tr");
-
-      // Criação das células
-      const cellData = document.createElement("td");
-      const cellText = document.createElement("td");
-      const cellConfirm = document.createElement("td");
-
-      // Preenche as células
-      cellData.innerText = dataRegistro;
-      cellText.innerText = obs;
-      const confirmButton = document.createElement("button");
-      confirmButton.innerText = "Confirmar";
-      confirmButton.onclick = function () {
-        const confirmSave = confirm("Você tem certeza que deseja salvar essa edição?");
-        if (confirmSave) {
-          salvarNoFirebase(); // Salva os dados no Firebase
-        }
-      };
-
-      cellConfirm.appendChild(confirmButton);
-      row.appendChild(cellData);
-      row.appendChild(cellText);
-      row.appendChild(cellConfirm);
-
-      // Faz com que a célula de serviço se torne editável
-      cellText.addEventListener("click", function () {
-        if (modo === "apontamento") {
-          const input = document.createElement("textarea");
-          input.value = cellText.innerText;
-
-          // Substitui o texto por um campo de input
-          cellText.innerHTML = '';
-          cellText.appendChild(input);
-
-          // Ao pressionar Enter, adiciona uma nova linha
-          input.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-              e.preventDefault(); // Impede o comportamento padrão do Enter
-              input.value += "\n"; // Adiciona uma nova linha dentro do campo de input
-            }
-          });
-
-          // Ao perder o foco, o valor é atualizado na célula
-          input.addEventListener("blur", function () {
-            cellText.innerHTML = input.value;
-            // Atualiza os dados no Firebase
-            salvarNoFirebase();
-          });
-
-          // Faz o input ser selecionado automaticamente
-          input.focus();
-        }
-      });
-
-      // Insere a linha na tabela, de forma ordenada pela data
-      let inserido = false;
-      for (let i = 0; i < table.rows.length; i++) {
-        const dataExistente = table.rows[i].cells[0].innerText;
-        const [d1, m1, a1] = dataRegistro.split("/").map(Number);
-        const [d2, m2, a2] = dataExistente.split("/").map(Number);
-        const date1 = new Date(a1, m1 - 1, d1);
-        const date2 = new Date(a2, m2 - 1, d2);
-        if (date1 < date2) {
-          table.insertBefore(row, table.rows[i]);
-          inserido = true;
-          break;
-        }
-      }
-      if (!inserido) table.appendChild(row);
-    }
-
-    function atualizarValores() {
-      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
-      const valorDia = 100;
-      const total = dias * valorDia;
-      document.getElementById("totalToReceive").value = `R$ ${total.toFixed(2)}`;
-      document.getElementById("valorTotalTexto").innerText = total.toFixed(2);
-    }
-
-    async function fecharQuinzena() {
-      if (modo !== "apontamento") return alert("Você não tem permissão para fechar a quinzena.");
-      const confirmClose = confirm("Deseja realmente fechar a quinzena? Isso limpará os dados atuais.");
-      if (!confirmClose) return;
-
-      // Limpa tudo
-      document.getElementById("observationsTable").innerHTML = "";
-      document.getElementById("daysWorked").value = 0;
-      atualizarValores();
-
-      // Apaga dados Firebase
-      await database.ref('saripan').remove();
-    }
-
-    // --- Exportar ---
-    function exportarCSV() {
-      let csv = "Data,Serviço\n";
-      const rows = document.querySelectorAll("#observationsTable tr");
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        csv += `"${cols[0].innerText}","${cols[1].innerText.replace(/"/g, '""')}"\n`;
-      });
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `saripan_${new Date().toISOString().split("T")[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    async function exportarPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      doc.setFontSize(18);
-      doc.text("SARIPAN - Relatório de Serviços", 14, 20);
-      doc.setFontSize(12);
-      doc.text(`Prestador: ${prestador}`, 14, 30);
-
-      const rows = [];
-      const trs = document.querySelectorAll("#observationsTable tr");
-      trs.forEach(tr => {
-        const cols = tr.querySelectorAll("td");
-        rows.push([cols[0].innerText, cols[1].innerText]);
-      });
-
-      doc.autoTable({
-        head: [["Data", "Serviço"]],
-        body: rows,
-        startY: 40,
-        styles: { fontSize: 10 },
-      });
-
-      doc.text(`Total a Receber: R$ ${document.getElementById("valorTotalTexto").innerText}`, 14, doc.lastAutoTable.finalY + 10);
-
-      doc.save(`saripan_${new Date().toISOString().split("T")[0]}.pdf`);
-    }
-
-    // --- Persistência com Firebase ---
-    async function salvarNoFirebase() {
-      if (modo !== "apontamento") return;
-      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
-      const total = dias * 100;
-
-      // Pega dados da tabela
-      const observacoes = [];
-      document.querySelectorAll("#observationsTable tr").forEach(row => {
-        const data = row.cells[0].innerText;
-        const servico = row.cells[1].innerText;
-        observacoes.push({ data, servico });
-      });
-
-      const dados = {
-        prestador,
-        dias,
-        total,
-        observacoes
-      };
-
-      await database.ref('saripan').set(dados);
-    }
-
-    async function carregarDoFirebase() {
-      const snapshot = await database.ref('saripan').get();
-      if (!snapshot.exists()) {
-        // Sem dados no Firebase, tentar localStorage
-        carregarDoLocalStorage();
-        return;
-      }
-
-      const dados = snapshot.val();
-      if (!dados) return;
-
-      document.getElementById("daysWorked").value = dados.dias || 0;
-      atualizarValores();
-
-      const table = document.getElementById("observationsTable");
-      table.innerHTML = "";
-      if (dados.observacoes) {
-        dados.observacoes.forEach(item => {
-          inserirLinhaTabela(item.data, item.servico);
-        });
-      }
-    }
-
-    // --- Fallback localStorage para dados offline ---
-    function salvarNoLocalStorage() {
-      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
-      const total = dias * 100;
-
-      const observacoes = [];
-      document.querySelectorAll("#observationsTable tr").forEach(row => {
-        const data = row.cells[0].innerText;
-        const servico = row.cells[1].innerText;
-        observacoes.push({ data, servico });
-      });
-
-      const dados = {
-        prestador,
-        dias,
-        total,
-        observacoes
-      };
-
-      localStorage.setItem('saripan-dados', JSON.stringify(dados));
-    }
-
-    function carregarDoLocalStorage() {
-      const dadosStr = localStorage.getItem('saripan-dados');
-      if (!dadosStr) return;
-
-      const dados = JSON.parse(dadosStr);
-      if (!dados) return;
-
-      document.getElementById("daysWorked").value = dados.dias || 0;
-      atualizarValores();
-
-      const table = document.getElementById("observationsTable");
-      table.innerHTML = "";
-      if (dados.observacoes) {
-        dados.observacoes.forEach(item => {
-          inserirLinhaTabela(item.data, item.servico);
-        });
-      }
-    }
-
-    // Salva localStorage a cada mudança no input dias ou quando registrar serviço
-    document.getElementById("daysWorked").addEventListener("change", salvarNoLocalStorage);
-
-    // Também salva localStorage após registrar serviço
-    window.registrarServico = (function(orig) {
-      return async function(manual = false) {
-        await orig(manual);
-        salvarNoLocalStorage();
-      };
-    })(registrarServico);
-
-  </script>
-</body>
-</html>
+  // Salvar no Firebase
+  await salvarNoFirebase();
+}
