@@ -25,7 +25,7 @@
       max-width: 800px;
       margin: 20px auto;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-      position: relative; /* Para posicionar elementos */
+      position: relative;
     }
 
     /* Header */
@@ -102,6 +102,19 @@
       color: #d32f2f;
     }
 
+    /* Total Monetário no Rodapé (NOVO) */
+    .total-rodape {
+      margin-top: 15px;
+      text-align: right;
+      font-size: 20px;
+      font-weight: bold;
+      color: #28a745;
+      padding: 15px;
+      background-color: #e8f5e9;
+      border-radius: 8px;
+      border: 1px solid #c8e6c9;
+    }
+
     /* Inputs e Controles */
     .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
     label { font-weight: 600; margin-bottom: 5px; display: block; color: #333; }
@@ -151,8 +164,7 @@
         <ul class="resumo-lista" id="listaResumo">
             </ul>
         <div class="resumo-total" id="textoTotalDiarias">Total: 0 diárias</div>
-        <div id="totalDinheiroAdmin" style="text-align:right; color:#28a745; font-size:14px; margin-top:5px;" class="hidden"></div>
-    </div>
+        </div>
 
     <div id="painelControle" class="hidden">
         <div class="apontamento-box">
@@ -195,6 +207,11 @@
             <tbody id="tbodyRegistros"></tbody>
         </table>
     </div>
+
+    <div id="footerTotal" class="total-rodape hidden">
+        Total a Receber: R$ 0,00
+    </div>
+
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -254,13 +271,13 @@
             document.getElementById('painelControle').classList.remove('hidden');
             document.getElementById('colunaAcao').classList.remove('hidden');
             document.getElementById('colunaValor').classList.remove('hidden');
-            document.getElementById('totalDinheiroAdmin').classList.remove('hidden');
+            document.getElementById('footerTotal').classList.remove('hidden'); // MOSTRA O RODAPÉ
             document.getElementById('dataServico').valueAsDate = new Date();
         } else {
             document.getElementById('painelControle').classList.add('hidden');
             document.getElementById('colunaAcao').classList.add('hidden');
             document.getElementById('colunaValor').classList.add('hidden');
-            document.getElementById('totalDinheiroAdmin').classList.add('hidden');
+            document.getElementById('footerTotal').classList.add('hidden'); // ESCONDE O RODAPÉ
         }
         await carregarDados();
     }
@@ -354,7 +371,9 @@
         if (registros.length === 0) lista.innerHTML = "<li>Nenhum dia trabalhado registrado.</li>";
 
         document.getElementById('textoTotalDiarias').innerText = `Total: ${totalDiarias} diárias`;
-        document.getElementById('totalDinheiroAdmin').innerText = `(Admin: R$ ${totalValor.toFixed(2)})`;
+        
+        // Atualiza o rodapé monetário
+        document.getElementById('footerTotal').innerText = `Total a Receber: R$ ${totalValor.toFixed(2)}`;
     }
 
     async function salvarFirebase() {
