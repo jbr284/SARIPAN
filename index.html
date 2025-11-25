@@ -5,240 +5,204 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SARIPAN</title>
   <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
-<meta name="theme-color" content="#d32f2f">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+  <meta name="theme-color" content="#d32f2f">
 
   <style>
     /* Global Styles */
     body {
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f7fb;
-  margin: 0;
-  padding: 0;
-}
-
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7fb;
+      margin: 0;
+      padding: 0;
     }
+
     .container {
       background-color: #fff;
       border-radius: 12px;
-      padding: 30px;
-      width: 100%;
-      max-width: 960px;
+      padding: 20px;
+      width: 95%;
+      max-width: 800px;
+      margin: 20px auto;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      position: relative; /* Para posicionar elementos */
     }
 
-    /* Header and Subheading */
-    h1, h2 {
+    /* Header */
+    .header-app {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    h1 {
       color: #007bff;
-      margin-bottom: 15px;
+      margin: 0;
+      font-size: 24px;
       text-align: center;
     }
+
     .subtitulo {
       text-align: center;
       margin-bottom: 20px;
+      font-size: 16px;
+      color: #555;
+    }
+
+    /* Botão Voltar */
+    .btn-voltar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-voltar:hover { background-color: #5a6268; }
+
+    /* Estilos do Resumo Detalhado */
+    .resumo-box {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+    .resumo-titulo {
       font-size: 18px;
       font-weight: bold;
+      color: #0d47a1;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
     }
-
-    /* Grid Layout */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-bottom: 20px;
+    .resumo-lista {
+      list-style: none;
+      padding: 0;
+      margin: 0;
     }
-
-    label {
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    /* Buttons and Controls */
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 25px;
-    }
-
-    .buttons button {
-      padding: 12px 20px;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 8px;
-      font-size: 14px;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      border: none;
-    }
-
-    .btn-ponto {
-      background-color: #28a745;
-      color: white;
-    }
-
-    .btn-ponto:hover {
-      background-color: #218838;
-      transform: scale(1.05);
-    }
-
-    .btn-fechar {
-      background-color: #fd7e14;
-      color: white;
-    }
-
-    .btn-fechar:hover {
-      background-color: #e96b10;
-      transform: scale(1.05);
-    }
-
-    .btn-exportar {
-      background-color: #17a2b8;
-      color: white;
-    }
-
-    .btn-exportar:hover {
-      background-color: #138f99;
-      transform: scale(1.05);
-    }
-
-    /* Table */
-    table {
-      width: 100%;
-      margin-top: 30px;
-      border-collapse: collapse;
-      display: block;
-    }
-
-    th, td {
-      padding: 12px;
-      border: 1px solid #ddd;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    th {
-      background-color: #007bff;
-      color: white;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    /* Footer Total */
-    .total-box {
-      font-weight: bold;
+    .resumo-lista li {
+      padding: 8px 0;
+      border-bottom: 1px dashed #eee;
+      color: #333;
       font-size: 16px;
-      padding-top: 10px;
-      color: #007bff;
+    }
+    .resumo-total {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
       text-align: right;
+      color: #d32f2f;
     }
 
-    /* Hidden Elements */
-    .hidden {
-      display: none;
-    }
+    /* Inputs e Controles */
+    .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+    label { font-weight: 600; margin-bottom: 5px; display: block; color: #333; }
+    input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: #fff; box-sizing: border-box;}
+    
+    .apontamento-box { background: #e3f2fd; padding: 20px; border-radius: 12px; border: 1px solid #90caf9; margin-bottom: 25px; }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
+    /* Botões de Ação */
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+    button.action-btn { padding: 14px 24px; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 14px; border: none; color: white; flex: 1; min-width: 120px; }
+    
+    .btn-verde { background-color: #28a745; }
+    .btn-laranja { background-color: #fd7e14; }
+    .btn-azul { background-color: #17a2b8; }
+    .btn-vermelho { background-color: #dc3545; }
+
+    /* Tabela */
+    .table-container { overflow-x: auto; margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+    th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+    th { background-color: #007bff; color: white; }
+    
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   
-  <div id="inicio" class="inicio" style="text-align: center; padding: 40px;">
-    <h1 style="color: #007bff; font-size: 32px;">SARIPAN</h1>
-    <p class="subtitulo" style="font-size: 18px;">Relatório de Serviços</p>
-    <p style="margin-bottom: 30px; font-size: 16px;"><strong>Prestador:</strong> João Batista Rosa</p>
-    <div style="display: flex; flex-direction: column; gap: 20px; max-width: 300px; margin: 0 auto;">
-      <button onclick="entrarApontamento()" style="
-        padding: 16px;
-        font-size: 18px;
-        font-weight: bold;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        transition: transform 0.2s ease, background-color 0.3s ease;">
-        📋 Modo Apontamento
-      </button>
-      <button onclick="entrarAcompanhamento()" style="
-        padding: 16px;
-        font-size: 18px;
-        font-weight: bold;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        transition: transform 0.2s ease, background-color 0.3s ease;">
-        👁️ Modo Acompanhamento
-      </button>
+  <div id="inicio" style="text-align: center; padding: 40px;">
+    <h1 style="font-size: 32px; margin-bottom: 10px;">SARIPAN</h1>
+    <p class="subtitulo">Gestão de Serviços</p>
+    <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 30px auto;">
+      <button class="action-btn btn-verde" onclick="entrarApontamento()">📋 Modo Apontamento</button>
+      <button class="action-btn btn-azul" onclick="entrarAcompanhamento()">👁️ Modo Acompanhamento</button>
     </div>
   </div>
 
   <div id="app" class="container hidden">
-    <h1>SARIPAN</h1>
-    <p class="subtitulo">Apontamento de dias trabalhado: <span class="nome-proprio">João Batista Rosa</span></p>
-    <div class="grid">
-      <div><label for="currentDate">Data:</label><input type="text" id="currentDate" readonly /></div>
-      <div><label for="daysWorked">Dias Trabalhados:</label><input type="number" id="daysWorked" value="0" readonly /></div>
-      <div id="valorProtegido"><label>Total a Receber:</label><input type="text" id="totalToReceive" value="0" readonly /></div>
+    
+    <div class="header-app">
+        <button class="btn-voltar" onclick="voltarInicio()">⬅ Voltar</button>
+        <h1>SARIPAN</h1>
+    </div>
+    
+    <div class="resumo-box" id="boxResumo">
+        <div class="resumo-titulo" id="tituloQuinzena">Carregando...</div>
+        <p style="font-weight:bold; color:#555;">Dias trabalhados:</p>
+        <ul class="resumo-lista" id="listaResumo">
+            </ul>
+        <div class="resumo-total" id="textoTotalDiarias">Total: 0 diárias</div>
+        <div id="totalDinheiroAdmin" style="text-align:right; color:#28a745; font-size:14px; margin-top:5px;" class="hidden"></div>
     </div>
 
-    <label for="observations">Serviços realizados:</label>
-    <textarea id="observations" placeholder="Descreva o serviço realizado..."></textarea>
-    <label for="manualDate">Data manual (opcional):</label>
-    <input type="date" id="manualDate" />
-    <label for="valorDia">Valor do Dia Trabalhado:</label>
-    <input type="number" id="valorDia" placeholder="Valor diário" step="0.01" />
-
-    <div class="buttons">
-      <button class="btn-ponto" onclick="registrarServico()">Ponto</button>
-      <button class="btn-ponto" onclick="registrarServico(true)">Apontar Manualmente</button>
-      <button class="btn-fechar" onclick="fecharQuinzena()">Fechar Quinzena</button>
-      <button class="btn-exportar" onclick="exportarCSV()">Exportar CSV</button>
-      <button class="btn-exportar" onclick="exportarPDF()">Exportar PDF</button>
+    <div id="painelControle" class="hidden">
+        <div class="apontamento-box">
+            <h3 style="margin-top:0; color:#0d47a1;">Novo Registro</h3>
+            <label>Data do Serviço:</label>
+            <input type="date" id="dataServico" style="margin-bottom: 15px;">
+            <div class="grid-input">
+                <div>
+                    <label>Carga Horária:</label>
+                    <select id="tipoCarga">
+                        <option value="1">Meio Expediente</option>
+                        <option value="2">Dia Todo</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Tipo de Dia:</label>
+                    <select id="tipoDia">
+                        <option value="1">Dia Útil</option>
+                        <option value="2">Domingo / Feriado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid-input">
+                <div><label>Valor Base (R$):</label><input type="number" id="valorBase" value="130.00"></div>
+                <div><label>Previsão:</label><input type="text" id="valorCalculadoPreview" value="R$ 130,00" readonly style="background:#eee;"></div>
+            </div>
+            <button class="action-btn btn-verde" style="width:100%;" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
+        </div>
+        <div class="buttons">
+            <button class="action-btn btn-laranja" onclick="fecharQuinzena()">⚠️ Fechar Quinzena</button>
+            <button class="action-btn btn-azul" onclick="exportarPDF()">📄 Gerar PDF</button>
+        </div>
     </div>
 
-    <!-- Tabela visível apenas no modo de apontamento -->
-    <table id="observationsTableContainer" class="hidden">
-      <thead><tr><th>Data</th><th>Serviço</th><th>Valor</th><th>Ação</th></tr></thead>
-      <tbody id="observationsTable"></tbody>
-    </table>
-    <div id="tableTotalRow" class="total-box hidden">Total a Receber: R$ <span id="valorTotalTexto">0</span></div>
+    <div class="table-container">
+        <table id="tabelaRegistros">
+            <thead>
+                <tr><th>Data</th><th>Detalhes</th><th id="colunaValor">Valor</th><th id="colunaAcao">Ação</th></tr>
+            </thead>
+            <tbody id="tbodyRegistros"></tbody>
+        </table>
+    </div>
   </div>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
   <script>
-    // Configuração do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s",
       authDomain: "saripan-db.firebaseapp.com",
@@ -248,311 +212,196 @@ body {
       messagingSenderId: "1:80320414744:web:958b3a99462d97575e2f6d",
       appId: "G-9W62N5PFV9"
     };
-
-    // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
+    
+    let modoAtual = ""; 
+    let registros = [];
 
-    let modo = "";
-    const prestador = "João Batista Rosa";
-    document.getElementById("currentDate").value = new Date().toLocaleString("pt-BR");
+    // --- NAVEGAÇÃO ---
+    function voltarInicio() {
+        document.getElementById('app').classList.add('hidden');
+        document.getElementById('inicio').classList.remove('hidden');
+        modoAtual = "";
+    }
 
-    // Função para entrar no modo apontamento
-    window.entrarApontamento = async function () {
-      const senha = prompt("Digite a senha de acesso:");
-      if (senha !== "0305") return alert("Senha incorreta!");
+    // --- CÁLCULO DE PREVIEW ---
+    function atualizarPreview() {
+        const base = parseFloat(document.getElementById('valorBase').value) || 0;
+        const carga = parseInt(document.getElementById('tipoCarga').value);
+        const tipo = parseInt(document.getElementById('tipoDia').value);
+        let mult = (tipo === 2 && carga === 2) ? 4 : (carga * tipo);
+        document.getElementById('valorCalculadoPreview').value = `R$ ${(base * mult).toFixed(2)}`;
+    }
+    ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
 
-      modo = "apontamento";
-      document.getElementById("inicio").classList.add("hidden");
-      document.getElementById("app").classList.remove("hidden");
-
-      habilitarEdicao(true);
-      mostrarTabela(true);
-      await carregarDoFirebase();
+    // --- LOGIN ---
+    window.entrarApontamento = async function() {
+        if(prompt("Senha:") !== "0305") return alert("Senha incorreta"); 
+        modoAtual = "admin";
+        iniciarApp();
+    };
+    window.entrarAcompanhamento = async function() {
+        modoAtual = "view";
+        iniciarApp();
     };
 
-    // Função para entrar no modo de acompanhamento
-    window.entrarAcompanhamento = async function () {
-      modo = "acompanhamento";
-      document.getElementById("inicio").classList.add("hidden");
-      document.getElementById("app").classList.remove("hidden");
-
-      // Esconde tabela e total no modo acompanhamento
-      document.getElementById("observations").style.display = "none";
-      document.getElementById("manualDate").style.display = "none";
-      document.getElementById("valorDia").style.display = "none";
-      document.querySelector('label[for="observations"]').style.display = "none";
-      document.querySelector('label[for="manualDate"]').style.display = "none";
-      document.querySelector('label[for="valorDia"]').style.display = "none";
-
-      document.querySelectorAll(".btn-ponto, .btn-fechar").forEach(btn => {
-        btn.style.display = "none";
-      });
-
-      // Oculta a tabela de registros
-      mostrarTabela(false);
-
-      habilitarEdicao(false);
-      await carregarDoFirebase();
-    };
-
-    // Função para mostrar ou esconder a tabela de registros
-    function mostrarTabela(mostrar) {
-      const tabela = document.getElementById("observationsTableContainer");
-      const total = document.getElementById("tableTotalRow");
-
-      if (mostrar) {
-        tabela.classList.remove("hidden");
-        total.classList.remove("hidden");
-      } else {
-        tabela.classList.add("hidden");
-        total.classList.add("hidden");
-      }
+    async function iniciarApp() {
+        document.getElementById('inicio').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        
+        if (modoAtual === "admin") {
+            document.getElementById('painelControle').classList.remove('hidden');
+            document.getElementById('colunaAcao').classList.remove('hidden');
+            document.getElementById('colunaValor').classList.remove('hidden');
+            document.getElementById('totalDinheiroAdmin').classList.remove('hidden');
+            document.getElementById('dataServico').valueAsDate = new Date();
+        } else {
+            document.getElementById('painelControle').classList.add('hidden');
+            document.getElementById('colunaAcao').classList.add('hidden');
+            document.getElementById('colunaValor').classList.add('hidden');
+            document.getElementById('totalDinheiroAdmin').classList.add('hidden');
+        }
+        await carregarDados();
     }
 
-    // Habilita ou desabilita edição
-    function habilitarEdicao(habilitar) {
-      document.getElementById("observations").disabled = !habilitar;
-      document.getElementById("manualDate").disabled = !habilitar;
-      document.getElementById("valorDia").disabled = !habilitar;
-      document.querySelectorAll(".btn-ponto, .btn-fechar").forEach(btn => {
-        btn.disabled = !habilitar;
-      });
+    // --- LÓGICA DE DADOS ---
+    async function adicionarRegistro() {
+        const dataInput = document.getElementById('dataServico').value;
+        if (!dataInput) return alert("Selecione uma data!");
+        
+        const base = parseFloat(document.getElementById('valorBase').value);
+        const carga = parseInt(document.getElementById('tipoCarga').value);
+        const tipoDia = parseInt(document.getElementById('tipoDia').value);
+        let mult = (tipoDia === 2 && carga === 2) ? 4 : (carga * tipoDia);
+
+        registros.push({
+            id: Date.now(),
+            data: dataInput,
+            dataFormatada: dataInput.split('-').reverse().join('/'),
+            carga: carga,
+            tipoDia: tipoDia,
+            multiplicador: mult,
+            valor: base * mult,
+            base: base
+        });
+        
+        registros.sort((a, b) => new Date(a.data) - new Date(b.data));
+        atualizarInterface();
+        await salvarFirebase();
     }
 
-    // Função para registrar serviços
-    async function registrarServico(manual = false) {
-      if (modo !== "apontamento") return alert("Você não tem permissão para registrar.");
-
-      const obs = document.getElementById("observations").value.trim();
-      if (!obs) return alert("Preencha a descrição do serviço.");
-
-      let dataRegistro;
-      if (manual) {
-        const dataInput = document.getElementById("manualDate").value;
-        if (!dataInput) return alert("Selecione uma data manual.");
-        const partes = dataInput.split("-");
-        dataRegistro = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      } else {
-        dataRegistro = new Date().toLocaleDateString();
-      }
-
-      // Obter valor do dia trabalhado
-      let valorDia = parseFloat(document.getElementById("valorDia").value);
-      if (isNaN(valorDia) || valorDia <= 0) {
-        valorDia = 0;  // Se o valor não for válido, define como 0
-      }
-
-      // Insere na tabela
-      inserirLinhaTabela(dataRegistro, obs, valorDia);
-
-      // Atualiza dias e total
-      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
-      document.getElementById("daysWorked").value = dias + 1;
-      atualizarValores();
-
-      // Limpa inputs
-      document.getElementById("observations").value = "";
-      document.getElementById("manualDate").value = "";
-      document.getElementById("valorDia").value = "";
-
-      // Salvar no Firebase
-      await salvarNoFirebase();
+    function removerRegistro(id) {
+        if(confirm("Excluir?")) {
+            registros = registros.filter(r => r.id !== id);
+            atualizarInterface();
+            salvarFirebase();
+        }
     }
 
-    // Função para inserir dados na tabela com a opção de excluir
-    function inserirLinhaTabela(dataRegistro, obs, valorDia) {
-      const table = document.getElementById("observationsTable");
-      const row = document.createElement("tr");
+    function atualizarInterface() {
+        // TABELA
+        const tbody = document.getElementById('tbodyRegistros');
+        tbody.innerHTML = "";
+        registros.forEach(reg => {
+            let desc = "";
+            if (reg.tipoDia === 2) desc += "🗓️ Feriado ";
+            if (reg.carga === 2) desc += "⏰ Dia Todo";
+            if (desc === "") desc = "Meio Expediente";
+            
+            let html = `<td>${reg.dataFormatada}</td><td>${desc}</td>`;
+            if (modoAtual === "admin") html += `<td>R$ ${reg.valor.toFixed(2)}</td><td><button class="action-btn btn-vermelho" style="padding: 5px 10px; min-width: auto;" onclick="removerRegistro(${reg.id})">X</button></td>`;
+            else html += `<td class="hidden"></td><td class="hidden"></td>`;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
 
-      const cellData = document.createElement("td");
-      const cellText = document.createElement("td");
-      const cellValor = document.createElement("td");
-      const cellAction = document.createElement("td");
+        // RESUMO DETALHADO
+        const lista = document.getElementById('listaResumo');
+        lista.innerHTML = "";
+        
+        let contadores = { normal: 0, dupla: 0, feriadoNormal: 0, feriadoTodo: 0 };
+        let totalDiarias = 0;
+        let totalValor = 0;
 
-      cellData.innerText = dataRegistro;
-      cellText.innerText = obs;
+        registros.forEach(reg => {
+            totalDiarias += reg.multiplicador;
+            totalValor += reg.valor;
 
-      if (isNaN(valorDia)) {
-        valorDia = 0;
-      }
+            if (reg.carga === 1 && reg.tipoDia === 1) contadores.normal++;
+            else if (reg.carga === 2 && reg.tipoDia === 1) contadores.dupla++;
+            else if (reg.carga === 1 && reg.tipoDia === 2) contadores.feriadoNormal++;
+            else if (reg.carga === 2 && reg.tipoDia === 2) contadores.feriadoTodo++;
+        });
 
-      cellValor.innerText = `R$ ${valorDia.toFixed(2)}`;
+        let textoPeriodo = "Sem registros";
+        if (registros.length > 0) {
+            const dataObj = new Date(registros[0].data);
+            const dia = dataObj.getUTCDate();
+            const mes = dataObj.toLocaleString('pt-BR', { month: 'long' });
+            const quinzena = dia <= 15 ? "1ª Quinzena" : "2ª Quinzena";
+            textoPeriodo = `${quinzena} de ${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
+        }
+        document.getElementById('tituloQuinzena').innerText = textoPeriodo;
 
-      // Adicionando o botão de exclusão
-      const deleteBtn = document.createElement("button");
-      deleteBtn.innerText = "Excluir";
-      deleteBtn.onclick = () => excluirRegistro(row, valorDia);
-      cellAction.appendChild(deleteBtn);
+        if (contadores.normal > 0) lista.innerHTML += `<li>${contadores.normal} diária(s) normal</li>`;
+        if (contadores.dupla > 0) lista.innerHTML += `<li>${contadores.dupla} diária(s) dupla</li>`;
+        if (contadores.feriadoNormal > 0) lista.innerHTML += `<li>${contadores.feriadoNormal} feriado(s) normal</li>`;
+        if (contadores.feriadoTodo > 0) lista.innerHTML += `<li>${contadores.feriadoTodo} feriado(s) dia todo</li>`;
 
-      row.appendChild(cellData);
-      row.appendChild(cellText);
-      row.appendChild(cellValor);
-      row.appendChild(cellAction);
+        if (registros.length === 0) lista.innerHTML = "<li>Nenhum dia trabalhado registrado.</li>";
 
-      table.appendChild(row);
-
-      atualizarValores();
+        document.getElementById('textoTotalDiarias').innerText = `Total: ${totalDiarias} diárias`;
+        document.getElementById('totalDinheiroAdmin').innerText = `(Admin: R$ ${totalValor.toFixed(2)})`;
     }
 
-    // Função para excluir um registro
-    function excluirRegistro(row, valorDia) {
-      const confirmDelete = confirm("Você tem certeza que deseja excluir este registro?");
-      if (!confirmDelete) return;
-
-      row.remove();
-
-      // Atualiza o número de dias trabalhados
-      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
-      document.getElementById("daysWorked").value = dias - 1;
-
-      // Atualiza totais e valores após a exclusão
-      atualizarValores();
-      // Salva as alterações no Firebase
-      salvarNoFirebase();
+    async function salvarFirebase() {
+        if (modoAtual === "admin") await database.ref('saripan').set({ ultAtualizacao: new Date().toISOString(), dados: registros });
     }
-
-    // Função para atualizar os valores
-    function atualizarValores() {
-      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
-      const total = Array.from(document.querySelectorAll("#observationsTable tr"))
-                          .reduce((sum, row) => {
-                            const valor = parseFloat(row.cells[2].innerText.replace('R$', '').trim());
-                            return sum + (isNaN(valor) ? 0 : valor);
-                          }, 0);
-      document.getElementById("totalToReceive").value = `R$ ${total.toFixed(2)}`;
-      document.getElementById("valorTotalTexto").innerText = total.toFixed(2);
+    async function carregarDados() {
+        const snap = await database.ref('saripan').get();
+        if (snap.exists()) registros = snap.val().dados || [];
+        atualizarInterface();
     }
-
-    // Função para fechar a quinzena
     async function fecharQuinzena() {
-      if (modo !== "apontamento") return alert("Você não tem permissão para fechar a quinzena.");
-      const confirmClose = confirm("Deseja realmente fechar a quinzena? Isso limpará os dados atuais.");
-      if (!confirmClose) return;
-
-      document.getElementById("observationsTable").innerHTML = "";
-      document.getElementById("daysWorked").value = 0;
-      atualizarValores();
-
-      await database.ref('saripan').remove();
+        if(confirm("Limpar tudo para nova quinzena?")) { registros = []; atualizarInterface(); await salvarFirebase(); }
     }
 
-    // Função para exportar CSV
-    function exportarCSV() {
-      let csv = "Data,Serviço,Valor\n";
-      const rows = document.querySelectorAll("#observationsTable tr");
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        csv += `"${cols[0].innerText}","${cols[1].innerText.replace(/"/g, '""')}","${cols[2].innerText}"\n`;
-      });
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `saripan_${new Date().toISOString().split("T")[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    // Função para exportar PDF
+    // --- PDF ---
     async function exportarPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(18); doc.setTextColor(0,123,255); doc.text("SARIPAN - Relatório", 14, 20);
+        doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text("Prestador: João Batista Rosa", 14, 30);
+        doc.text(`Referência: ${document.getElementById('tituloQuinzena').innerText}`, 14, 38);
 
-      doc.setFontSize(18);
-      doc.text("SARIPAN - Relatório de Serviços", 14, 20);
-      doc.setFontSize(12);
-      doc.text(`Prestador: ${prestador}`, 14, 30);
+        let dadosTabela = [];
+        let totalGeral = 0; let totalDiarias = 0; let diasNormais = 0;
 
-      const rows = [];
-      const trs = document.querySelectorAll("#observationsTable tr");
-      trs.forEach(tr => {
-        const cols = tr.querySelectorAll("td");
-        rows.push([cols[0].innerText, cols[1].innerText, cols[2].innerText]);
-      });
-
-      doc.autoTable({
-        head: [["Data", "Serviço", "Valor"]],
-        body: rows,
-        startY: 40,
-        styles: { fontSize: 10 },
-      });
-
-      doc.text(`Total a Receber: R$ ${document.getElementById("valorTotalTexto").innerText}`, 14, doc.lastAutoTable.finalY + 10);
-
-      doc.save(`saripan_${new Date().toISOString().split("T")[0]}.pdf`);
-    }
-
-    // Função para salvar no Firebase
-    async function salvarNoFirebase() {
-      if (modo !== "apontamento") return;
-      const dias = parseInt(document.getElementById("daysWorked").value) || 0;
-      const total = Array.from(document.querySelectorAll("#observationsTable tr"))
-  .reduce((sum, row) => {
-    const valor = parseFloat(row.cells[2].innerText.replace('R$', '').trim());
-    return sum + (isNaN(valor) ? 0 : valor);
-  }, 0);
-
-      const observacoes = [];
-      document.querySelectorAll("#observationsTable tr").forEach(row => {
-        const data = row.cells[0].innerText;
-        const servico = row.cells[1].innerText;
-        const valorDia = parseFloat(row.cells[2].innerText.replace('R$', '').trim());
-        observacoes.push({ data, servico, valorDia });
-      });
-
-      const dados = {
-        prestador,
-        dias,
-        total,
-        observacoes
-      };
-
-      await database.ref('saripan').set(dados);
-    }
-
-    // Função para carregar do Firebase
-    async function carregarDoFirebase() {
-      const snapshot = await database.ref('saripan').get();
-      if (!snapshot.exists()) {
-        carregarDoLocalStorage();
-        return;
-      }
-
-      const dados = snapshot.val();
-      if (!dados) return;
-
-      document.getElementById("daysWorked").value = dados.dias || 0;
-      atualizarValores();
-
-      const table = document.getElementById("observationsTable");
-      table.innerHTML = "";
-      if (dados.observacoes) {
-        dados.observacoes.forEach(item => {
-          inserirLinhaTabela(item.data, item.servico, item.valorDia);
+        registros.forEach(reg => {
+            totalGeral += reg.valor; totalDiarias += reg.multiplicador;
+            if(reg.carga===1 && reg.tipoDia===1) diasNormais++;
+            else {
+                let txt = `Dia ${reg.dataFormatada}: `;
+                if(reg.tipoDia===2) txt += "FERIADO ";
+                if(reg.carga===2) txt += "DIA TODO"; else txt += "MEIO EXPEDIENTE";
+                dadosTabela.push([txt, `R$ ${reg.valor.toFixed(2)}`]);
+            }
         });
-      }
-    }
 
-    // Fallback para o localStorage
-    function carregarDoLocalStorage() {
-      const dadosStr = localStorage.getItem('saripan-dados');
-      if (!dadosStr) return;
+        let corpo = [];
+        if(diasNormais > 0) corpo.push([`${diasNormais} Diárias Normais`, `R$ ${(diasNormais*130).toFixed(2)}`]);
+        dadosTabela.forEach(d => corpo.push(d));
 
-      const dados = JSON.parse(dadosStr);
-      if (!dados) return;
-
-      document.getElementById("daysWorked").value = dados.dias || 0;
-      atualizarValores();
-
-      const table = document.getElementById("observationsTable");
-      table.innerHTML = "";
-      if (dados.observacoes) {
-        dados.observacoes.forEach(item => {
-          inserirLinhaTabela(item.data, item.servico, item.valorDia);
-        });
-      }
+        doc.autoTable({ head: [['Descrição','Valor']], body: corpo, startY: 45, theme: 'grid' });
+        
+        let y = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(12); doc.text(`Total de Diárias a Pagar: ${totalDiarias}`, 14, y);
+        doc.text(`Valor Total: R$ ${totalGeral.toFixed(2)}`, 14, y+8);
+        doc.save('relatorio.pdf');
     }
   </script>
 </body>
