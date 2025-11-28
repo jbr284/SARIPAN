@@ -439,8 +439,8 @@
         // 4. TABELA
         let dadosTabela = registros.map(reg => {
             let desc = "Diária Normal";
-            if (reg.tipoDia === 2) desc = "Feriado/Dom ";
-            if (reg.carga === 2) desc = reg.tipoDia === 2 ? "Feriado (Diária Dupla)" : "Diária Dupla (Diária Dupla)";
+            if (reg.tipoDia === 2) desc = "Feriado";
+            if (reg.carga === 2) desc = reg.tipoDia === 2 ? "Feriado (Diária Dupla)" : "Diária Dupla";
             if (reg.carga === 1 && reg.tipoDia === 1) desc = "Diária Normal";
             
             return [
