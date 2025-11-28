@@ -175,8 +175,8 @@
                 <div>
                     <label>Carga Horária:</label>
                     <select id="tipoCarga">
-                        <option value="1">Meio Expediente</option>
-                        <option value="2">Dia Todo</option>
+                        <option value="1">Diária Normal</option>
+                        <option value="2">Diária Dupla</option>
                     </select>
                 </div>
                 <div>
@@ -323,8 +323,8 @@
         registros.forEach(reg => {
             let desc = "";
             if (reg.tipoDia === 2) desc += "🗓️ Feriado ";
-            if (reg.carga === 2) desc += "⏰ Dia Todo";
-            if (desc === "") desc = "Meio Expediente";
+            if (reg.carga === 2) desc += "⏰ Diária Dupla";
+            if (desc === "") desc = "Diária Normal";
             
             let html = `<td>${reg.dataFormatada}</td><td>${desc}</td>`;
             if (modoAtual === "admin") html += `<td>R$ ${reg.valor.toFixed(2)}</td><td><button class="action-btn btn-vermelho" style="padding: 5px 10px; min-width: auto;" onclick="removerRegistro(${reg.id})">X</button></td>`;
@@ -366,7 +366,7 @@
         if (contadores.normal > 0) lista.innerHTML += `<li>${contadores.normal} diária(s) normal</li>`;
         if (contadores.dupla > 0) lista.innerHTML += `<li>${contadores.dupla} diária(s) dupla</li>`;
         if (contadores.feriadoNormal > 0) lista.innerHTML += `<li>${contadores.feriadoNormal} feriado(s) normal</li>`;
-        if (contadores.feriadoTodo > 0) lista.innerHTML += `<li>${contadores.feriadoTodo} feriado(s) dia todo</li>`;
+        if (contadores.feriadoTodo > 0) lista.innerHTML += `<li>${contadores.feriadoTodo} feriado(s) Diária Dupla</li>`;
 
         if (registros.length === 0) lista.innerHTML = "<li>Nenhum dia trabalhado registrado.</li>";
 
@@ -406,7 +406,7 @@
             else {
                 let txt = `Dia ${reg.dataFormatada}: `;
                 if(reg.tipoDia===2) txt += "FERIADO ";
-                if(reg.carga===2) txt += "DIA TODO"; else txt += "MEIO EXPEDIENTE";
+                if(reg.carga===2) txt += "Diária Dupla"; else txt += "Diária Normal";
                 dadosTabela.push([txt, `R$ ${reg.valor.toFixed(2)}`]);
             }
         });
