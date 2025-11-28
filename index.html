@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SARIPAN</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
@@ -102,7 +102,7 @@
       color: #d32f2f;
     }
 
-    /* Total Monetário no Rodapé (NOVO) */
+    /* Total Monetário no Rodapé */
     .total-rodape {
       margin-top: 15px;
       text-align: right;
@@ -164,7 +164,7 @@
         <ul class="resumo-lista" id="listaResumo">
             </ul>
         <div class="resumo-total" id="textoTotalDiarias">Total: 0 diárias</div>
-        </div>
+    </div>
 
     <div id="painelControle" class="hidden">
         <div class="apontamento-box">
@@ -175,8 +175,8 @@
                 <div>
                     <label>Carga Horária:</label>
                     <select id="tipoCarga">
-                        <option value="1">Diária Normal</option>
-                        <option value="2">Diária Dupla</option>
+                        <option value="1">Meio Expediente</option>
+                        <option value="2">Dia Todo</option>
                     </select>
                 </div>
                 <div>
@@ -271,13 +271,13 @@
             document.getElementById('painelControle').classList.remove('hidden');
             document.getElementById('colunaAcao').classList.remove('hidden');
             document.getElementById('colunaValor').classList.remove('hidden');
-            document.getElementById('footerTotal').classList.remove('hidden'); // MOSTRA O RODAPÉ
+            document.getElementById('footerTotal').classList.remove('hidden'); 
             document.getElementById('dataServico').valueAsDate = new Date();
         } else {
             document.getElementById('painelControle').classList.add('hidden');
             document.getElementById('colunaAcao').classList.add('hidden');
             document.getElementById('colunaValor').classList.add('hidden');
-            document.getElementById('footerTotal').classList.add('hidden'); // ESCONDE O RODAPÉ
+            document.getElementById('footerTotal').classList.add('hidden');
         }
         await carregarDados();
     }
@@ -323,8 +323,8 @@
         registros.forEach(reg => {
             let desc = "";
             if (reg.tipoDia === 2) desc += "🗓️ Feriado ";
-            if (reg.carga === 2) desc += "⏰ Diária Dupla";
-            if (desc === "") desc = "Diária Normal";
+            if (reg.carga === 2) desc += "⏰ Dia Todo";
+            if (desc === "") desc = "Meio Expediente";
             
             let html = `<td>${reg.dataFormatada}</td><td>${desc}</td>`;
             if (modoAtual === "admin") html += `<td>R$ ${reg.valor.toFixed(2)}</td><td><button class="action-btn btn-vermelho" style="padding: 5px 10px; min-width: auto;" onclick="removerRegistro(${reg.id})">X</button></td>`;
@@ -366,13 +366,11 @@
         if (contadores.normal > 0) lista.innerHTML += `<li>${contadores.normal} diária(s) normal</li>`;
         if (contadores.dupla > 0) lista.innerHTML += `<li>${contadores.dupla} diária(s) dupla</li>`;
         if (contadores.feriadoNormal > 0) lista.innerHTML += `<li>${contadores.feriadoNormal} feriado(s) normal</li>`;
-        if (contadores.feriadoTodo > 0) lista.innerHTML += `<li>${contadores.feriadoTodo} feriado(s) Diária Dupla</li>`;
+        if (contadores.feriadoTodo > 0) lista.innerHTML += `<li>${contadores.feriadoTodo} feriado(s) dia todo</li>`;
 
         if (registros.length === 0) lista.innerHTML = "<li>Nenhum dia trabalhado registrado.</li>";
 
         document.getElementById('textoTotalDiarias').innerText = `Total: ${totalDiarias} diárias`;
-        
-        // Atualiza o rodapé monetário
         document.getElementById('footerTotal').innerText = `Total a Receber: R$ ${totalValor.toFixed(2)}`;
     }
 
@@ -388,39 +386,78 @@
         if(confirm("Limpar tudo para nova quinzena?")) { registros = []; atualizarInterface(); await salvarFirebase(); }
     }
 
-    // --- PDF ---
+    // --- PDF REFORMULADO (Resumo + Lista Completa) ---
     async function exportarPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
+        // 1. CABEÇALHO
         doc.setFontSize(18); doc.setTextColor(0,123,255); doc.text("SARIPAN - Relatório", 14, 20);
         doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text("Prestador: João Batista Rosa", 14, 30);
-        doc.text(`Referência: ${document.getElementById('tituloQuinzena').innerText}`, 14, 38);
+        
+        const textoPeriodo = document.getElementById('tituloQuinzena').innerText;
+        doc.text(`Referência: ${textoPeriodo}`, 14, 38);
 
-        let dadosTabela = [];
-        let totalGeral = 0; let totalDiarias = 0; let diasNormais = 0;
+        // 2. CÁLCULO DO RESUMO (Igual à tela)
+        let contadores = { normal: 0, dupla: 0, feriadoNormal: 0, feriadoTodo: 0 };
+        let totalDiarias = 0;
+        let totalGeral = 0;
 
         registros.forEach(reg => {
-            totalGeral += reg.valor; totalDiarias += reg.multiplicador;
-            if(reg.carga===1 && reg.tipoDia===1) diasNormais++;
-            else {
-                let txt = `Dia ${reg.dataFormatada}: `;
-                if(reg.tipoDia===2) txt += "FERIADO ";
-                if(reg.carga===2) txt += "Diária Dupla"; else txt += "Diária Normal";
-                dadosTabela.push([txt, `R$ ${reg.valor.toFixed(2)}`]);
-            }
+            totalDiarias += reg.multiplicador;
+            totalGeral += reg.valor;
+            if (reg.carga === 1 && reg.tipoDia === 1) contadores.normal++;
+            else if (reg.carga === 2 && reg.tipoDia === 1) contadores.dupla++;
+            else if (reg.carga === 1 && reg.tipoDia === 2) contadores.feriadoNormal++;
+            else if (reg.carga === 2 && reg.tipoDia === 2) contadores.feriadoTodo++;
         });
 
-        let corpo = [];
-        if(diasNormais > 0) corpo.push([`${diasNormais} Diárias Normais`, `R$ ${(diasNormais*130).toFixed(2)}`]);
-        dadosTabela.forEach(d => corpo.push(d));
+        // 3. IMPRESSÃO DO RESUMO (Antes da tabela)
+        let y = 48;
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text("Resumo do Período:", 14, y);
+        doc.setFont(undefined, 'normal');
+        y += 7;
 
-        doc.autoTable({ head: [['Descrição','Valor']], body: corpo, startY: 45, theme: 'grid' });
+        if (contadores.normal > 0) { doc.text(`- ${contadores.normal} diária(s) normal`, 14, y); y += 6; }
+        if (contadores.dupla > 0) { doc.text(`- ${contadores.dupla} diária(s) dupla`, 14, y); y += 6; }
+        if (contadores.feriadoNormal > 0) { doc.text(`- ${contadores.feriadoNormal} feriado(s) normal`, 14, y); y += 6; }
+        if (contadores.feriadoTodo > 0) { doc.text(`- ${contadores.feriadoTodo} feriado(s) dia todo`, 14, y); y += 6; }
         
-        let y = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(12); doc.text(`Total de Diárias a Pagar: ${totalDiarias}`, 14, y);
-        doc.text(`Valor Total: R$ ${totalGeral.toFixed(2)}`, 14, y+8);
-        doc.save('relatorio.pdf');
+        y += 4; // Espaço antes da tabela
+
+        // 4. PREPARAR DADOS DA TABELA COMPLETA (Um por um)
+        let dadosTabela = registros.map(reg => {
+            let desc = "Meio Expediente";
+            if (reg.tipoDia === 2) desc = "Feriado/Dom ";
+            if (reg.carga === 2) desc = reg.tipoDia === 2 ? "Feriado (Dia Todo)" : "Diária Dupla (Dia Todo)";
+            if (reg.carga === 1 && reg.tipoDia === 1) desc = "Diária Normal"; // Ajuste fino para ficar bonito
+            
+            return [
+                reg.dataFormatada,
+                desc,
+                `R$ ${reg.valor.toFixed(2)}`
+            ];
+        });
+
+        // 5. GERAR TABELA
+        doc.autoTable({ 
+            startY: y,
+            head: [['Data', 'Descrição', 'Valor']], 
+            body: dadosTabela, 
+            theme: 'grid',
+            headStyles: { fillColor: [0, 123, 255] },
+            columnStyles: { 0: { cellWidth: 30 }, 2: { cellWidth: 35, halign: 'right' } }
+        });
+        
+        // 6. RODAPÉ (Igual ao anterior)
+        let finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(12); doc.text(`Total de Diárias a Pagar: ${totalDiarias}`, 14, finalY);
+        doc.setFontSize(14); doc.setFont(undefined, 'bold');
+        doc.text(`Valor Total: R$ ${totalGeral.toFixed(2)}`, 14, finalY + 8);
+        
+        doc.save('relatorio_saripan.pdf');
     }
   </script>
 </body>
