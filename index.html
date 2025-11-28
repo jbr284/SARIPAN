@@ -175,8 +175,8 @@
                 <div>
                     <label>Carga Horária:</label>
                     <select id="tipoCarga">
-                        <option value="1">Meio Expediente</option>
-                        <option value="2">Dia Todo</option>
+                        <option value="1">Diária Normal</option>
+                        <option value="2">Diária Dupla</option>
                     </select>
                 </div>
                 <div>
@@ -323,8 +323,8 @@
         registros.forEach(reg => {
             let desc = "";
             if (reg.tipoDia === 2) desc += "🗓️ Feriado ";
-            if (reg.carga === 2) desc += "⏰ Dia Todo";
-            if (desc === "") desc = "Meio Expediente";
+            if (reg.carga === 2) desc += "⏰ Diária Dupla";
+            if (desc === "") desc = "Diária Normal";
             
             let html = `<td>${reg.dataFormatada}</td><td>${desc}</td>`;
             if (modoAtual === "admin") html += `<td>R$ ${reg.valor.toFixed(2)}</td><td><button class="action-btn btn-vermelho" style="padding: 5px 10px; min-width: auto;" onclick="removerRegistro(${reg.id})">X</button></td>`;
@@ -366,7 +366,7 @@
         if (contadores.normal > 0) lista.innerHTML += `<li>${contadores.normal} diária(s) normal</li>`;
         if (contadores.dupla > 0) lista.innerHTML += `<li>${contadores.dupla} diária(s) dupla</li>`;
         if (contadores.feriadoNormal > 0) lista.innerHTML += `<li>${contadores.feriadoNormal} feriado(s) normal</li>`;
-        if (contadores.feriadoTodo > 0) lista.innerHTML += `<li>${contadores.feriadoTodo} feriado(s) dia todo</li>`;
+        if (contadores.feriadoTodo > 0) lista.innerHTML += `<li>${contadores.feriadoTodo} feriado(s) Diária Dupla</li>`;
 
         if (registros.length === 0) lista.innerHTML = "<li>Nenhum dia trabalhado registrado.</li>";
 
@@ -423,7 +423,7 @@
         if (contadores.normal > 0) { doc.text(`- ${contadores.normal} diária(s) normal`, 14, y); y += 6; }
         if (contadores.dupla > 0) { doc.text(`- ${contadores.dupla} diária(s) dupla`, 14, y); y += 6; }
         if (contadores.feriadoNormal > 0) { doc.text(`- ${contadores.feriadoNormal} feriado(s) normal`, 14, y); y += 6; }
-        if (contadores.feriadoTodo > 0) { doc.text(`- ${contadores.feriadoTodo} feriado(s) dia todo`, 14, y); y += 6; }
+        if (contadores.feriadoTodo > 0) { doc.text(`- ${contadores.feriadoTodo} feriado(s) Diária Dupla`, 14, y); y += 6; }
         
         // --- AQUI ESTÁ A MUDANÇA: TOTAL DE DIÁRIAS ABAIXO DO RESUMO ---
         y += 4;
@@ -438,9 +438,9 @@
 
         // 4. TABELA
         let dadosTabela = registros.map(reg => {
-            let desc = "Meio Expediente";
+            let desc = "Diária Normal";
             if (reg.tipoDia === 2) desc = "Feriado/Dom ";
-            if (reg.carga === 2) desc = reg.tipoDia === 2 ? "Feriado (Dia Todo)" : "Diária Dupla (Dia Todo)";
+            if (reg.carga === 2) desc = reg.tipoDia === 2 ? "Feriado (Diária Dupla)" : "Diária Dupla (Diária Dupla)";
             if (reg.carga === 1 && reg.tipoDia === 1) desc = "Diária Normal";
             
             return [
