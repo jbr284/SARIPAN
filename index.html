@@ -386,7 +386,7 @@
         if(confirm("Limpar tudo para nova quinzena?")) { registros = []; atualizarInterface(); await salvarFirebase(); }
     }
 
-    // --- PDF REFORMULADO (Resumo + Lista Completa) ---
+    // --- PDF REFORMULADO (Total em Negrito abaixo do Resumo) ---
     async function exportarPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -398,7 +398,7 @@
         const textoPeriodo = document.getElementById('tituloQuinzena').innerText;
         doc.text(`Referência: ${textoPeriodo}`, 14, 38);
 
-        // 2. CÁLCULO DO RESUMO (Igual à tela)
+        // 2. CÁLCULO
         let contadores = { normal: 0, dupla: 0, feriadoNormal: 0, feriadoTodo: 0 };
         let totalDiarias = 0;
         let totalGeral = 0;
@@ -412,7 +412,7 @@
             else if (reg.carga === 2 && reg.tipoDia === 2) contadores.feriadoTodo++;
         });
 
-        // 3. IMPRESSÃO DO RESUMO (Antes da tabela)
+        // 3. IMPRESSÃO DO RESUMO
         let y = 48;
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
@@ -425,14 +425,23 @@
         if (contadores.feriadoNormal > 0) { doc.text(`- ${contadores.feriadoNormal} feriado(s) normal`, 14, y); y += 6; }
         if (contadores.feriadoTodo > 0) { doc.text(`- ${contadores.feriadoTodo} feriado(s) dia todo`, 14, y); y += 6; }
         
-        y += 4; // Espaço antes da tabela
+        // --- AQUI ESTÁ A MUDANÇA: TOTAL DE DIÁRIAS ABAIXO DO RESUMO ---
+        y += 4;
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(211, 47, 47); // Vermelho SARIPAN
+        // Colocando alinhado à direita do bloco, ou abaixo
+        doc.text(`Total: ${totalDiarias} diárias`, 14, y);
+        
+        doc.setTextColor(0, 0, 0); // Reset cor
+        doc.setFont(undefined, 'normal');
+        y += 10; // Espaço para tabela
 
-        // 4. PREPARAR DADOS DA TABELA COMPLETA (Um por um)
+        // 4. TABELA
         let dadosTabela = registros.map(reg => {
             let desc = "Meio Expediente";
             if (reg.tipoDia === 2) desc = "Feriado/Dom ";
             if (reg.carga === 2) desc = reg.tipoDia === 2 ? "Feriado (Dia Todo)" : "Diária Dupla (Dia Todo)";
-            if (reg.carga === 1 && reg.tipoDia === 1) desc = "Diária Normal"; // Ajuste fino para ficar bonito
+            if (reg.carga === 1 && reg.tipoDia === 1) desc = "Diária Normal";
             
             return [
                 reg.dataFormatada,
@@ -441,7 +450,6 @@
             ];
         });
 
-        // 5. GERAR TABELA
         doc.autoTable({ 
             startY: y,
             head: [['Data', 'Descrição', 'Valor']], 
@@ -451,11 +459,10 @@
             columnStyles: { 0: { cellWidth: 30 }, 2: { cellWidth: 35, halign: 'right' } }
         });
         
-        // 6. RODAPÉ (Igual ao anterior)
+        // 5. RODAPÉ (Apenas Valor Monetário)
         let finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(12); doc.text(`Total de Diárias a Pagar: ${totalDiarias}`, 14, finalY);
         doc.setFontSize(14); doc.setFont(undefined, 'bold');
-        doc.text(`Valor Total: R$ ${totalGeral.toFixed(2)}`, 14, finalY + 8);
+        doc.text(`Valor Total: R$ ${totalGeral.toFixed(2)}`, 14, finalY);
         
         doc.save('relatorio_saripan.pdf');
     }
