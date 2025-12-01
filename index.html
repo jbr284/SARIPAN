@@ -183,7 +183,8 @@
                     <label>Tipo de Dia:</label>
                     <select id="tipoDia">
                         <option value="1">Dia Útil</option>
-                        <option value="2">Domingo/Feriado</option>
+                        <option value="2">Domingo</option>
+                        <option value="3">Feriado</option>
                     </select>
                 </div>
             </div>
@@ -246,8 +247,10 @@
     function atualizarPreview() {
         const base = parseFloat(document.getElementById('valorBase').value) || 0;
         const carga = parseInt(document.getElementById('tipoCarga').value);
-        const tipo = parseInt(document.getElementById('tipoDia').value);
-        let mult = (tipo === 2 && carga === 2) ? 4 : (carga * tipo);
+        const tipoInput = parseInt(document.getElementById('tipoDia').value);
+        
+        let pesoDia = (tipoInput === 3) ? 2 : tipoInput;
+        let mult = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
         document.getElementById('valorCalculadoPreview').value = `R$ ${(base * mult).toFixed(2)}`;
     }
     ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
@@ -289,15 +292,17 @@
         
         const base = parseFloat(document.getElementById('valorBase').value);
         const carga = parseInt(document.getElementById('tipoCarga').value);
-        const tipoDia = parseInt(document.getElementById('tipoDia').value);
-        let mult = (tipoDia === 2 && carga === 2) ? 4 : (carga * tipoDia);
+        const tipoDiaInput = parseInt(document.getElementById('tipoDia').value);
+        
+        let pesoDia = (tipoDiaInput === 3) ? 2 : tipoDiaInput;
+        let mult = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
 
         registros.push({
             id: Date.now(),
             data: dataInput,
             dataFormatada: dataInput.split('-').reverse().join('/'),
             carga: carga,
-            tipoDia: tipoDia,
+            tipoDia: tipoDiaInput,
             multiplicador: mult,
             valor: base * mult,
             base: base
@@ -320,11 +325,21 @@
         // TABELA
         const tbody = document.getElementById('tbodyRegistros');
         tbody.innerHTML = "";
+        
         registros.forEach(reg => {
             let desc = "";
-            if (reg.tipoDia === 2) desc += "🗓️ Feriado ";
-            if (reg.carga === 2) desc += "⏰ Diária Dupla";
-            if (desc === "") desc = "Diária Normal";
+            
+            if (reg.tipoDia === 3) desc = "🎉 Feriado";
+            else if (reg.tipoDia === 2) desc = "🗓️ Domingo";
+            else desc = "Diária Normal";
+            
+            if (reg.carga === 2) {
+                if (reg.tipoDia === 1) {
+                    desc = "⏰ Diária Dupla";
+                } else {
+                    desc += " (Diária Dupla)";
+                }
+            }
             
             let html = `<td>${reg.dataFormatada}</td><td>${desc}</td>`;
             if (modoAtual === "admin") html += `<td>R$ ${reg.valor.toFixed(2)}</td><td><button class="action-btn btn-vermelho" style="padding: 5px 10px; min-width: auto;" onclick="removerRegistro(${reg.id})">X</button></td>`;
@@ -335,11 +350,18 @@
             tbody.appendChild(tr);
         });
 
-        // RESUMO DETALHADO
+        // RESUMO E TÍTULO
         const lista = document.getElementById('listaResumo');
         lista.innerHTML = "";
         
-        let contadores = { normal: 0, dupla: 0, feriadoNormal: 0, feriadoTodo: 0 };
+        let contadores = { 
+            normal: 0, 
+            dupla: 0, 
+            domingo: 0, 
+            feriado: 0,
+            domingoDupla: 0,
+            feriadoDupla: 0
+        };
         let totalDiarias = 0;
         let totalValor = 0;
 
@@ -349,24 +371,32 @@
 
             if (reg.carga === 1 && reg.tipoDia === 1) contadores.normal++;
             else if (reg.carga === 2 && reg.tipoDia === 1) contadores.dupla++;
-            else if (reg.carga === 1 && reg.tipoDia === 2) contadores.feriadoNormal++;
-            else if (reg.carga === 2 && reg.tipoDia === 2) contadores.feriadoTodo++;
+            else if (reg.carga === 1 && reg.tipoDia === 2) contadores.domingo++;
+            else if (reg.carga === 1 && reg.tipoDia === 3) contadores.feriado++;
+            else if (reg.carga === 2 && reg.tipoDia === 2) contadores.domingoDupla++;
+            else if (reg.carga === 2 && reg.tipoDia === 3) contadores.feriadoDupla++;
         });
 
         let textoPeriodo = "Sem registros";
         if (registros.length > 0) {
             const dataObj = new Date(registros[0].data);
             const dia = dataObj.getUTCDate();
-            const mes = dataObj.toLocaleString('pt-BR', { month: 'long' });
+            
+            // CORREÇÃO: Meses manuais para evitar erro de fuso
+            const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            const mes = meses[dataObj.getUTCMonth()];
+
             const quinzena = dia <= 15 ? "1ª Quinzena" : "2ª Quinzena";
-            textoPeriodo = `${quinzena} de ${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
+            textoPeriodo = `${quinzena} de ${mes}`;
         }
         document.getElementById('tituloQuinzena').innerText = textoPeriodo;
 
         if (contadores.normal > 0) lista.innerHTML += `<li>${contadores.normal} diária(s) normal</li>`;
         if (contadores.dupla > 0) lista.innerHTML += `<li>${contadores.dupla} diária(s) dupla</li>`;
-        if (contadores.feriadoNormal > 0) lista.innerHTML += `<li>${contadores.feriadoNormal} feriado(s) normal</li>`;
-        if (contadores.feriadoTodo > 0) lista.innerHTML += `<li>${contadores.feriadoTodo} feriado(s) Diária Dupla</li>`;
+        if (contadores.domingo > 0) lista.innerHTML += `<li>${contadores.domingo} domingo(s)</li>`;
+        if (contadores.feriado > 0) lista.innerHTML += `<li>${contadores.feriado} feriado(s)</li>`;
+        if (contadores.domingoDupla > 0) lista.innerHTML += `<li>${contadores.domingoDupla} domingo(s) Diária Dupla</li>`;
+        if (contadores.feriadoDupla > 0) lista.innerHTML += `<li>${contadores.feriadoDupla} feriado(s) Diária Dupla</li>`;
 
         if (registros.length === 0) lista.innerHTML = "<li>Nenhum dia trabalhado registrado.</li>";
 
@@ -386,20 +416,18 @@
         if(confirm("Limpar tudo para nova quinzena?")) { registros = []; atualizarInterface(); await salvarFirebase(); }
     }
 
-    // --- PDF REFORMULADO (Total em Negrito abaixo do Resumo) ---
+    // --- PDF ATUALIZADO ---
     async function exportarPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // 1. CABEÇALHO
         doc.setFontSize(18); doc.setTextColor(0,123,255); doc.text("SARIPAN - Relatório", 14, 20);
         doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text("Prestador: João Batista Rosa", 14, 30);
         
         const textoPeriodo = document.getElementById('tituloQuinzena').innerText;
         doc.text(`Referência: ${textoPeriodo}`, 14, 38);
 
-        // 2. CÁLCULO
-        let contadores = { normal: 0, dupla: 0, feriadoNormal: 0, feriadoTodo: 0 };
+        let contadores = { normal: 0, dupla: 0, domingo: 0, feriado: 0, domingoDupla: 0, feriadoDupla: 0 };
         let totalDiarias = 0;
         let totalGeral = 0;
 
@@ -408,11 +436,12 @@
             totalGeral += reg.valor;
             if (reg.carga === 1 && reg.tipoDia === 1) contadores.normal++;
             else if (reg.carga === 2 && reg.tipoDia === 1) contadores.dupla++;
-            else if (reg.carga === 1 && reg.tipoDia === 2) contadores.feriadoNormal++;
-            else if (reg.carga === 2 && reg.tipoDia === 2) contadores.feriadoTodo++;
+            else if (reg.carga === 1 && reg.tipoDia === 2) contadores.domingo++;
+            else if (reg.carga === 1 && reg.tipoDia === 3) contadores.feriado++;
+            else if (reg.carga === 2 && reg.tipoDia === 2) contadores.domingoDupla++;
+            else if (reg.carga === 2 && reg.tipoDia === 3) contadores.feriadoDupla++;
         });
 
-        // 3. IMPRESSÃO DO RESUMO
         let y = 48;
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
@@ -422,26 +451,35 @@
 
         if (contadores.normal > 0) { doc.text(`- ${contadores.normal} diária(s) normal`, 14, y); y += 6; }
         if (contadores.dupla > 0) { doc.text(`- ${contadores.dupla} diária(s) dupla`, 14, y); y += 6; }
-        if (contadores.feriadoNormal > 0) { doc.text(`- ${contadores.feriadoNormal} feriado(s) normal`, 14, y); y += 6; }
-        if (contadores.feriadoTodo > 0) { doc.text(`- ${contadores.feriadoTodo} feriado(s) Diária Dupla`, 14, y); y += 6; }
+        if (contadores.domingo > 0) { doc.text(`- ${contadores.domingo} domingo(s)`, 14, y); y += 6; }
+        if (contadores.feriado > 0) { doc.text(`- ${contadores.feriado} feriado(s)`, 14, y); y += 6; }
+        if (contadores.domingoDupla > 0) { doc.text(`- ${contadores.domingoDupla} domingo(s) Diária Dupla`, 14, y); y += 6; }
+        if (contadores.feriadoDupla > 0) { doc.text(`- ${contadores.feriadoDupla} feriado(s) Diária Dupla`, 14, y); y += 6; }
         
-        // --- AQUI ESTÁ A MUDANÇA: TOTAL DE DIÁRIAS ABAIXO DO RESUMO ---
         y += 4;
         doc.setFont(undefined, 'bold');
-        doc.setTextColor(211, 47, 47); // Vermelho SARIPAN
-        // Colocando alinhado à direita do bloco, ou abaixo
+        doc.setTextColor(211, 47, 47);
         doc.text(`Total: ${totalDiarias} diárias`, 14, y);
         
-        doc.setTextColor(0, 0, 0); // Reset cor
+        doc.setTextColor(0, 0, 0); 
         doc.setFont(undefined, 'normal');
-        y += 10; // Espaço para tabela
+        y += 10; 
 
-        // 4. TABELA
         let dadosTabela = registros.map(reg => {
-            let desc = "Diária Normal";
-            if (reg.tipoDia === 2) desc = "Feriado";
-            if (reg.carga === 2) desc = reg.tipoDia === 2 ? "Feriado (Diária Dupla)" : "Diária Dupla";
-            if (reg.carga === 1 && reg.tipoDia === 1) desc = "Diária Normal";
+            let desc = "";
+            
+            if (reg.tipoDia === 3) desc = "Feriado";
+            else if (reg.tipoDia === 2) desc = "Domingo";
+            else desc = "Diária Normal";
+            
+            if (reg.carga === 2) {
+                if (reg.tipoDia === 1) {
+                    desc = "Diária Dupla"; 
+                } else {
+                    if (reg.tipoDia === 3) desc = "Feriado (Diária Dupla)";
+                    if (reg.tipoDia === 2) desc = "Domingo (Diária Dupla)";
+                }
+            }
             
             return [
                 reg.dataFormatada,
@@ -459,12 +497,45 @@
             columnStyles: { 0: { cellWidth: 30 }, 2: { cellWidth: 35, halign: 'right' } }
         });
         
-        // 5. RODAPÉ (Apenas Valor Monetário)
         let finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(14); doc.setFont(undefined, 'bold');
         doc.text(`Valor Total: R$ ${totalGeral.toFixed(2)}`, 14, finalY);
         
         doc.save('relatorio_saripan.pdf');
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((registration) => {
+          console.log('SW registrado com sucesso:', registration.scope);
+          
+          // Se detectar que um novo SW foi encontrado (mudança de versão)
+          registration.onupdatefound = () => {
+            const newWorker = registration.installing;
+            newWorker.onstatechange = () => {
+              if (newWorker.state === 'installed') {
+                if (navigator.serviceWorker.controller) {
+                  // Nova atualização disponível!
+                  console.log('Nova versão disponível. Recarregando...');
+                  window.location.reload(); // Recarrega a página automaticamente
+                }
+              }
+            };
+          };
+        }).catch((err) => {
+          console.log('Falha ao registrar SW:', err);
+        });
+      });
+
+      // Garante que a página recarregue se o SW assumir o controle
+      let refreshing;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        window.location.reload();
+        refreshing = true;
+      });
     }
   </script>
 </body>
