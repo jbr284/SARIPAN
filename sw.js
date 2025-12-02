@@ -1,5 +1,5 @@
 // MUDE ESTA VERSÃO TODA VEZ QUE ATUALIZAR O CÓDIGO
-const CACHE_NAME = 'saripan-v1.2'; 
+const CACHE_NAME = 'saripan-v1.3'; 
 
 const ASSETS = [
   './',
