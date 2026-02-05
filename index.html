@@ -401,6 +401,9 @@
             const grupo = grupos[chave];
             grupo.itens.sort((a, b) => new Date(a.data) - new Date(b.data));
 
+            // [NOVO] Calcular Total de Peso (Diárias a receber)
+            const totalPeso = grupo.itens.reduce((acc, item) => acc + item.multiplicador, 0);
+
             const isFirst = index === 0; 
             const nomeMes = MESES[grupo.mes];
             const titulo = `${grupo.quinzena}ª Quinzena de ${nomeMes} ${grupo.ano}`;
@@ -429,6 +432,7 @@
                         <td></td>
                     </tr>`;
             } else {
+                // [MODIFICADO] MODO VIEW COM DOIS TOTAIS
                 metaTexto = `${grupo.itens.length} registros trabalhados`;
                 btnPDF = ''; 
                 btnDeleteHTML = ''; 
@@ -436,7 +440,10 @@
                 thAcao = ''; 
                 totalRowHTML = `
                     <tr class="total-row">
-                        <td colspan="3">Total de Dias Trabalhados: ${grupo.itens.length}</td>
+                        <td colspan="3" style="text-align: left; padding: 12px;">
+                            <div style="margin-bottom:4px;">Total de Dias Trabalhados: ${grupo.itens.length}</div>
+                            <div style="color:#0d47a1; font-weight:bold;">Total de Diárias a receber: ${totalPeso}</div>
+                        </td>
                     </tr>`;
             }
 
@@ -613,102 +620,3 @@
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        doc.setFontSize(16);
-        doc.setFont(undefined, 'bold');
-        doc.text("SARIPAN - Relatório", 14, 20);
-        
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'normal');
-        doc.text("Prestador: João Batista Rosa", 14, 28);
-        const nomeMes = MESES[mes];
-        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes}`, 14, 34);
-        
-        doc.setFont(undefined, 'bold');
-        doc.text("Resumo do Período:", 14, 44);
-        doc.setFont(undefined, 'normal');
-        
-        let y = 50;
-        if (contagem.normal > 0) { doc.text(`- ${contagem.normal} diária(s) normal`, 14, y); y += 6; }
-        if (contagem.dupla > 0) { doc.text(`- ${contagem.dupla} diária(s) dupla`, 14, y); y += 6; }
-        if (contagem.feriado > 0) { doc.text(`- ${contagem.feriado} feriado(s) normal`, 14, y); y += 6; }
-        if (contagem.domingo > 0) { doc.text(`- ${contagem.domingo} domingo(s)`, 14, y); y += 6; }
-        if (contagem.feriadoDupla > 0) { doc.text(`- ${contagem.feriadoDupla} feriado(s) dupla`, 14, y); y += 6; }
-        if (contagem.domingoDupla > 0) { doc.text(`- ${contagem.domingoDupla} domingo(s) dupla`, 14, y); y += 6; }
-
-        doc.setFont(undefined, 'bold');
-        y += 2;
-        doc.text(`Total: ${totalMultiplicador} diárias a receber`, 14, y);
-        // REMOVIDA A LINHA DUPLICADA AQUI
-
-        const bodyData = itens.map(i => {
-            const tipoStr = i.carga === 1 ? 'Normal' : 'Dupla';
-            const detalheStr = i.tipoDia === 1 ? 'Dia Útil' : i.tipoDia === 2 ? 'Domingo' : 'Feriado';
-            
-            return [
-                i.data.split('-').reverse().join('/'),
-                tipoStr,
-                detalheStr,
-                `R$ ${i.total.toFixed(2)}`
-            ];
-        });
-
-        doc.autoTable({
-            startY: y + 10,
-            head: [['Data', 'Tipo', 'Detalhes', 'Valor']], 
-            body: bodyData,
-            theme: 'grid', 
-            headStyles: { 
-                fillColor: [0, 176, 240], 
-                textColor: [0, 0, 0],     
-                fontStyle: 'bold',
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            },
-            bodyStyles: {
-                textColor: [0, 0, 0],
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            },
-            foot: [['', '', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
-            footStyles: {
-                fillColor: [255, 255, 255],
-                textColor: [0, 0, 0],
-                fontStyle: 'bold',
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            }
-        });
-
-        doc.save(`Saripan_${nomeMes}_${ano}_Q${q}.pdf`);
-    }
-
-    // --- FIREBASE SYNC ---
-    async function salvarFirebase() {
-        if (modoAtual === "admin") {
-            await database.ref('saripan_v2').set({ 
-                ultAtualizacao: new Date().toISOString(), 
-                dados: registros 
-            });
-        }
-    }
-
-    async function carregarDados() {
-        const snap = await database.ref('saripan_v2').get();
-        if (snap.exists()) {
-            registros = snap.val().dados || [];
-        } else {
-            registros = [];
-        }
-        renderizarApontamentos();
-    }
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
-    }
-  </script>
-</body>
-</html>
