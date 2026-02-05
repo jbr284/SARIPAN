@@ -10,21 +10,66 @@
 
   <style>
     /* Global Styles */
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; padding-bottom: 40px; }
-    .container { background-color: #fff; max-width: 800px; margin: 0 auto; min-height: 100vh; box-shadow: 0 0 15px rgba(0,0,0,0.05); position: relative; }
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        background-color: #f0f2f5; 
+        margin: 0; 
+        padding: 0; 
+        height: 100vh; /* Ocupa 100% da altura da tela */
+        overflow: hidden; /* Impede a rolagem da página inteira */
+    }
 
-    /* Header e Navegação */
-    .app-header { background: #0d47a1; color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .container { 
+        background-color: #fff; 
+        max-width: 800px; 
+        margin: 0 auto; 
+        height: 100%; /* Altura total */
+        display: flex; /* Layout Flexível */
+        flex-direction: column; /* Um item abaixo do outro */
+        box-shadow: 0 0 15px rgba(0,0,0,0.05); 
+        position: relative; 
+    }
+
+    /* ÁREA FIXA (NÃO ROLA) */
+    .fixed-area {
+        flex-shrink: 0; /* Não encolhe */
+        z-index: 10;
+        background: white;
+    }
+
+    /* Header */
+    .app-header { 
+        background: #0d47a1; 
+        color: white; 
+        padding: 15px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+    }
     .app-title { font-size: 20px; font-weight: bold; margin: 0; }
     .btn-nav-top { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
     
     /* Abas Superiores */
     .tabs-container { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
-    .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-size: 16px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; }
+    .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-size: 16px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: background 0.2s; }
     .tab-btn.active { color: #0d47a1; border-bottom: 3px solid #0d47a1; background: #f9f9f9; }
 
+    /* ÁREA DE ROLAGEM (SCROLL) */
+    .scroll-content {
+        flex-grow: 1; /* Ocupa todo o espaço restante */
+        overflow-y: auto; /* Permite rolar apenas esta área */
+        background: #f0f2f5;
+        position: relative;
+    }
+
     /* Painéis */
-    .panel { display: none; padding: 15px; animation: fadeIn 0.3s; }
+    .panel { 
+        display: none; 
+        padding: 15px; 
+        padding-bottom: 80px; /* Espaço extra no final */
+        animation: fadeIn 0.3s; 
+    }
     .panel.active { display: block; }
 
     /* Formulário de Registro */
@@ -49,7 +94,7 @@
     .accordion-content { display: none; padding: 0; }
     .accordion-content.open { display: block; }
 
-    /* Tabela Interna (Visual do APP - Moderno) */
+    /* Tabela Interna (Visual App) */
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
     th { background: #eee; color: #555; font-size: 12px; text-transform: uppercase; }
@@ -58,14 +103,26 @@
     .td-acao { text-align: center; width: 40px; }
     .total-row { background: #e8f5e9; font-weight: bold; }
 
-    /* Tabela Financeira */
-    .fin-table { width: 100%; margin-top: 10px; border: 1px solid #ddd; }
+    /* FINANCEIRO */
+    .year-summary { 
+        background: #fff8e1; 
+        border: 1px solid #ffe0b2; 
+        border-radius: 8px; 
+        padding: 15px; 
+        margin-bottom: 20px; 
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .year-summary h4 { margin: 0; color: #f57c00; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+    .year-total-value { font-size: 24px; font-weight: bold; color: #333; margin-top: 5px; }
+
+    .fin-table { width: 100%; border: 1px solid #ddd; background: white; }
     .fin-table th { background: #0d47a1; color: white; }
     .fin-table td { border: 1px solid #ddd; }
-    .fin-row-total { background: #fff3e0; font-weight: bold; }
+    .fin-row-total { background: #fff3e0; font-weight: bold; color: #e65100; }
 
     /* Tela Inicial */
-    #inicio { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; }
+    #inicio { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; width: 100%; position: absolute; top:0; left:0; z-index: 200; }
     .btn-big { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 30px; border: none; color: white; width: 80%; max-width: 300px; cursor: pointer; }
 
     .hidden { display: none !important; }
@@ -76,7 +133,7 @@
 
   <div id="inicio">
     <h1 style="color:#d32f2f; font-size: 40px; margin-bottom: 5px;">SARIPAN</h1>
-    <p style="color:#666; margin-bottom: 40px;">Gestão Inteligente de Diárias</p>
+    <p style="color:#666; margin-bottom: 40px;">Gestão de prestação de serviços</p>
     
     <button class="btn-big btn-green" onclick="entrarModo('admin')">📋 Acessar Sistema</button>
     <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ Apenas Visualizar</button>
@@ -84,71 +141,72 @@
 
   <div id="app" class="container hidden">
     
-    <div class="app-header">
-      <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
-      <div class="app-title">SARIPAN</div>
-      <div style="width: 50px;"></div> </div>
+    <div class="fixed-area">
+        <div class="app-header">
+          <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
+          <div class="app-title">SARIPAN</div>
+          <div style="width: 50px;"></div>
+        </div>
 
-    <div class="tabs-container">
-      <button class="tab-btn active" onclick="mudarAba('apontamentos')">📝 Apontamentos</button>
-      <button id="btn-tab-financeiro" class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
+        <div class="tabs-container">
+          <button class="tab-btn active" onclick="mudarAba('apontamentos')">📝 Apontamentos</button>
+          <button id="btn-tab-financeiro" class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
+        </div>
     </div>
 
-    <div id="painel-apontamentos" class="panel active">
-      
-      <div id="area-formulario" class="form-box hidden">
-        <h3 class="form-title">Novo Registro</h3>
+    <div class="scroll-content">
         
-        <label>Data do Serviço:</label>
-        <input type="date" id="dataServico" style="margin-bottom: 10px;">
-        
-        <div class="grid-input">
-          <div>
-            <label>Carga:</label>
-            <select id="tipoCarga">
-              <option value="1">Normal (1x)</option>
-              <option value="2">Dupla (2x)</option>
-            </select>
+        <div id="painel-apontamentos" class="panel active">
+          
+          <div id="area-formulario" class="form-box hidden">
+            <h3 class="form-title">Novo Registro</h3>
+            <label>Data do Serviço:</label>
+            <input type="date" id="dataServico" style="margin-bottom: 10px;">
+            
+            <div class="grid-input">
+              <div>
+                <label>Carga:</label>
+                <select id="tipoCarga">
+                  <option value="1">Normal </option>
+                  <option value="2">Dupla </option>
+                </select>
+              </div>
+              <div>
+                <label>Dia:</label>
+                <select id="tipoDia">
+                  <option value="1">Útil</option>
+                  <option value="2">Domingo</option>
+                  <option value="3">Feriado</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-input">
+              <div>
+                <label>Valor Base (R$):</label>
+                <input type="number" id="valorBase" value="130.00">
+              </div>
+              <div>
+                <label>Previsão:</label>
+                <input type="text" id="previewValor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;">
+              </div>
+            </div>
+
+            <button class="btn-action btn-green" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
           </div>
-          <div>
-            <label>Dia:</label>
-            <select id="tipoDia">
-              <option value="1">Útil</option>
-              <option value="2">Domingo</option>
-              <option value="3">Feriado</option>
-            </select>
+
+          <div id="lista-quinzenas-container"></div>
+          
+          <div id="msg-sem-dados" style="text-align:center; padding: 40px; color:#999; display:none;">
+            Nenhum registro encontrado.
           </div>
         </div>
 
-        <div class="grid-input">
-          <div>
-            <label>Valor Base (R$):</label>
-            <input type="number" id="valorBase" value="130.00">
-          </div>
-          <div>
-            <label>Previsão:</label>
-            <input type="text" id="previewValor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;">
-          </div>
+        <div id="painel-financeiro" class="panel">
+          <div id="financeiro-content"></div>
         </div>
 
-        <button class="btn-action btn-green" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
-      </div>
-
-      <div id="lista-quinzenas-container">
-        </div>
-      
-      <div id="msg-sem-dados" style="text-align:center; padding: 40px; color:#999; display:none;">
-        Nenhum registro encontrado.
-      </div>
-    </div>
-
-    <div id="painel-financeiro" class="panel">
-      <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Consolidado Mensal</h3>
-      <div id="tabela-financeira-container">
-        </div>
-    </div>
-
-  </div>
+    </div> </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -444,51 +502,77 @@
         seta.innerText = content.classList.contains('open') ? '▼' : '▶';
     }
 
-    // --- ABA FINANCEIRA ---
+    // --- ABA FINANCEIRA COM TOTAL ANUAL ---
     function renderizarFinanceiro() {
         if (modoAtual !== 'admin') return;
 
-        const container = document.getElementById('tabela-financeira-container');
+        const container = document.getElementById('financeiro-content');
+        container.innerHTML = "";
+
+        // 1. Calcular Totais
         const dadosMes = {}; 
-        
+        const totaisAnuais = {};
+
         registros.forEach(reg => {
-            const chave = `${reg.ano}-${reg.mes}`;
-            if (!dadosMes[chave]) {
-                dadosMes[chave] = { ano: reg.ano, mes: reg.mes, q1: 0, q2: 0 };
+            // Mensal
+            const chaveMes = `${reg.ano}-${reg.mes}`;
+            if (!dadosMes[chaveMes]) {
+                dadosMes[chaveMes] = { ano: reg.ano, mes: reg.mes, q1: 0, q2: 0 };
             }
-            if (reg.quinzena === 1) dadosMes[chave].q1 += reg.total;
-            else dadosMes[chave].q2 += reg.total;
+            if (reg.quinzena === 1) dadosMes[chaveMes].q1 += reg.total;
+            else dadosMes[chaveMes].q2 += reg.total;
+
+            // Anual
+            if (!totaisAnuais[reg.ano]) totaisAnuais[reg.ano] = 0;
+            totaisAnuais[reg.ano] += reg.total;
         });
 
-        const chaves = Object.keys(dadosMes).sort((a,b) => {
+        // 2. Ordenar
+        const chavesMes = Object.keys(dadosMes).sort((a,b) => {
              const [aA, aM] = a.split('-').map(Number);
              const [bA, bM] = b.split('-').map(Number);
              if (aA !== bA) return bA - aA;
              return bM - aM;
         });
+        
+        const anosOrdenados = Object.keys(totaisAnuais).sort((a,b) => b-a); // Mais recente primeiro
 
-        if (chaves.length === 0) {
-            container.innerHTML = "<p style='text-align:center'>Sem dados financeiros.</p>";
+        if (chavesMes.length === 0) {
+            container.innerHTML = "<p style='text-align:center; padding:20px;'>Sem dados financeiros.</p>";
             return;
         }
 
-        let html = `
+        // 3. Renderizar CARD DE TOTAIS ANUAIS
+        let htmlAnual = '';
+        anosOrdenados.forEach(ano => {
+            const valor = totaisAnuais[ano].toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            htmlAnual += `
+                <div class="year-summary">
+                    <h4>Total Acumulado ${ano}</h4>
+                    <div class="year-total-value">${valor}</div>
+                </div>
+            `;
+        });
+        container.innerHTML += htmlAnual;
+
+        // 4. Renderizar TABELA MENSAL
+        let htmlTable = `
             <table class="fin-table">
                 <thead>
                     <tr>
                         <th>Mês/Ano</th>
-                        <th style="text-align:right">1ª Quinz.</th>
-                        <th style="text-align:right">2ª Quinz.</th>
-                        <th style="text-align:right; background:#003c8f;">Total</th>
+                        <th style="text-align:right">1ª Q.</th>
+                        <th style="text-align:right">2ª Q.</th>
+                        <th style="text-align:right; background:#003c8f; color:white;">Total</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
-        chaves.forEach(k => {
+        chavesMes.forEach(k => {
             const d = dadosMes[k];
             const total = d.q1 + d.q2;
-            html += `
+            htmlTable += `
                 <tr>
                     <td>${MESES[d.mes]} ${d.ano}</td>
                     <td style="text-align:right">R$ ${d.q1.toFixed(2)}</td>
@@ -498,11 +582,11 @@
             `;
         });
 
-        html += `</tbody></table>`;
-        container.innerHTML = html;
+        htmlTable += `</tbody></table>`;
+        container.innerHTML += htmlTable;
     }
 
-    // --- PDF COM CABEÇALHO DETALHADO (SOLICITADO) ---
+    // --- PDF (Mantido o design Grid/Planilha solicitado) ---
     function gerarPDF(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         
@@ -512,27 +596,19 @@
 
         if (itens.length === 0) return alert("Erro: Sem dados.");
 
-        // 1. CALCULAR O RESUMO DETALHADO
-        let contagem = {
-            normal: 0,
-            dupla: 0,
-            feriado: 0,
-            domingo: 0,
-            feriadoDupla: 0,
-            domingoDupla: 0
-        };
+        // Resumo
+        let contagem = { normal: 0, dupla: 0, feriado: 0, domingo: 0, feriadoDupla: 0, domingoDupla: 0 };
         let totalMultiplicador = 0;
         let totalDinheiro = 0;
 
         itens.forEach(i => {
             totalMultiplicador += i.multiplicador;
             totalDinheiro += i.total;
-
             if (i.carga === 1) {
                 if (i.tipoDia === 1) contagem.normal++;
                 else if (i.tipoDia === 2) contagem.domingo++;
                 else if (i.tipoDia === 3) contagem.feriado++;
-            } else { // Carga Dupla
+            } else { 
                 if (i.tipoDia === 1) contagem.dupla++;
                 else if (i.tipoDia === 2) contagem.domingoDupla++;
                 else if (i.tipoDia === 3) contagem.feriadoDupla++;
@@ -542,7 +618,6 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // 2. CABEÇALHO PERSONALIZADO (SEM AZULÃO)
         doc.setFontSize(16);
         doc.setFont(undefined, 'bold');
         doc.text("SARIPAN - Relatório", 14, 20);
@@ -571,7 +646,6 @@
         y += 6;
         doc.text(`Total: ${totalMultiplicador} diárias`, 14, y);
 
-        // 3. TABELA ESTILO PLANILHA (AZUL CIANO + BORDAS PRETAS)
         const bodyData = itens.map(i => {
             let tipo = i.tipoDia === 3 ? "Feriado" : i.tipoDia === 2 ? "Domingo" : "Diária Normal";
             if(i.carga === 2) tipo += " (Dobra)";
@@ -586,24 +660,21 @@
             startY: y + 10,
             head: [['Data', 'Descrição', 'Valor']],
             body: bodyData,
-            theme: 'grid', // BORDAS PRETAS
-            
+            theme: 'grid', 
             headStyles: { 
-                fillColor: [0, 176, 240], // Azul Ciano (#00b0f0)
-                textColor: [0, 0, 0],     // Texto Preto
+                fillColor: [0, 176, 240], 
+                textColor: [0, 0, 0],     
                 fontStyle: 'bold',
                 halign: 'center',
                 lineColor: [0, 0, 0],
                 lineWidth: 0.1
             },
-            
             bodyStyles: {
                 textColor: [0, 0, 0],
                 halign: 'center',
                 lineColor: [0, 0, 0],
                 lineWidth: 0.1
             },
-            
             foot: [['', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
             footStyles: {
                 fillColor: [255, 255, 255],
