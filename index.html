@@ -133,7 +133,7 @@
 
   <div id="inicio">
     <h1 style="color:#d32f2f; font-size: 40px; margin-bottom: 5px;">SARIPAN</h1>
-    <p style="color:#666; margin-bottom: 40px;">Gestão de Prestação Serviços</p>
+    <p style="color:#666; margin-bottom: 40px;">Gestão Inteligente de Diárias</p>
     
     <button class="btn-big btn-green" onclick="entrarModo('admin')">📋 Acessar Sistema</button>
     <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ Apenas Visualizar</button>
@@ -214,18 +214,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
   <script>
-    // --- FUNÇÕES GLOBAIS (DEFINIDAS PRIMEIRO PARA EVITAR ERRO) ---
+    // --- FUNÇÕES GLOBAIS ---
     let modoAtual = ""; 
     let registros = [];
-    let database = null; // Inicializa vazio
+    let database = null; 
     const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
     function entrarModo(modo) {
         if (!database) {
-            alert("Erro: Sistema não conectado ao Banco de Dados (Verifique a internet).");
-            // Tenta inicializar de novo caso tenha carregado agora
             iniciarFirebase();
-            if(!database) return;
+            if(!database) return alert("Aguarde, conectando ao banco de dados...");
         }
 
         if (modo === 'admin') {
@@ -283,11 +281,7 @@
     function calcularValor(base, carga, tipoDia) {
         let pesoDia = (tipoDia === 3 || tipoDia === 2) ? 2 : 1;
         let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
-        
-        return {
-            multiplicador: multiplicador,
-            total: base * multiplicador
-        };
+        return { multiplicador: multiplicador, total: base * multiplicador };
     }
 
     function atualizarPreview() {
@@ -361,7 +355,7 @@
         seta.innerText = content.classList.contains('open') ? '▼' : '▶';
     }
 
-    // --- RENDERIZAÇÃO ---
+    // --- RENDERIZAÇÃO INTELIGENTE (ACORDEÃO) ---
     function renderizarApontamentos() {
         const container = document.getElementById('lista-quinzenas-container');
         container.innerHTML = "";
@@ -397,13 +391,36 @@
             return bQ - aQ;
         });
 
-        chavesOrdenadas.forEach((chave, index) => {
+        // === LÓGICA DE FILTRO PARA MODO VISUALIZAR ===
+        let chavesFinais = chavesOrdenadas;
+        if (modoAtual === 'view') {
+            const hoje = new Date();
+            const anoH = hoje.getFullYear();
+            const mesH = hoje.getMonth();
+            const diaH = hoje.getDate();
+            const quinzH = diaH <= 15 ? 1 : 2;
+            const chaveVigente = `${anoH}-${mesH}-${quinzH}`;
+            
+            // Filtra para exibir APENAS a quinzena atual
+            chavesFinais = chavesOrdenadas.filter(k => k === chaveVigente);
+            
+            if (chavesFinais.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:#666;">
+                    <h3>Nenhum registro para a quinzena vigente.</h3>
+                    <p>Referência: ${quinzH}ª Quinzena de ${MESES[mesH]}</p>
+                </div>`;
+                return;
+            }
+        }
+
+        chavesFinais.forEach((chave, index) => {
             const grupo = grupos[chave];
             grupo.itens.sort((a, b) => new Date(a.data) - new Date(b.data));
 
-            // Calcular Total de Peso (Diárias a receber)
             const totalPeso = grupo.itens.reduce((acc, item) => acc + item.multiplicador, 0);
 
+            // No modo View (como só tem 1 item), ele já vem aberto. 
+            // No modo Admin, o primeiro item vem aberto.
             const isFirst = index === 0; 
             const nomeMes = MESES[grupo.mes];
             const titulo = `${grupo.quinzena}ª Quinzena de ${nomeMes} ${grupo.ano}`;
@@ -704,7 +721,6 @@
         }
     }
 
-    // --- SETUP INICIAL BLINDADO ---
     function iniciarFirebase() {
         try {
             const firebaseConfig = {
@@ -731,7 +747,6 @@
     window.addEventListener('DOMContentLoaded', () => {
         iniciarFirebase();
         
-        // Listeners de Input
         ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
         
         if ('serviceWorker' in navigator) {
