@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saripan-v2.3-table-style'; 
+const CACHE_NAME = 'saripan-v2.4-pdf-fix'; 
 
 const ASSETS = [
   './',
