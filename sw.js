@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saripan-v3.0-robust'; 
+const CACHE_NAME = 'saripan-v3.2-robust'; 
 
 const ASSETS = [
   './',
