@@ -10,7 +10,7 @@
 
   <style>
     /* Global Styles */
-    body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; padding-bottom: 40px; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; padding-bottom: 40px; }
     .container { background-color: #fff; max-width: 800px; margin: 0 auto; min-height: 100vh; box-shadow: 0 0 15px rgba(0,0,0,0.05); position: relative; }
 
     /* Header e Navegação */
@@ -46,61 +46,23 @@
     .accordion-actions { display: flex; gap: 10px; }
     .btn-icon { background: none; border: none; font-size: 18px; cursor: pointer; padding: 5px; }
     
-    .accordion-content { display: none; padding: 10px; background: #fff; }
+    .accordion-content { display: none; padding: 0; }
     .accordion-content.open { display: block; }
 
-    /* === ESTILO DA TABELA (IGUAL À IMAGEM) === */
-    table { 
-        width: 100%; 
-        border-collapse: collapse; 
-        font-family: Arial, sans-serif; 
-        margin-top: 5px;
-    }
-    
-    /* Cabeçalho Azul Ciano e Texto Preto */
-    th { 
-        background-color: #00b0f0; /* Cor exata da imagem */
-        color: #000000; 
-        font-weight: bold; 
-        font-size: 16px; 
-        text-transform: none; /* Remove uppercase forçado */
-        text-align: center; 
-        border: 1px solid #000000; /* Borda preta sólida */
-        padding: 8px;
-    }
-
-    /* Células com Borda Preta e Texto Preto */
-    td { 
-        padding: 8px; 
-        text-align: center; 
-        border: 1px solid #000000; /* Borda preta sólida */
-        color: #000000;
-        font-size: 15px;
-    }
-
-    /* Remove estilos antigos que conflitavam */
-    tr:last-child td { border-bottom: 1px solid #000000; }
-    .td-valor { 
-        font-weight: normal; 
-        color: #000000; /* Remove cor verde, deixa preto igual a imagem */
-        text-align: center; 
-    }
+    /* Tabela Interna (Visual do APP - Moderno) */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #eee; color: #555; font-size: 12px; text-transform: uppercase; }
+    tr:last-child td { border-bottom: none; }
+    .td-valor { font-weight: bold; color: #2e7d32; text-align: right; }
     .td-acao { text-align: center; width: 40px; }
-    
-    /* Linha de Total */
-    .total-row { 
-        background: #ffffff; /* Fundo branco normal */
-        font-weight: bold; 
-    }
-    .total-row td {
-        border: 1px solid #000000;
-    }
+    .total-row { background: #e8f5e9; font-weight: bold; }
 
-    /* Tabela Financeira (Mantive legível, mas com bordas) */
-    .fin-table { width: 100%; margin-top: 10px; border: 1px solid #000; border-collapse: collapse; }
-    .fin-table th { background: #00b0f0; color: black; border: 1px solid #000; }
-    .fin-table td { border: 1px solid #000; color: black; text-align: center; }
-    .fin-row-total { background: #fff; font-weight: bold; }
+    /* Tabela Financeira */
+    .fin-table { width: 100%; margin-top: 10px; border: 1px solid #ddd; }
+    .fin-table th { background: #0d47a1; color: white; }
+    .fin-table td { border: 1px solid #ddd; }
+    .fin-row-total { background: #fff3e0; font-weight: bold; }
 
     /* Tela Inicial */
     #inicio { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; }
@@ -165,7 +127,7 @@
           </div>
           <div>
             <label>Previsão:</label>
-            <input type="text" id="previewValor" readonly style="background: #eee; font-weight: bold; color: #000;">
+            <input type="text" id="previewValor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;">
           </div>
         </div>
 
@@ -400,8 +362,8 @@
                 metaTexto = `${grupo.itens.length} registros • Total: ${totalFormatado}`;
                 btnPDF = `<button class="btn-icon" style="color:#1976d2;" onclick="event.stopPropagation(); gerarPDF('${chave}')" title="Baixar PDF">📄</button>`;
                 btnDeleteHTML = `<button class="btn-icon" style="color:#d32f2f;" onclick="event.stopPropagation(); excluirQuinzena('${chave}')" title="Excluir Quinzena">🗑️</button>`;
-                thValor = '<th>Valor</th>'; // Alinhamento herdado do CSS
-                thAcao = '<th>Ação</th>';
+                thValor = '<th style="text-align:right">Valor</th>';
+                thAcao = '<th class="td-acao"></th>';
                 totalRowHTML = `
                     <tr class="total-row">
                         <td colspan="2">Total do Período</td>
@@ -409,7 +371,6 @@
                         <td></td>
                     </tr>`;
             } else {
-                // Modo View
                 metaTexto = `${grupo.itens.length} registros trabalhados`;
                 btnPDF = ''; 
                 btnDeleteHTML = ''; 
@@ -516,9 +477,9 @@
                 <thead>
                     <tr>
                         <th>Mês/Ano</th>
-                        <th>1ª Quinz.</th>
-                        <th>2ª Quinz.</th>
-                        <th style="background:#003c8f; color:white;">Total</th>
+                        <th style="text-align:right">1ª Quinz.</th>
+                        <th style="text-align:right">2ª Quinz.</th>
+                        <th style="text-align:right; background:#003c8f;">Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -530,9 +491,9 @@
             html += `
                 <tr>
                     <td>${MESES[d.mes]} ${d.ano}</td>
-                    <td>R$ ${d.q1.toFixed(2)}</td>
-                    <td>R$ ${d.q2.toFixed(2)}</td>
-                    <td class="fin-row-total">R$ ${total.toFixed(2)}</td>
+                    <td style="text-align:right">R$ ${d.q1.toFixed(2)}</td>
+                    <td style="text-align:right">R$ ${d.q2.toFixed(2)}</td>
+                    <td style="text-align:right" class="fin-row-total">R$ ${total.toFixed(2)}</td>
                 </tr>
             `;
         });
@@ -541,7 +502,7 @@
         container.innerHTML = html;
     }
 
-    // --- PDF ---
+    // --- PDF COM ESTILO RETRÔ/GRID (IGUAL ANEXO) ---
     function gerarPDF(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         
@@ -554,29 +515,31 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        doc.setFillColor(13, 71, 161);
-        doc.rect(0, 0, 210, 25, 'F');
-        doc.setFontSize(22);
-        doc.setTextColor(255, 255, 255);
-        doc.text("SARIPAN - Relatório de Serviços", 105, 17, null, null, 'center');
-
-        doc.setTextColor(0,0,0);
+        // Cabeçalho da Página (Mantido simples)
+        doc.setFontSize(18);
+        doc.setTextColor(13, 71, 161);
+        doc.text("SARIPAN - Relatório", 14, 20);
+        
         doc.setFontSize(12);
+        doc.setTextColor(0,0,0);
         const nomeMes = MESES[mes];
-        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes} de ${ano}`, 14, 40);
-        doc.text(`Prestador: João Batista Rosa`, 14, 48);
+        doc.text(`Prestador: João Batista Rosa`, 14, 30);
+        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes} de ${ano}`, 14, 38);
 
+        // Resumo
         let dias = 0;
         let total = 0;
         itens.forEach(i => { dias += i.multiplicador; total += i.total; });
         
         doc.setFont(undefined, 'bold');
-        doc.text(`Total de Diárias (Peso): ${dias}`, 14, 58);
-        doc.text(`Valor Total: R$ ${total.toFixed(2)}`, 100, 58);
+        doc.text("Resumo do Período:", 14, 48);
         doc.setFont(undefined, 'normal');
+        doc.text(`${itens.length} diária(s) registrada(s)`, 14, 54);
+        doc.text(`Total Peso: ${dias}`, 14, 60);
 
+        // Dados da Tabela
         const bodyData = itens.map(i => {
-            let tipo = i.tipoDia === 3 ? "Feriado" : i.tipoDia === 2 ? "Domingo" : "Dia Útil";
+            let tipo = i.tipoDia === 3 ? "Feriado" : i.tipoDia === 2 ? "Domingo" : "Diária Normal";
             if(i.carga === 2) tipo += " (Dobra)";
             return [
                 i.data.split('-').reverse().join('/'),
@@ -585,14 +548,43 @@
             ];
         });
 
+        // ESTILO ESPECÍFICO DO PDF (GRID AZUL CIANO E PRETO)
         doc.autoTable({
             startY: 65,
-            head: [['Data', 'Tipo de Serviço', 'Valor']],
+            head: [['Data', 'Descrição', 'Valor']],
             body: bodyData,
-            theme: 'striped',
-            headStyles: { fillColor: [13, 71, 161] },
-            foot: [['', 'TOTAL', `R$ ${total.toFixed(2)}`]],
-            footStyles: { fillColor: [200, 200, 200], textColor: [0,0,0], fontStyle: 'bold' }
+            theme: 'grid', // FORÇA AS BORDAS
+            
+            // ESTILO DO CABEÇALHO (AZUL CIANO E PRETO)
+            headStyles: { 
+                fillColor: [0, 176, 240], // Azul Ciano (#00b0f0)
+                textColor: [0, 0, 0],     // Texto Preto
+                fontStyle: 'bold',
+                halign: 'center',
+                lineColor: [0, 0, 0],     // Linha Preta
+                lineWidth: 0.1
+            },
+            
+            // ESTILO DO CORPO (BRANCO E PRETO)
+            bodyStyles: {
+                textColor: [0, 0, 0],
+                halign: 'center',         // Centralizado como na imagem
+                lineColor: [0, 0, 0],
+                lineWidth: 0.1
+            },
+            
+            // Coluna do meio alinhada à esquerda? A imagem parece centralizada.
+            // Mas vou manter centralizado para garantir.
+            
+            // RODAPÉ TOTAL
+            foot: [['', 'Valor Total:', `R$ ${total.toFixed(2)}`]],
+            footStyles: {
+                fillColor: [255, 255, 255], // Fundo branco
+                textColor: [0, 0, 0],       // Texto Preto
+                fontStyle: 'bold',
+                lineColor: [0, 0, 0],
+                lineWidth: 0.1
+            }
         });
 
         doc.save(`Saripan_${nomeMes}_${ano}_Q${q}.pdf`);
