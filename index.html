@@ -1,78 +1,399 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Profissional v2</title>
+    <title>Saripan - Gestão de Diárias</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        
-        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
-        
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #666; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+        }
 
-        button { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-add { background: var(--accent); color: white; }
-        .btn-pdf { background: #27ae60; color: white; width: 100%; margin-top: 20px; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
 
-        /* Tabela Organizada */
-        table { width: 100%; border-collapse: collapse; margin-top: 25px; }
-        th { background: var(--primary); color: white; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
-        tr:nth-child(even) { background: #f9f9f9; }
+        body {
+            background-color: var(--bg-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Header Fixo --- */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- Navegação --- */
+        nav {
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--secondary-color);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+        }
+
+        nav button.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        /* --- Conteúdo --- */
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #555; }
+        
+        /* Ajuste de colunas para mobile */
+        td:nth-child(1) { width: 15%; } /* Data */
+        td:nth-child(2) { width: 20%; } /* Tipo */
+        td:nth-child(3) { width: 35%; } /* Detalhes */
+        td:nth-child(4) { width: 20%; font-weight: bold; } /* Valor */
+        td:nth-child(5) { width: 10%; text-align: right; } /* Ação */
+
+        .financial-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .summary-box {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .summary-box p { font-size: 18px; font-weight: bold; color: var(--primary-color); }
+
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            border: none;
+            font-size: 24px;
+        }
+
+        .hidden { display: none; }
+        .text-success { color: var(--success-color); }
+        
+        /* Estilos de Impressão */
+        @media print {
+            body { overflow: visible; height: auto; background: white; }
+            header, nav, .fab, .no-print, button { display: none !important; }
+            main { overflow: visible; padding: 0; }
+            
+            .print-header {
+                display: block;
+                border: 1px solid #000;
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            .print-header h2 { text-align: center; margin-bottom: 15px; }
+            .print-summary { font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap;}
+            .print-summary div { margin-right: 15px; }
+            
+            table { font-size: 11px; width: 100%; border: 1px solid #000; }
+            th { background-color: #ddd !important; border: 1px solid #000; -webkit-print-color-adjust: exact; }
+            td { border: 1px solid #000; padding: 5px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Registro de Dados</h2>
-    
-    <div class="form-grid">
-        <div class="form-group">
-            <label>Data</label>
-            <input type="date" id="inputData">
-        </div>
-        <div class="form-group">
-            <label>Tipo</label>
-            <select id="selectTipo">
-                <option value="Normal">Normal</option>
-                <option value="Dupla">Dupla</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Detalhes</label>
-            <select id="selectDetalhes">
-                <option value="Dia útil">Dia útil</option>
-                <option value="Domingo">Domingo</option>
-                <option value="Feriado">Feriado</option>
-            </select>
-        </div>
-        <div class="form-group" style="justify-content: flex-end;">
-            <button class="btn-add" onclick="adicionarRegistro()">Adicionar</button>
-        </div>
-    </div>
+    <header>
+        <h3>Saripan</h3>
+        <p style="font-size: 0.8rem; opacity: 0.8;">Gestão de Escala</p>
+    </header>
 
-    <table id="tabelaRegistros">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Tipo</th>
-                <th>Detalhes</th>
-                <th>Valor</th>
-            </tr>
-        </thead>
-        <tbody id="corpoTabela"></tbody>
-    </table>
+    <nav>
+        <button class="tab-btn active" onclick="showTab('registros')">Registros</button>
+        <button class="tab-btn" onclick="showTab('financeiro')">Financeiro</button>
+    </nav>
 
-    <button class="btn-pdf" onclick="gerarPDF()">Gerar PDF Profissional</button>
-</div>
+    <main>
+        <div id="tab-registros" class="tab-content">
+            <div class="card">
+                <h4>Lançamentos</h4>
+                <div style="margin: 10px 0;">
+                    <input type="month" id="mesReferencia" class="form-control" style="padding: 8px; width: 100%; border: 1px solid #ccc; border-radius: 4px;" onchange="renderizarTabela()">
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Detalhes</th>
+                            <th>Valor</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-registros">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-financeiro" class="tab-content hidden">
+            <div class="financial-summary">
+                <div class="summary-box">
+                    <h3>Total Mês</h3>
+                    <p id="total-mes">R$ 0,00</p>
+                </div>
+                <div class="summary-box" style="background-color: #d4edda;">
+                    <h3>Total Anual</h3>
+                    <p id="total-anual" class="text-success">R$ 0,00</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Relatório Financeiro</h4>
+                <div id="detalhes-financeiros" style="margin-top:10px; font-size: 0.9rem;">
+                    </div>
+                <button onclick="gerarPDF()" style="margin-top: 15px; width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 4px; font-weight: bold;">
+                    <i class="material-icons" style="vertical-align: middle; font-size: 18px;">picture_as_pdf</i> IMPRIMIR RELATÓRIO
+                </button>
+            </div>
+        </div>
+
+        <div id="area-impressao" class="hidden">
+            <div class="print-header">
+                <h2>Relatório de Diárias - Saripan</h2>
+                <div class="print-summary" id="print-summary-content"></div>
+            </div>
+            <table id="tabela-impressao">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Data</th>
+                        <th style="width: 20%;">Tipo</th>
+                        <th style="width: 45%;">Detalhes</th> <th style="width: 20%;">Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-impressao"></tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <button class="fab" onclick="adicionarRegistroMock()">+</button>
+
+    <script>
+        // ==========================================
+        // CONFIGURAÇÃO DE PREÇOS (CALCULADORA)
+        // Edite os valores abaixo conforme necessário
+        // ==========================================
+        const PRECOS = {
+            'Normal': {
+                'Dia Útil': 150.00,
+                'Domingo': 180.00,  // Exemplo
+                'Feriado': 200.00   // Exemplo
+            },
+            'Dupla': {
+                'Dia Útil': 300.00,
+                'Domingo': 360.00,  // Exemplo
+                'Feriado': 400.00   // Exemplo
+            }
+        };
+
+        // Dados Simulados (Nova Estrutura: Sem 'valor' fixo, com 'detalhes')
+        let registros = [
+            { id: 1, data: '2026-02-01', tipo: 'Normal', detalhes: 'Dia Útil' },
+            { id: 2, data: '2026-02-02', tipo: 'Dupla', detalhes: 'Dia Útil' },
+            { id: 3, data: '2026-02-03', tipo: 'Normal', detalhes: 'Feriado' },
+            { id: 4, data: '2026-02-04', tipo: 'Normal', detalhes: 'Domingo' },
+            { id: 5, data: '2026-01-15', tipo: 'Dupla', detalhes: 'Dia Útil' } 
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('mesReferencia').value = new Date().toISOString().slice(0, 7);
+            renderizarTabela();
+        });
+
+        // --- Lógica de Cálculo ---
+        function calcularValor(tipo, detalhes) {
+            if (PRECOS[tipo] && PRECOS[tipo][detalhes]) {
+                return PRECOS[tipo][detalhes];
+            }
+            return 0.00; // Fallback se não encontrar
+        }
+
+        // --- Renderização ---
+        function renderizarTabela() {
+            const mesRef = document.getElementById('mesReferencia').value;
+            const tbody = document.getElementById('tabela-registros');
+            tbody.innerHTML = '';
+
+            const filtrados = registros.filter(r => r.data.startsWith(mesRef));
+
+            filtrados.forEach(r => {
+                const valorCalculado = calcularValor(r.tipo, r.detalhes);
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatarData(r.data)}</td>
+                    <td>${r.tipo}</td>
+                    <td>${r.detalhes}</td>
+                    <td style="color: var(--primary-color); font-weight: bold;">R$ ${valorCalculado.toFixed(2)}</td>
+                    <td><button onclick="remover(${r.id})" style="color:red; border:none; background:none; cursor:pointer;"><i class="material-icons" style="font-size:18px">delete</i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            atualizarFinanceiro();
+        }
+
+        function atualizarFinanceiro() {
+            const mesRef = document.getElementById('mesReferencia').value;
+            const anoRef = mesRef.split('-')[0];
+
+            // Helpers de cálculo
+            const somar = (lista) => lista.reduce((acc, curr) => acc + calcularValor(curr.tipo, curr.detalhes), 0);
+
+            const totalMes = somar(registros.filter(r => r.data.startsWith(mesRef)));
+            const totalAnual = somar(registros.filter(r => r.data.startsWith(anoRef)));
+
+            // Contadores para o resumo
+            const resumo = { 'Normal': 0, 'Dupla': 0, 'Dia Útil': 0, 'Domingo': 0, 'Feriado': 0 };
+            
+            registros.filter(r => r.data.startsWith(mesRef)).forEach(r => {
+                if(resumo[r.tipo] !== undefined) resumo[r.tipo]++;
+                if(resumo[r.detalhes] !== undefined) resumo[r.detalhes]++;
+            });
+
+            document.getElementById('total-mes').innerText = `R$ ${totalMes.toFixed(2)}`;
+            document.getElementById('total-anual').innerText = `R$ ${totalAnual.toFixed(2)}`;
+
+            // Resumo detalhado (Tela e Impressão)
+            const resumoHTML = `
+                <div><strong>Normais:</strong> ${resumo['Normal']}</div>
+                <div><strong>Duplas:</strong> ${resumo['Dupla']}</div>
+                <div><strong>Dom/Fer:</strong> ${resumo['Domingo'] + resumo['Feriado']}</div>
+                <div style="margin-top: 5px; font-size: 1.1em;"><strong>TOTAL: R$ ${totalMes.toFixed(2)}</strong></div>
+            `;
+
+            document.getElementById('detalhes-financeiros').innerHTML = resumoHTML;
+            document.getElementById('print-summary-content').innerHTML = resumoHTML;
+        }
+
+        function gerarPDF() {
+            const mesRef = document.getElementById('mesReferencia').value;
+            const filtrados = registros.filter(r => r.data.startsWith(mesRef));
+            const tbodyPrint = document.getElementById('tbody-impressao');
+            tbodyPrint.innerHTML = '';
+
+            filtrados.forEach(r => {
+                const valor = calcularValor(r.tipo, r.detalhes);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatarData(r.data)}</td>
+                    <td>${r.tipo}</td>
+                    <td>${r.detalhes}</td>
+                    <td>R$ ${valor.toFixed(2)}</td>
+                `;
+                tbodyPrint.appendChild(tr);
+            });
+
+            const areaPrint = document.getElementById('area-impressao');
+            areaPrint.classList.remove('hidden');
+            
+            const conteudoOriginal = document.body.innerHTML;
+            document.body.innerHTML = areaPrint.innerHTML;
+            window.print();
+            document.body.innerHTML = conteudoOriginal;
+            window.location.reload(); 
+        }
+
+        // --- Helpers ---
+        function formatarData(dataISO) {
+            const [ano, mes, dia] = dataISO.split('-');
+            return `${dia}/${mes}`;
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function adicionarRegistroMock() {
+            // Apenas para teste rápido, adiciona um registro aleatório
+            // Próximo passo: Criar Modal Real
+            const tipos = ['Normal', 'Dupla'];
+            const detalhes = ['Dia Útil', 'Domingo', 'Feriado'];
+            
+            const novo = {
+                id: Date.now(),
+                data: document.getElementById('mesReferencia').value + '-15', // dia fixo para teste
+                tipo: tipos[Math.floor(Math.random() * types.length)],
+                detalhes: detalhes[Math.floor(Math.random() * detalhes.length)]
+            };
+            
+            // Simulação para o usuário ver funcionando sem modal
+            alert("Ainda precisamos criar o Formulário (Modal). Adicionei um registro de teste na memória.");
+            registros.push({
+                id: Date.now(),
+                data: document.getElementById('mesReferencia').value + '-' + Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0'),
+                tipo: 'Normal', 
+                detalhes: 'Dia Útil'
+            });
+            renderizarTabela();
+        }
+
+        function remover(id) {
+            if(confirm('Excluir este registro?')) {
+                registros = registros.filter(r => r.id !== id);
+                renderizarTabela();
+            }
+        }
+    </script>
+</body>
+</html>
