@@ -1,48 +1,41 @@
-// MUDE ESTA VERSÃO TODA VEZ QUE ATUALIZAR O CÓDIGO
-const CACHE_NAME = 'saripan-v1.3'; 
+// ATUALIZE AQUI SEMPRE QUE MUDAR O CÓDIGO
+const CACHE_NAME = 'saripan-v2.0-auto'; 
 
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192x192.png',
-  './icons/icon-512x512.png'
-  // Adicione aqui outros arquivos se tiver (ex: style.css)
+  './icons/icon-512x512.png',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js'
 ];
 
-// 1. Instalação: Baixa os arquivos novos
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Força o novo SW a entrar em ação imediatamente
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Caching nova versão:', CACHE_NAME);
-      return cache.addAll(ASSETS);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-// 2. Ativação: Limpa os caches antigos
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(
         keyList.map((key) => {
-          if (key !== CACHE_NAME) {
-            console.log('[SW] Removendo cache antigo:', key);
-            return caches.delete(key);
-          }
+          if (key !== CACHE_NAME) return caches.delete(key);
         })
       );
     })
   );
-  self.clients.claim(); // Assume o controle da página imediatamente
+  self.clients.claim();
 });
 
-// 3. Fetch: Serve o cache, mas se não tiver, busca na rede
 self.addEventListener('fetch', (event) => {
+  // Estratégia: Network First (Tenta pegar online, se falhar, pega cache)
+  // Isso garante que você sempre veja a versão mais nova do Firebase/App
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .catch(() => caches.match(event.request))
   );
 });
