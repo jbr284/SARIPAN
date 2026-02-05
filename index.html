@@ -1,717 +1,78 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SARIPAN</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
-  <meta name="theme-color" content="#d32f2f">
-
-  <style>
-    /* Global Styles */
-    body { 
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        background-color: #f0f2f5; 
-        margin: 0; 
-        padding: 0; 
-        height: 100vh; /* Ocupa 100% da altura da tela */
-        overflow: hidden; /* Impede a rolagem da página inteira */
-    }
-
-    .container { 
-        background-color: #fff; 
-        max-width: 800px; 
-        margin: 0 auto; 
-        height: 100%; /* Altura total */
-        display: flex; /* Layout Flexível */
-        flex-direction: column; /* Um item abaixo do outro */
-        box-shadow: 0 0 15px rgba(0,0,0,0.05); 
-        position: relative; 
-    }
-
-    /* ÁREA FIXA (NÃO ROLA) */
-    .fixed-area {
-        flex-shrink: 0; /* Não encolhe */
-        z-index: 10;
-        background: white;
-    }
-
-    /* Header */
-    .app-header { 
-        background: #0d47a1; 
-        color: white; 
-        padding: 15px; 
-        display: flex; 
-        align-items: center; 
-        justify-content: space-between; 
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-    }
-    .app-title { font-size: 20px; font-weight: bold; margin: 0; }
-    .btn-nav-top { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Profissional v2</title>
     
-    /* Abas Superiores */
-    .tabs-container { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
-    .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-size: 16px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: background 0.2s; }
-    .tab-btn.active { color: #0d47a1; border-bottom: 3px solid #0d47a1; background: #f9f9f9; }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-    /* ÁREA DE ROLAGEM (SCROLL) */
-    .scroll-content {
-        flex-grow: 1; /* Ocupa todo o espaço restante */
-        overflow-y: auto; /* Permite rolar apenas esta área */
-        background: #f0f2f5;
-        position: relative;
-    }
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #666; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
 
-    /* Painéis */
-    .panel { 
-        display: none; 
-        padding: 15px; 
-        padding-bottom: 80px; /* Espaço extra no final */
-        animation: fadeIn 0.3s; 
-    }
-    .panel.active { display: block; }
+        button { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-add { background: var(--accent); color: white; }
+        .btn-pdf { background: #27ae60; color: white; width: 100%; margin-top: 20px; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
 
-    /* Formulário de Registro */
-    .form-box { background: #e3f2fd; padding: 15px; border-radius: 8px; border: 1px solid #bbdefb; margin-bottom: 20px; }
-    .form-title { margin-top: 0; color: #1565c0; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #bbdefb; padding-bottom: 5px; }
-    .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-    label { font-size: 13px; font-weight: bold; color: #444; display: block; margin-bottom: 4px; }
-    input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
-    .btn-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; margin-top: 10px; }
-    .btn-green { background-color: #2e7d32; }
-    .btn-red { background-color: #c62828; }
-
-    /* ACORDEÃO (Listas Quinzenais) */
-    .accordion-group { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
-    .accordion-header { background: #f5f5f5; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; border-left: 5px solid #0d47a1; }
-    .accordion-header.active { background: #e8eaf6; }
-    .accordion-title { font-weight: bold; color: #333; font-size: 15px; }
-    .accordion-meta { font-size: 12px; color: #666; margin-top: 2px; }
-    .accordion-actions { display: flex; gap: 10px; }
-    .btn-icon { background: none; border: none; font-size: 18px; cursor: pointer; padding: 5px; }
-    
-    .accordion-content { display: none; padding: 0; }
-    .accordion-content.open { display: block; }
-
-    /* Tabela Interna (Visual App) */
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
-    th { background: #eee; color: #555; font-size: 12px; text-transform: uppercase; }
-    tr:last-child td { border-bottom: none; }
-    .td-valor { font-weight: bold; color: #2e7d32; text-align: right; }
-    .td-acao { text-align: center; width: 40px; }
-    .total-row { background: #e8f5e9; font-weight: bold; }
-
-    /* FINANCEIRO */
-    .year-summary { 
-        background: #fff8e1; 
-        border: 1px solid #ffe0b2; 
-        border-radius: 8px; 
-        padding: 15px; 
-        margin-bottom: 20px; 
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .year-summary h4 { margin: 0; color: #f57c00; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-    .year-total-value { font-size: 24px; font-weight: bold; color: #333; margin-top: 5px; }
-
-    .fin-table { width: 100%; border: 1px solid #ddd; background: white; }
-    .fin-table th { background: #0d47a1; color: white; }
-    .fin-table td { border: 1px solid #ddd; }
-    .fin-row-total { background: #fff3e0; font-weight: bold; color: #e65100; }
-
-    /* Tela Inicial */
-    #inicio { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; width: 100%; position: absolute; top:0; left:0; z-index: 200; }
-    .btn-big { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 30px; border: none; color: white; width: 80%; max-width: 300px; cursor: pointer; }
-
-    .hidden { display: none !important; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  </style>
+        /* Tabela Organizada */
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        th { background: var(--primary); color: white; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
+        tr:nth-child(even) { background: #f9f9f9; }
+    </style>
 </head>
 <body>
 
-  <div id="inicio">
-    <h1 style="color:#d32f2f; font-size: 40px; margin-bottom: 5px;">SARIPAN</h1>
-    <p style="color:#666; margin-bottom: 40px;">Gestão de prestação de serviços</p>
+<div class="container">
+    <h2>Registro de Dados</h2>
     
-    <button class="btn-big btn-green" onclick="entrarModo('admin')">📋 Acessar Sistema</button>
-    <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ Apenas Visualizar</button>
-  </div>
-
-  <div id="app" class="container hidden">
-    
-    <div class="fixed-area">
-        <div class="app-header">
-          <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
-          <div class="app-title">SARIPAN</div>
-          <div style="width: 50px;"></div>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="inputData">
         </div>
-
-        <div class="tabs-container">
-          <button class="tab-btn active" onclick="mudarAba('apontamentos')">📝 Apontamentos</button>
-          <button id="btn-tab-financeiro" class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
+        <div class="form-group">
+            <label>Tipo</label>
+            <select id="selectTipo">
+                <option value="Normal">Normal</option>
+                <option value="Dupla">Dupla</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Detalhes</label>
+            <select id="selectDetalhes">
+                <option value="Dia útil">Dia útil</option>
+                <option value="Domingo">Domingo</option>
+                <option value="Feriado">Feriado</option>
+            </select>
+        </div>
+        <div class="form-group" style="justify-content: flex-end;">
+            <button class="btn-add" onclick="adicionarRegistro()">Adicionar</button>
         </div>
     </div>
 
-    <div class="scroll-content">
-        
-        <div id="painel-apontamentos" class="panel active">
-          
-          <div id="area-formulario" class="form-box hidden">
-            <h3 class="form-title">Novo Registro</h3>
-            <label>Data do Serviço:</label>
-            <input type="date" id="dataServico" style="margin-bottom: 10px;">
-            
-            <div class="grid-input">
-              <div>
-                <label>Carga:</label>
-                <select id="tipoCarga">
-                  <option value="1">Normal </option>
-                  <option value="2">Dupla </option>
-                </select>
-              </div>
-              <div>
-                <label>Dia:</label>
-                <select id="tipoDia">
-                  <option value="1">Normal</option>
-                  <option value="2">Domingo</option>
-                  <option value="3">Feriado</option>
-                </select>
-              </div>
-            </div>
+    <table id="tabelaRegistros">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Detalhes</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabela"></tbody>
+    </table>
 
-            <div class="grid-input">
-              <div>
-                <label>Valor Base (R$):</label>
-                <input type="number" id="valorBase" value="130.00">
-              </div>
-              <div>
-                <label>Previsão:</label>
-                <input type="text" id="previewValor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;">
-              </div>
-            </div>
-
-            <button class="btn-action btn-green" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
-          </div>
-
-          <div id="lista-quinzenas-container"></div>
-          
-          <div id="msg-sem-dados" style="text-align:center; padding: 40px; color:#999; display:none;">
-            Nenhum registro encontrado.
-          </div>
-        </div>
-
-        <div id="painel-financeiro" class="panel">
-          <div id="financeiro-content"></div>
-        </div>
-
-    </div> </div>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-
-  <script>
-    // --- CONFIGURAÇÃO FIREBASE ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s",
-      authDomain: "saripan-db.firebaseapp.com",
-      databaseURL: "https://saripan-db-default-rtdb.firebaseio.com",
-      projectId: "saripan-db",
-      storageBucket: "saripan-db.firebasestorage.app",
-      messagingSenderId: "1:80320414744:web:958b3a99462d97575e2f6d",
-      appId: "G-9W62N5PFV9"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // --- ESTADO GLOBAL ---
-    let modoAtual = ""; 
-    let registros = [];
-    const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-    // --- NAVEGAÇÃO ---
-    function entrarModo(modo) {
-        if (modo === 'admin') {
-            const senha = prompt("Senha de Acesso:");
-            if (senha !== "0305") return alert("Senha incorreta!");
-        }
-        
-        modoAtual = modo;
-        
-        document.getElementById('inicio').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        
-        if (modo === 'admin') {
-            document.getElementById('area-formulario').classList.remove('hidden');
-            document.getElementById('btn-tab-financeiro').style.display = 'block';
-        } else {
-            // Modo VIEW
-            document.getElementById('area-formulario').classList.add('hidden');
-            document.getElementById('btn-tab-financeiro').style.display = 'none';
-        }
-        
-        mudarAba('apontamentos');
-        document.getElementById('dataServico').valueAsDate = new Date();
-        atualizarPreview();
-        carregarDados();
-    }
-
-    function sairApp() {
-        if (modoAtual === 'view') {
-            location.reload();
-            return;
-        }
-        if(confirm("Sair do sistema?")) {
-            location.reload();
-        }
-    }
-
-    function mudarAba(aba) {
-        if (aba === 'financeiro' && modoAtual !== 'admin') return;
-
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        
-        if (aba === 'apontamentos') {
-            document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
-            document.getElementById('painel-apontamentos').classList.add('active');
-        } else {
-            document.getElementById('btn-tab-financeiro').classList.add('active');
-            document.getElementById('painel-financeiro').classList.add('active');
-            renderizarFinanceiro();
-        }
-    }
-
-    // --- LÓGICA DE CÁLCULO E PREVIEW ---
-    function calcularValor(base, carga, tipoDia) {
-        let pesoDia = (tipoDia === 3 || tipoDia === 2) ? 2 : 1;
-        let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
-        
-        return {
-            multiplicador: multiplicador,
-            total: base * multiplicador
-        };
-    }
-
-    function atualizarPreview() {
-        const base = parseFloat(document.getElementById('valorBase').value) || 0;
-        const carga = parseInt(document.getElementById('tipoCarga').value);
-        const tipoDia = parseInt(document.getElementById('tipoDia').value);
-        const calc = calcularValor(base, carga, tipoDia);
-        document.getElementById('previewValor').value = `R$ ${calc.total.toFixed(2)}`;
-    }
-
-    ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
-
-    // --- CRUD ---
-    async function adicionarRegistro() {
-        if (modoAtual !== 'admin') return;
-
-        const dataInput = document.getElementById('dataServico').value;
-        if (!dataInput) return alert("Data inválida!");
-
-        const base = parseFloat(document.getElementById('valorBase').value);
-        const carga = parseInt(document.getElementById('tipoCarga').value);
-        const tipoDia = parseInt(document.getElementById('tipoDia').value);
-        
-        const calc = calcularValor(base, carga, tipoDia);
-        
-        const dateObj = new Date(dataInput);
-        const ano = dateObj.getUTCFullYear();
-        const mesIndex = dateObj.getUTCMonth(); 
-        const dia = dateObj.getUTCDate();
-        const quinzena = dia <= 15 ? 1 : 2;
-
-        const novoReg = {
-            id: Date.now(),
-            data: dataInput,
-            ano: ano,
-            mes: mesIndex,
-            quinzena: quinzena,
-            carga: carga,
-            tipoDia: tipoDia,
-            valorBase: base,
-            multiplicador: calc.multiplicador,
-            total: calc.total
-        };
-
-        registros.push(novoReg);
-        await salvarFirebase();
-        renderizarApontamentos();
-        alert("Registro salvo!");
-    }
-
-    async function excluirRegistro(id) {
-        if (modoAtual !== 'admin') return;
-        if(!confirm("Excluir este registro?")) return;
-        registros = registros.filter(r => r.id !== id);
-        await salvarFirebase();
-        renderizarApontamentos();
-    }
-
-    async function excluirQuinzena(chaveGrupo) {
-        if (modoAtual !== 'admin') return;
-        if (!confirm("ATENÇÃO: Isso apagará TODOS os registros desta quinzena.\n\nTem certeza?")) return;
-        const [ano, mes, q] = chaveGrupo.split('-').map(Number);
-        registros = registros.filter(r => !(r.ano === ano && r.mes === mes && r.quinzena === q));
-        await salvarFirebase();
-        renderizarApontamentos();
-    }
-
-    // --- RENDERIZAÇÃO INTELIGENTE (ACORDEÃO) ---
-    function renderizarApontamentos() {
-        const container = document.getElementById('lista-quinzenas-container');
-        container.innerHTML = "";
-
-        if (registros.length === 0) {
-            document.getElementById('msg-sem-dados').style.display = 'block';
-            return;
-        }
-        document.getElementById('msg-sem-dados').style.display = 'none';
-
-        const grupos = {};
-        
-        registros.forEach(reg => {
-            const chave = `${reg.ano}-${reg.mes}-${reg.quinzena}`;
-            if (!grupos[chave]) {
-                grupos[chave] = {
-                    ano: reg.ano,
-                    mes: reg.mes,
-                    quinzena: reg.quinzena,
-                    itens: [],
-                    totalValor: 0
-                };
-            }
-            grupos[chave].itens.push(reg);
-            grupos[chave].totalValor += reg.total;
-        });
-
-        const chavesOrdenadas = Object.keys(grupos).sort((a, b) => {
-            const [aA, aM, aQ] = a.split('-').map(Number);
-            const [bA, bM, bQ] = b.split('-').map(Number);
-            if (aA !== bA) return bA - aA;
-            if (aM !== bM) return bM - aM;
-            return bQ - aQ;
-        });
-
-        chavesOrdenadas.forEach((chave, index) => {
-            const grupo = grupos[chave];
-            grupo.itens.sort((a, b) => new Date(a.data) - new Date(b.data));
-
-            const isFirst = index === 0; 
-            const nomeMes = MESES[grupo.mes];
-            const titulo = `${grupo.quinzena}ª Quinzena de ${nomeMes} ${grupo.ano}`;
-            const totalFormatado = grupo.totalValor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-
-            const div = document.createElement('div');
-            div.className = 'accordion-group';
-            
-            let btnPDF = '';
-            let btnDeleteHTML = '';
-            let metaTexto = '';
-            let thValor = '';
-            let thAcao = '';
-            let totalRowHTML = '';
-
-            if (modoAtual === 'admin') {
-                metaTexto = `${grupo.itens.length} registros • Total: ${totalFormatado}`;
-                btnPDF = `<button class="btn-icon" style="color:#1976d2;" onclick="event.stopPropagation(); gerarPDF('${chave}')" title="Baixar PDF">📄</button>`;
-                btnDeleteHTML = `<button class="btn-icon" style="color:#d32f2f;" onclick="event.stopPropagation(); excluirQuinzena('${chave}')" title="Excluir Quinzena">🗑️</button>`;
-                thValor = '<th style="text-align:right">Valor</th>';
-                thAcao = '<th class="td-acao"></th>';
-                totalRowHTML = `
-                    <tr class="total-row">
-                        <td colspan="2">Total do Período</td>
-                        <td class="td-valor">${totalFormatado}</td>
-                        <td></td>
-                    </tr>`;
-            } else {
-                metaTexto = `${grupo.itens.length} registros trabalhados`;
-                btnPDF = ''; 
-                btnDeleteHTML = ''; 
-                thValor = ''; 
-                thAcao = ''; 
-                totalRowHTML = `
-                    <tr class="total-row">
-                        <td colspan="2">Total de Dias Trabalhados: ${grupo.itens.length}</td>
-                    </tr>`;
-            }
-
-            div.innerHTML = `
-                <div class="accordion-header ${isFirst ? 'active' : ''}" onclick="toggleAccordion(this)">
-                    <div>
-                        <div class="accordion-title">${titulo}</div>
-                        <div class="accordion-meta">${metaTexto}</div>
-                    </div>
-                    <div class="accordion-actions">
-                        ${btnPDF}
-                        ${btnDeleteHTML}
-                        <span style="margin-left:5px; font-size:12px;">${isFirst ? '▼' : '▶'}</span>
-                    </div>
-                </div>
-                <div class="accordion-content ${isFirst ? 'open' : ''}">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Dia</th>
-                                <th>Detalhe</th>
-                                ${thValor}
-                                ${thAcao}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${grupo.itens.map(item => {
-                                const diaStr = item.data.split('-')[2];
-                                let desc = item.tipoDia === 3 ? "Feriado" : item.tipoDia === 2 ? "Domingo" : "Útil";
-                                if (item.carga === 2) desc += " (Dobrado)";
-                                
-                                let tdValor = '';
-                                let tdAcao = '';
-
-                                if (modoAtual === 'admin') {
-                                    tdValor = `<td class="td-valor">R$ ${item.total.toFixed(2)}</td>`;
-                                    tdAcao = `<td class="td-acao"><span style="color:red; cursor:pointer;" onclick="excluirRegistro(${item.id})">✖</span></td>`;
-                                }
-
-                                return `
-                                    <tr>
-                                        <td>${diaStr}/${(item.mes+1).toString().padStart(2,'0')}</td>
-                                        <td>${desc}</td>
-                                        ${tdValor}
-                                        ${tdAcao}
-                                    </tr>
-                                `;
-                            }).join('')}
-                            ${totalRowHTML}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function toggleAccordion(header) {
-        header.classList.toggle('active');
-        const content = header.nextElementSibling;
-        content.classList.toggle('open');
-        const seta = header.querySelector('span:last-child');
-        seta.innerText = content.classList.contains('open') ? '▼' : '▶';
-    }
-
-    // --- ABA FINANCEIRA COM TOTAL ANUAL ---
-    function renderizarFinanceiro() {
-        if (modoAtual !== 'admin') return;
-
-        const container = document.getElementById('financeiro-content');
-        container.innerHTML = "";
-
-        // 1. Calcular Totais
-        const dadosMes = {}; 
-        const totaisAnuais = {};
-
-        registros.forEach(reg => {
-            // Mensal
-            const chaveMes = `${reg.ano}-${reg.mes}`;
-            if (!dadosMes[chaveMes]) {
-                dadosMes[chaveMes] = { ano: reg.ano, mes: reg.mes, q1: 0, q2: 0 };
-            }
-            if (reg.quinzena === 1) dadosMes[chaveMes].q1 += reg.total;
-            else dadosMes[chaveMes].q2 += reg.total;
-
-            // Anual
-            if (!totaisAnuais[reg.ano]) totaisAnuais[reg.ano] = 0;
-            totaisAnuais[reg.ano] += reg.total;
-        });
-
-        // 2. Ordenar
-        const chavesMes = Object.keys(dadosMes).sort((a,b) => {
-             const [aA, aM] = a.split('-').map(Number);
-             const [bA, bM] = b.split('-').map(Number);
-             if (aA !== bA) return bA - aA;
-             return bM - aM;
-        });
-        
-        const anosOrdenados = Object.keys(totaisAnuais).sort((a,b) => b-a); // Mais recente primeiro
-
-        if (chavesMes.length === 0) {
-            container.innerHTML = "<p style='text-align:center; padding:20px;'>Sem dados financeiros.</p>";
-            return;
-        }
-
-        // 3. Renderizar CARD DE TOTAIS ANUAIS
-        let htmlAnual = '';
-        anosOrdenados.forEach(ano => {
-            const valor = totaisAnuais[ano].toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-            htmlAnual += `
-                <div class="year-summary">
-                    <h4>Total Acumulado ${ano}</h4>
-                    <div class="year-total-value">${valor}</div>
-                </div>
-            `;
-        });
-        container.innerHTML += htmlAnual;
-
-        // 4. Renderizar TABELA MENSAL
-        let htmlTable = `
-            <table class="fin-table">
-                <thead>
-                    <tr>
-                        <th>Mês/Ano</th>
-                        <th style="text-align:right">1ª Q.</th>
-                        <th style="text-align:right">2ª Q.</th>
-                        <th style="text-align:right; background:#003c8f; color:white;">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        chavesMes.forEach(k => {
-            const d = dadosMes[k];
-            const total = d.q1 + d.q2;
-            htmlTable += `
-                <tr>
-                    <td>${MESES[d.mes]} ${d.ano}</td>
-                    <td style="text-align:right">R$ ${d.q1.toFixed(2)}</td>
-                    <td style="text-align:right">R$ ${d.q2.toFixed(2)}</td>
-                    <td style="text-align:right" class="fin-row-total">R$ ${total.toFixed(2)}</td>
-                </tr>
-            `;
-        });
-
-        htmlTable += `</tbody></table>`;
-        container.innerHTML += htmlTable;
-    }
-
-    // --- PDF (Mantido o design Grid/Planilha solicitado) ---
-    function gerarPDF(chaveGrupo) {
-        if (modoAtual !== 'admin') return;
-        
-        const [ano, mes, q] = chaveGrupo.split('-').map(Number);
-        const itens = registros.filter(r => r.ano === ano && r.mes === mes && r.quinzena === q);
-        itens.sort((a, b) => new Date(a.data) - new Date(b.data));
-
-        if (itens.length === 0) return alert("Erro: Sem dados.");
-
-        // Resumo
-        let contagem = { normal: 0, dupla: 0, feriado: 0, domingo: 0, feriadoDupla: 0, domingoDupla: 0 };
-        let totalMultiplicador = 0;
-        let totalDinheiro = 0;
-
-        itens.forEach(i => {
-            totalMultiplicador += i.multiplicador;
-            totalDinheiro += i.total;
-            if (i.carga === 1) {
-                if (i.tipoDia === 1) contagem.normal++;
-                else if (i.tipoDia === 2) contagem.domingo++;
-                else if (i.tipoDia === 3) contagem.feriado++;
-            } else { 
-                if (i.tipoDia === 1) contagem.dupla++;
-                else if (i.tipoDia === 2) contagem.domingoDupla++;
-                else if (i.tipoDia === 3) contagem.feriadoDupla++;
-            }
-        });
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        doc.setFontSize(16);
-        doc.setFont(undefined, 'bold');
-        doc.text("SARIPAN - Relatório", 14, 20);
-        
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'normal');
-        doc.text("Prestador: João Batista Rosa", 14, 28);
-        const nomeMes = MESES[mes];
-        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes}`, 14, 34);
-        
-        doc.setFont(undefined, 'bold');
-        doc.text("Resumo do Período:", 14, 44);
-        doc.setFont(undefined, 'normal');
-        
-        let y = 50;
-        if (contagem.normal > 0) { doc.text(`- ${contagem.normal} diária(s) normal`, 14, y); y += 6; }
-        if (contagem.dupla > 0) { doc.text(`- ${contagem.dupla} diária(s) dupla`, 14, y); y += 6; }
-        if (contagem.feriado > 0) { doc.text(`- ${contagem.feriado} feriado(s) normal`, 14, y); y += 6; }
-        if (contagem.domingo > 0) { doc.text(`- ${contagem.domingo} domingo(s)`, 14, y); y += 6; }
-        if (contagem.feriadoDupla > 0) { doc.text(`- ${contagem.feriadoDupla} feriado(s) dupla`, 14, y); y += 6; }
-        if (contagem.domingoDupla > 0) { doc.text(`- ${contagem.domingoDupla} domingo(s) dupla`, 14, y); y += 6; }
-
-        doc.setFont(undefined, 'bold');
-        y += 2;
-        doc.text(`Total: ${totalMultiplicador} diárias a receber`, 14, y);
-        y += 6;
-        doc.text(`Total: ${totalMultiplicador} diárias`, 14, y);
-
-        const bodyData = itens.map(i => {
-            let tipo = i.tipoDia === 3 ? "Feriado" : i.tipoDia === 2 ? "Domingo" : "Diária Normal";
-            if(i.carga === 2) tipo += " (Dobra)";
-            return [
-                i.data.split('-').reverse().join('/'),
-                tipo,
-                `R$ ${i.total.toFixed(2)}`
-            ];
-        });
-
-        doc.autoTable({
-            startY: y + 10,
-            head: [['Data', 'Descrição', 'Valor']],
-            body: bodyData,
-            theme: 'grid', 
-            headStyles: { 
-                fillColor: [0, 176, 240], 
-                textColor: [0, 0, 0],     
-                fontStyle: 'bold',
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            },
-            bodyStyles: {
-                textColor: [0, 0, 0],
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            },
-            foot: [['', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
-            footStyles: {
-                fillColor: [255, 255, 255],
-                textColor: [0, 0, 0],
-                fontStyle: 'bold',
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            }
-        });
-
-        doc.save(`Saripan_${nomeMes}_${ano}_Q${q}.pdf`);
-    }
-
-    // --- FIREBASE SYNC ---
-    async function salvarFirebase() {
-        if (modoAtual === "admin") {
-            await database.ref('saripan_v2').set({ 
-                ultAtualizacao: new Date().toISOString(), 
-                dados: registros 
-            });
-        }
-    }
-
-    async function carregarDados() {
-        const snap = await database.ref('saripan_v2').get();
-        if (snap.exists()) {
-            registros = snap.val().dados || [];
-        } else {
-            registros = [];
-        }
-        renderizarApontamentos();
-    }
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
-    }
-  </script>
-</body>
-</html>
+    <button class="btn-pdf" onclick="gerarPDF()">Gerar PDF Profissional</button>
+</div>
