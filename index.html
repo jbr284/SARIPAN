@@ -14,6 +14,7 @@
             --success-color: #28a745;
             --bg-color: #f4f6f9;
             --card-bg: #ffffff;
+            --header-height: 120px; /* Altura combinada do header + abas */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
@@ -23,7 +24,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: hidden; /* Impede rolagem no body */
         }
 
         /* --- Header Fixo --- */
@@ -33,10 +34,11 @@
             padding: 15px;
             text-align: center;
             flex-shrink: 0;
+            z-index: 1000;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* --- Navegação --- */
+        /* --- Navegação/Abas Fixas --- */
         nav {
             background-color: var(--card-bg);
             display: flex;
@@ -62,14 +64,15 @@
             border-bottom: 3px solid var(--primary-color);
         }
 
-        /* --- Conteúdo --- */
+        /* --- Área de Conteúdo Rolável --- */
         main {
             flex-grow: 1;
-            overflow-y: auto;
+            overflow-y: auto; /* Apenas o conteúdo rola */
             padding: 15px;
-            padding-bottom: 80px;
+            padding-bottom: 80px; /* Espaço para FAB ou rodapé se houver */
         }
 
+        /* Cards e Tabelas */
         .card {
             background: var(--card-bg);
             border-radius: 8px;
@@ -78,17 +81,11 @@
             margin-bottom: 15px;
         }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #555; }
-        
-        /* Ajuste de colunas para mobile */
-        td:nth-child(1) { width: 15%; } /* Data */
-        td:nth-child(2) { width: 20%; } /* Tipo */
-        td:nth-child(3) { width: 35%; } /* Detalhes */
-        td:nth-child(4) { width: 20%; font-weight: bold; } /* Valor */
-        td:nth-child(5) { width: 10%; text-align: right; } /* Ação */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; font-weight: 600; }
 
+        /* Resumo Financeiro */
         .financial-summary {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -101,8 +98,10 @@
             border-radius: 5px;
             text-align: center;
         }
+        .summary-box h3 { font-size: 14px; color: #555; }
         .summary-box p { font-size: 18px; font-weight: bold; color: var(--primary-color); }
 
+        /* Botão Flutuante (FAB) */
         .fab {
             position: fixed;
             bottom: 20px;
@@ -121,28 +120,28 @@
             font-size: 24px;
         }
 
+        /* Classes utilitárias */
         .hidden { display: none; }
         .text-success { color: var(--success-color); }
         
-        /* Estilos de Impressão */
+        /* Estilos de Impressão (PDF) */
         @media print {
-            body { overflow: visible; height: auto; background: white; }
-            header, nav, .fab, .no-print, button { display: none !important; }
+            body { overflow: visible; height: auto; }
+            header, nav, .fab, .no-print { display: none !important; }
             main { overflow: visible; padding: 0; }
             
             .print-header {
                 display: block;
                 border: 1px solid #000;
-                padding: 15px;
+                padding: 10px;
                 margin-bottom: 20px;
             }
-            .print-header h2 { text-align: center; margin-bottom: 15px; }
-            .print-summary { font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap;}
-            .print-summary div { margin-right: 15px; }
-            
-            table { font-size: 11px; width: 100%; border: 1px solid #000; }
-            th { background-color: #ddd !important; border: 1px solid #000; -webkit-print-color-adjust: exact; }
-            td { border: 1px solid #000; padding: 5px; }
+            .print-header h2 { text-align: center; margin-bottom: 10px; }
+            .print-summary {
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -159,11 +158,12 @@
     </nav>
 
     <main>
+        
         <div id="tab-registros" class="tab-content">
             <div class="card">
-                <h4>Lançamentos</h4>
+                <h4>Lançamentos do Mês</h4>
                 <div style="margin: 10px 0;">
-                    <input type="month" id="mesReferencia" class="form-control" style="padding: 8px; width: 100%; border: 1px solid #ccc; border-radius: 4px;" onchange="renderizarTabela()">
+                    <input type="month" id="mesReferencia" class="form-control" onchange="renderizarTabela()">
                 </div>
                 
                 <table>
@@ -171,9 +171,8 @@
                         <tr>
                             <th>Data</th>
                             <th>Tipo</th>
-                            <th>Detalhes</th>
                             <th>Valor</th>
-                            <th></th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="tabela-registros">
@@ -183,6 +182,7 @@
         </div>
 
         <div id="tab-financeiro" class="tab-content hidden">
+            
             <div class="financial-summary">
                 <div class="summary-box">
                     <h3>Total Mês</h3>
@@ -195,11 +195,12 @@
             </div>
 
             <div class="card">
-                <h4>Relatório Financeiro</h4>
-                <div id="detalhes-financeiros" style="margin-top:10px; font-size: 0.9rem;">
+                <h4>Relatório Detalhado</h4>
+                <p>Resumo de ganhos por categoria.</p>
+                <div id="detalhes-financeiros" style="margin-top:10px;">
                     </div>
-                <button onclick="gerarPDF()" style="margin-top: 15px; width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 4px; font-weight: bold;">
-                    <i class="material-icons" style="vertical-align: middle; font-size: 18px;">picture_as_pdf</i> IMPRIMIR RELATÓRIO
+                <button onclick="gerarPDF()" style="margin-top: 15px; width: 100%; padding: 10px; background: #333; color: white; border: none; border-radius: 4px;">
+                    <i class="material-icons" style="vertical-align: middle; font-size: 16px;">picture_as_pdf</i> Gerar Relatório PDF
                 </button>
             </div>
         </div>
@@ -207,15 +208,12 @@
         <div id="area-impressao" class="hidden">
             <div class="print-header">
                 <h2>Relatório de Diárias - Saripan</h2>
-                <div class="print-summary" id="print-summary-content"></div>
+                <div class="print-summary" id="print-summary-content">
+                    </div>
             </div>
-            <table id="tabela-impressao">
+            <table id="tabela-impressao" style="width: 100%; border: 1px solid #000;">
                 <thead>
-                    <tr>
-                        <th style="width: 15%;">Data</th>
-                        <th style="width: 20%;">Tipo</th>
-                        <th style="width: 45%;">Detalhes</th> <th style="width: 20%;">Valor</th>
-                    </tr>
+                    <tr style="background: #ccc;"><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th></tr>
                 </thead>
                 <tbody id="tbody-impressao"></tbody>
             </table>
@@ -223,46 +221,31 @@
 
     </main>
 
-    <button class="fab" onclick="adicionarRegistroMock()">+</button>
+    <button class="fab" onclick="adicionarRegistro()">+</button>
 
     <script>
-        // ==========================================
-        // CONFIGURAÇÃO DE PREÇOS (CALCULADORA)
-        // Edite os valores abaixo conforme necessário
-        // ==========================================
-        const PRECOS = {
-            'Normal': {
-                'Dia Útil': 150.00,
-                'Domingo': 180.00,  // Exemplo
-                'Feriado': 200.00   // Exemplo
-            },
-            'Dupla': {
-                'Dia Útil': 300.00,
-                'Domingo': 360.00,  // Exemplo
-                'Feriado': 400.00   // Exemplo
-            }
-        };
-
-        // Dados Simulados (Nova Estrutura: Sem 'valor' fixo, com 'detalhes')
+        // --- Dados Simulados (Substituir por LocalStorage ou Banco) ---
         let registros = [
-            { id: 1, data: '2026-02-01', tipo: 'Normal', detalhes: 'Dia Útil' },
-            { id: 2, data: '2026-02-02', tipo: 'Dupla', detalhes: 'Dia Útil' },
-            { id: 3, data: '2026-02-03', tipo: 'Normal', detalhes: 'Feriado' },
-            { id: 4, data: '2026-02-04', tipo: 'Normal', detalhes: 'Domingo' },
-            { id: 5, data: '2026-01-15', tipo: 'Dupla', detalhes: 'Dia Útil' } 
+            { id: 1, data: '2026-02-01', tipo: 'Normal', valor: 150.00 },
+            { id: 2, data: '2026-02-02', tipo: 'Dupla', valor: 300.00 },
+            { id: 3, data: '2026-02-03', tipo: 'Normal', valor: 150.00 },
+            { id: 4, data: '2026-01-15', tipo: 'Feriado', valor: 250.00 } // Mês anterior para teste anual
         ];
 
+        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('mesReferencia').value = new Date().toISOString().slice(0, 7);
             renderizarTabela();
+            atualizarFinanceiro();
         });
 
-        // --- Lógica de Cálculo ---
-        function calcularValor(tipo, detalhes) {
-            if (PRECOS[tipo] && PRECOS[tipo][detalhes]) {
-                return PRECOS[tipo][detalhes];
-            }
-            return 0.00; // Fallback se não encontrar
+        // --- Navegação entre Abas ---
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
         }
 
         // --- Renderização ---
@@ -274,122 +257,105 @@
             const filtrados = registros.filter(r => r.data.startsWith(mesRef));
 
             filtrados.forEach(r => {
-                const valorCalculado = calcularValor(r.tipo, r.detalhes);
-                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${formatarData(r.data)}</td>
                     <td>${r.tipo}</td>
-                    <td>${r.detalhes}</td>
-                    <td style="color: var(--primary-color); font-weight: bold;">R$ ${valorCalculado.toFixed(2)}</td>
-                    <td><button onclick="remover(${r.id})" style="color:red; border:none; background:none; cursor:pointer;"><i class="material-icons" style="font-size:18px">delete</i></button></td>
+                    <td>R$ ${r.valor.toFixed(2)}</td>
+                    <td><button onclick="remover(${r.id})" style="color:red; border:none; background:none;">&times;</button></td>
                 `;
                 tbody.appendChild(tr);
             });
             
-            atualizarFinanceiro();
+            atualizarFinanceiro(); // Atualiza totais sempre que renderizar
         }
 
+        // --- Lógica Financeira (Otimizada) ---
         function atualizarFinanceiro() {
             const mesRef = document.getElementById('mesReferencia').value;
             const anoRef = mesRef.split('-')[0];
 
-            // Helpers de cálculo
-            const somar = (lista) => lista.reduce((acc, curr) => acc + calcularValor(curr.tipo, curr.detalhes), 0);
+            // Total Mensal
+            const totalMes = registros
+                .filter(r => r.data.startsWith(mesRef))
+                .reduce((acc, curr) => acc + curr.valor, 0);
 
-            const totalMes = somar(registros.filter(r => r.data.startsWith(mesRef)));
-            const totalAnual = somar(registros.filter(r => r.data.startsWith(anoRef)));
+            // Total Anual (Solicitação da madrugada)
+            const totalAnual = registros
+                .filter(r => r.data.startsWith(anoRef))
+                .reduce((acc, curr) => acc + curr.valor, 0);
 
-            // Contadores para o resumo
-            const resumo = { 'Normal': 0, 'Dupla': 0, 'Dia Útil': 0, 'Domingo': 0, 'Feriado': 0 };
-            
+            // Resumo de Tipos (Mês Atual)
+            const resumoTipos = { Normal: 0, Dupla: 0, Feriado: 0 };
             registros.filter(r => r.data.startsWith(mesRef)).forEach(r => {
-                if(resumo[r.tipo] !== undefined) resumo[r.tipo]++;
-                if(resumo[r.detalhes] !== undefined) resumo[r.detalhes]++;
+                if(resumoTipos[r.tipo] !== undefined) resumoTipos[r.tipo]++;
             });
 
+            // Atualizar DOM
             document.getElementById('total-mes').innerText = `R$ ${totalMes.toFixed(2)}`;
             document.getElementById('total-anual').innerText = `R$ ${totalAnual.toFixed(2)}`;
 
-            // Resumo detalhado (Tela e Impressão)
-            const resumoHTML = `
-                <div><strong>Normais:</strong> ${resumo['Normal']}</div>
-                <div><strong>Duplas:</strong> ${resumo['Dupla']}</div>
-                <div><strong>Dom/Fer:</strong> ${resumo['Domingo'] + resumo['Feriado']}</div>
-                <div style="margin-top: 5px; font-size: 1.1em;"><strong>TOTAL: R$ ${totalMes.toFixed(2)}</strong></div>
+            // Atualizar detalhes para impressão e tela
+            const resumoTexto = `
+                <div><strong>Normais:</strong> ${resumoTipos.Normal}</div>
+                <div><strong>Duplas:</strong> ${resumoTipos.Dupla}</div>
+                <div><strong>Feriados:</strong> ${resumoTipos.Feriado}</div>
+                <div><strong>Total:</strong> R$ ${totalMes.toFixed(2)}</div>
             `;
-
-            document.getElementById('detalhes-financeiros').innerHTML = resumoHTML;
-            document.getElementById('print-summary-content').innerHTML = resumoHTML;
+            
+            // Renderiza na tela
+            document.getElementById('detalhes-financeiros').innerHTML = resumoTexto;
+            
+            // Prepara cabeçalho de impressão (Solicitação PDF)
+            document.getElementById('print-summary-content').innerHTML = resumoTexto;
         }
 
+        // --- Gerar PDF (Modo de Impressão Nativo) ---
         function gerarPDF() {
+            // Prepara a tabela de impressão
             const mesRef = document.getElementById('mesReferencia').value;
             const filtrados = registros.filter(r => r.data.startsWith(mesRef));
             const tbodyPrint = document.getElementById('tbody-impressao');
             tbodyPrint.innerHTML = '';
 
             filtrados.forEach(r => {
-                const valor = calcularValor(r.tipo, r.detalhes);
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${formatarData(r.data)}</td>
-                    <td>${r.tipo}</td>
-                    <td>${r.detalhes}</td>
-                    <td>R$ ${valor.toFixed(2)}</td>
+                    <td style="border:1px solid #000; padding:5px;">${formatarData(r.data)}</td>
+                    <td style="border:1px solid #000; padding:5px;">${r.tipo}</td>
+                    <td style="border:1px solid #000; padding:5px;">Ref. Diária</td>
+                    <td style="border:1px solid #000; padding:5px;">R$ ${r.valor.toFixed(2)}</td>
                 `;
                 tbodyPrint.appendChild(tr);
             });
 
+            // Exibe área de impressão, imprime e oculta
             const areaPrint = document.getElementById('area-impressao');
             areaPrint.classList.remove('hidden');
             
+            // Truque para imprimir apenas o conteúdo desejado
             const conteudoOriginal = document.body.innerHTML;
             document.body.innerHTML = areaPrint.innerHTML;
             window.print();
             document.body.innerHTML = conteudoOriginal;
-            window.location.reload(); 
+            
+            // Reatach events (necessário pois o innerHTML mata os listeners)
+            window.location.reload(); // Maneira mais simples de restaurar o estado após impressão "destrutiva"
         }
 
-        // --- Helpers ---
+        // --- Utilitários ---
         function formatarData(dataISO) {
             const [ano, mes, dia] = dataISO.split('-');
             return `${dia}/${mes}`;
         }
 
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        function adicionarRegistroMock() {
-            // Apenas para teste rápido, adiciona um registro aleatório
-            // Próximo passo: Criar Modal Real
-            const tipos = ['Normal', 'Dupla'];
-            const detalhes = ['Dia Útil', 'Domingo', 'Feriado'];
-            
-            const novo = {
-                id: Date.now(),
-                data: document.getElementById('mesReferencia').value + '-15', // dia fixo para teste
-                tipo: tipos[Math.floor(Math.random() * types.length)],
-                detalhes: detalhes[Math.floor(Math.random() * detalhes.length)]
-            };
-            
-            // Simulação para o usuário ver funcionando sem modal
-            alert("Ainda precisamos criar o Formulário (Modal). Adicionei um registro de teste na memória.");
-            registros.push({
-                id: Date.now(),
-                data: document.getElementById('mesReferencia').value + '-' + Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0'),
-                tipo: 'Normal', 
-                detalhes: 'Dia Útil'
-            });
-            renderizarTabela();
+        function adicionarRegistro() {
+            alert("Funcionalidade de adicionar registro (Modal) aqui.");
+            // Lógica de adicionar ao array 'registros'
         }
 
         function remover(id) {
-            if(confirm('Excluir este registro?')) {
+            if(confirm('Excluir?')) {
                 registros = registros.filter(r => r.id !== id);
                 renderizarTabela();
             }
