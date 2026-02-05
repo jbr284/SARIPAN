@@ -214,26 +214,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
   <script>
-    // --- CONFIGURAÇÃO FIREBASE ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s",
-      authDomain: "saripan-db.firebaseapp.com",
-      databaseURL: "https://saripan-db-default-rtdb.firebaseio.com",
-      projectId: "saripan-db",
-      storageBucket: "saripan-db.firebasestorage.app",
-      messagingSenderId: "1:80320414744:web:958b3a99462d97575e2f6d",
-      appId: "G-9W62N5PFV9"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // --- ESTADO GLOBAL ---
+    // --- FUNÇÕES GLOBAIS (DEFINIDAS PRIMEIRO PARA EVITAR ERRO) ---
     let modoAtual = ""; 
     let registros = [];
+    let database = null; // Inicializa vazio
     const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-    // --- NAVEGAÇÃO ---
     function entrarModo(modo) {
+        if (!database) {
+            alert("Erro: Sistema não conectado ao Banco de Dados (Verifique a internet).");
+            // Tenta inicializar de novo caso tenha carregado agora
+            iniciarFirebase();
+            if(!database) return;
+        }
+
         if (modo === 'admin') {
             const senha = prompt("Senha de Acesso:");
             if (senha !== "0305") return alert("Senha incorreta!");
@@ -285,7 +279,7 @@
         }
     }
 
-    // --- LÓGICA DE CÁLCULO E PREVIEW ---
+    // --- CÁLCULOS E PREVIEW ---
     function calcularValor(base, carga, tipoDia) {
         let pesoDia = (tipoDia === 3 || tipoDia === 2) ? 2 : 1;
         let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
@@ -303,8 +297,6 @@
         const calc = calcularValor(base, carga, tipoDia);
         document.getElementById('previewValor').value = `R$ ${calc.total.toFixed(2)}`;
     }
-
-    ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
 
     // --- CRUD ---
     async function adicionarRegistro() {
@@ -361,7 +353,15 @@
         renderizarApontamentos();
     }
 
-    // --- RENDERIZAÇÃO INTELIGENTE (ACORDEÃO) ---
+    function toggleAccordion(header) {
+        header.classList.toggle('active');
+        const content = header.nextElementSibling;
+        content.classList.toggle('open');
+        const seta = header.querySelector('span:last-child');
+        seta.innerText = content.classList.contains('open') ? '▼' : '▶';
+    }
+
+    // --- RENDERIZAÇÃO ---
     function renderizarApontamentos() {
         const container = document.getElementById('lista-quinzenas-container');
         container.innerHTML = "";
@@ -401,7 +401,7 @@
             const grupo = grupos[chave];
             grupo.itens.sort((a, b) => new Date(a.data) - new Date(b.data));
 
-            // [NOVO] Calcular Total de Peso (Diárias a receber)
+            // Calcular Total de Peso (Diárias a receber)
             const totalPeso = grupo.itens.reduce((acc, item) => acc + item.multiplicador, 0);
 
             const isFirst = index === 0; 
@@ -432,7 +432,6 @@
                         <td></td>
                     </tr>`;
             } else {
-                // [MODIFICADO] MODO VIEW COM DOIS TOTAIS
                 metaTexto = `${grupo.itens.length} registros trabalhados`;
                 btnPDF = ''; 
                 btnDeleteHTML = ''; 
@@ -473,7 +472,6 @@
                         <tbody>
                             ${grupo.itens.map(item => {
                                 const diaStr = item.data.split('-')[2];
-                                
                                 const tipoStr = item.carga === 1 ? 'Normal' : 'Dupla';
                                 const detalheStr = item.tipoDia === 1 ? 'Dia Útil' : item.tipoDia === 2 ? 'Domingo' : 'Feriado';
                                 
@@ -504,15 +502,6 @@
         });
     }
 
-    function toggleAccordion(header) {
-        header.classList.toggle('active');
-        const content = header.nextElementSibling;
-        content.classList.toggle('open');
-        const seta = header.querySelector('span:last-child');
-        seta.innerText = content.classList.contains('open') ? '▼' : '▶';
-    }
-
-    // --- ABA FINANCEIRA COM TOTAL ANUAL ---
     function renderizarFinanceiro() {
         if (modoAtual !== 'admin') return;
 
@@ -590,7 +579,6 @@
         container.innerHTML += htmlTable;
     }
 
-    // --- PDF ---
     function gerarPDF(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         
@@ -620,3 +608,136 @@
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        
+        doc.setFontSize(16);
+        doc.setFont(undefined, 'bold');
+        doc.text("SARIPAN - Relatório", 14, 20);
+        
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        doc.text("Prestador: João Batista Rosa", 14, 28);
+        const nomeMes = MESES[mes];
+        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes}`, 14, 34);
+        
+        doc.setFont(undefined, 'bold');
+        doc.text("Resumo do Período:", 14, 44);
+        doc.setFont(undefined, 'normal');
+        
+        let y = 50;
+        if (contagem.normal > 0) { doc.text(`- ${contagem.normal} diária(s) normal`, 14, y); y += 6; }
+        if (contagem.dupla > 0) { doc.text(`- ${contagem.dupla} diária(s) dupla`, 14, y); y += 6; }
+        if (contagem.feriado > 0) { doc.text(`- ${contagem.feriado} feriado(s) normal`, 14, y); y += 6; }
+        if (contagem.domingo > 0) { doc.text(`- ${contagem.domingo} domingo(s)`, 14, y); y += 6; }
+        if (contagem.feriadoDupla > 0) { doc.text(`- ${contagem.feriadoDupla} feriado(s) dupla`, 14, y); y += 6; }
+        if (contagem.domingoDupla > 0) { doc.text(`- ${contagem.domingoDupla} domingo(s) dupla`, 14, y); y += 6; }
+
+        doc.setFont(undefined, 'bold');
+        y += 2;
+        doc.text(`Total: ${totalMultiplicador} diárias a receber`, 14, y);
+
+        const bodyData = itens.map(i => {
+            const tipoStr = i.carga === 1 ? 'Normal' : 'Dupla';
+            const detalheStr = i.tipoDia === 1 ? 'Dia Útil' : i.tipoDia === 2 ? 'Domingo' : 'Feriado';
+            
+            return [
+                i.data.split('-').reverse().join('/'),
+                tipoStr,
+                detalheStr,
+                `R$ ${i.total.toFixed(2)}`
+            ];
+        });
+
+        doc.autoTable({
+            startY: y + 10,
+            head: [['Data', 'Tipo', 'Detalhes', 'Valor']], 
+            body: bodyData,
+            theme: 'grid', 
+            headStyles: { 
+                fillColor: [0, 176, 240], 
+                textColor: [0, 0, 0],     
+                fontStyle: 'bold',
+                halign: 'center',
+                lineColor: [0, 0, 0],
+                lineWidth: 0.1
+            },
+            bodyStyles: {
+                textColor: [0, 0, 0],
+                halign: 'center',
+                lineColor: [0, 0, 0],
+                lineWidth: 0.1
+            },
+            foot: [['', '', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
+            footStyles: {
+                fillColor: [255, 255, 255],
+                textColor: [0, 0, 0],
+                fontStyle: 'bold',
+                halign: 'center',
+                lineColor: [0, 0, 0],
+                lineWidth: 0.1
+            }
+        });
+
+        doc.save(`Saripan_${nomeMes}_${ano}_Q${q}.pdf`);
+    }
+
+    async function salvarFirebase() {
+        if (modoAtual === "admin" && database) {
+            await database.ref('saripan_v2').set({ 
+                ultAtualizacao: new Date().toISOString(), 
+                dados: registros 
+            });
+        }
+    }
+
+    async function carregarDados() {
+        if (!database) return;
+        try {
+            const snap = await database.ref('saripan_v2').get();
+            if (snap.exists()) {
+                registros = snap.val().dados || [];
+            } else {
+                registros = [];
+            }
+            renderizarApontamentos();
+        } catch (e) {
+            console.error("Erro ao carregar:", e);
+        }
+    }
+
+    // --- SETUP INICIAL BLINDADO ---
+    function iniciarFirebase() {
+        try {
+            const firebaseConfig = {
+              apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s",
+              authDomain: "saripan-db.firebaseapp.com",
+              databaseURL: "https://saripan-db-default-rtdb.firebaseio.com",
+              projectId: "saripan-db",
+              storageBucket: "saripan-db.firebasestorage.app",
+              messagingSenderId: "1:80320414744:web:958b3a99462d97575e2f6d",
+              appId: "G-9W62N5PFV9"
+            };
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                console.log("Firebase conectado.");
+            } else {
+                console.warn("Firebase SDK não carregado (Offline?).");
+            }
+        } catch (e) {
+            console.error("Erro ao iniciar Firebase:", e);
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        iniciarFirebase();
+        
+        // Listeners de Input
+        ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
+        
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js');
+        }
+    });
+  </script>
+</body>
+</html>
