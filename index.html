@@ -91,7 +91,7 @@
 
     <div class="tabs-container">
       <button class="tab-btn active" onclick="mudarAba('apontamentos')">📝 Apontamentos</button>
-      <button class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
+      <button id="btn-tab-financeiro" class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
     </div>
 
     <div id="painel-apontamentos" class="panel active">
@@ -180,15 +180,25 @@
             const senha = prompt("Senha de Acesso:");
             if (senha !== "0305") return alert("Senha incorreta!");
         }
+        
         modoAtual = modo;
+        
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         
         if (modo === 'admin') {
             document.getElementById('area-formulario').classList.remove('hidden');
+            // Mostra aba financeiro
+            document.getElementById('btn-tab-financeiro').style.display = 'block';
         } else {
+            // Modo VIEW
             document.getElementById('area-formulario').classList.add('hidden');
+            // Esconde aba financeiro
+            document.getElementById('btn-tab-financeiro').style.display = 'none';
         }
+        
+        // Reinicia para a primeira aba
+        mudarAba('apontamentos');
         
         // Data de hoje padrão
         document.getElementById('dataServico').valueAsDate = new Date();
@@ -204,6 +214,9 @@
     }
 
     function mudarAba(aba) {
+        // Bloqueio extra de segurança
+        if (aba === 'financeiro' && modoAtual !== 'admin') return;
+
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         
@@ -211,7 +224,7 @@
             document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
             document.getElementById('painel-apontamentos').classList.add('active');
         } else {
-            document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+            document.getElementById('btn-tab-financeiro').classList.add('active');
             document.getElementById('painel-financeiro').classList.add('active');
             renderizarFinanceiro();
         }
@@ -243,6 +256,8 @@
 
     // --- CRUD ---
     async function adicionarRegistro() {
+        if (modoAtual !== 'admin') return;
+
         const dataInput = document.getElementById('dataServico').value;
         if (!dataInput) return alert("Data inválida!");
 
@@ -252,10 +267,9 @@
         
         const calc = calcularValor(base, carga, tipoDia);
         
-        // Extrair Metadados para Agrupamento
         const dateObj = new Date(dataInput);
         const ano = dateObj.getUTCFullYear();
-        const mesIndex = dateObj.getUTCMonth(); // 0-11
+        const mesIndex = dateObj.getUTCMonth(); 
         const dia = dateObj.getUTCDate();
         const quinzena = dia <= 15 ? 1 : 2;
 
@@ -275,10 +289,11 @@
         registros.push(novoReg);
         await salvarFirebase();
         renderizarApontamentos();
-        alert("Registro salvo na " + quinzena + "ª Quinzena!");
+        alert("Registro salvo!");
     }
 
     async function excluirRegistro(id) {
+        if (modoAtual !== 'admin') return;
         if(!confirm("Excluir este registro?")) return;
         registros = registros.filter(r => r.id !== id);
         await salvarFirebase();
@@ -286,7 +301,7 @@
     }
 
     async function excluirQuinzena(chaveGrupo) {
-        // chaveGrupo ex: "2026-1-2" (Ano-Mes-Q)
+        if (modoAtual !== 'admin') return;
         if (!confirm("ATENÇÃO: Isso apagará TODOS os registros desta quinzena.\n\nTem certeza?")) return;
         
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
@@ -309,7 +324,6 @@
         document.getElementById('msg-sem-dados').style.display = 'none';
 
         // 1. Agrupar Registros
-        // Chave: "ANO-MES-QUINZENA"
         const grupos = {};
         
         registros.forEach(reg => {
@@ -331,7 +345,6 @@
         const chavesOrdenadas = Object.keys(grupos).sort((a, b) => {
             const [aA, aM, aQ] = a.split('-').map(Number);
             const [bA, bM, bQ] = b.split('-').map(Number);
-            // Compara Ano, depois Mês, depois Quinzena (Decrescente)
             if (aA !== bA) return bA - aA;
             if (aM !== bM) return bM - aM;
             return bQ - aQ;
@@ -340,10 +353,9 @@
         // 3. Gerar HTML
         chavesOrdenadas.forEach((chave, index) => {
             const grupo = grupos[chave];
-            // Ordenar itens dentro do grupo por dia
             grupo.itens.sort((a, b) => new Date(a.data) - new Date(b.data));
 
-            const isFirst = index === 0; // Primeiro item (mais recente) vem aberto
+            const isFirst = index === 0; 
             const nomeMes = MESES[grupo.mes];
             const titulo = `${grupo.quinzena}ª Quinzena de ${nomeMes} ${grupo.ano}`;
             const totalFormatado = grupo.totalValor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
@@ -351,19 +363,48 @@
             const div = document.createElement('div');
             div.className = 'accordion-group';
             
-            // Botões de Ação do Header (Só Admin vê Excluir)
-            const btnDeleteHTML = modoAtual === 'admin' 
-                ? `<button class="btn-icon" style="color:#d32f2f;" onclick="event.stopPropagation(); excluirQuinzena('${chave}')" title="Excluir Quinzena">🗑️</button>` 
-                : '';
+            // LÓGICA DE VISIBILIDADE (VIEW vs ADMIN)
+            let btnPDF = '';
+            let btnDeleteHTML = '';
+            let metaTexto = '';
+            let thValor = '';
+            let thAcao = '';
+            let totalRowHTML = '';
+
+            if (modoAtual === 'admin') {
+                // MODO ADMIN: Vê dinheiro, PDF e Excluir
+                metaTexto = `${grupo.itens.length} registros • Total: ${totalFormatado}`;
+                btnPDF = `<button class="btn-icon" style="color:#1976d2;" onclick="event.stopPropagation(); gerarPDF('${chave}')" title="Baixar PDF">📄</button>`;
+                btnDeleteHTML = `<button class="btn-icon" style="color:#d32f2f;" onclick="event.stopPropagation(); excluirQuinzena('${chave}')" title="Excluir Quinzena">🗑️</button>`;
+                thValor = '<th style="text-align:right">Valor</th>';
+                thAcao = '<th class="td-acao"></th>';
+                totalRowHTML = `
+                    <tr class="total-row">
+                        <td colspan="2">Total do Período</td>
+                        <td class="td-valor">${totalFormatado}</td>
+                        <td></td>
+                    </tr>`;
+            } else {
+                // MODO VIEW: Só vê quantidade, sem dinheiro, sem PDF
+                metaTexto = `${grupo.itens.length} registros trabalhados`;
+                btnPDF = ''; // Sem PDF
+                btnDeleteHTML = ''; // Sem Delete
+                thValor = ''; // Sem coluna valor
+                thAcao = ''; // Sem coluna ação
+                totalRowHTML = `
+                    <tr class="total-row">
+                        <td colspan="2">Total de Dias Trabalhados: ${grupo.itens.length}</td>
+                    </tr>`;
+            }
 
             div.innerHTML = `
                 <div class="accordion-header ${isFirst ? 'active' : ''}" onclick="toggleAccordion(this)">
                     <div>
                         <div class="accordion-title">${titulo}</div>
-                        <div class="accordion-meta">${grupo.itens.length} registros • Total: ${totalFormatado}</div>
+                        <div class="accordion-meta">${metaTexto}</div>
                     </div>
                     <div class="accordion-actions">
-                        <button class="btn-icon" style="color:#1976d2;" onclick="event.stopPropagation(); gerarPDF('${chave}')" title="Baixar PDF">📄</button>
+                        ${btnPDF}
                         ${btnDeleteHTML}
                         <span style="margin-left:5px; font-size:12px;">${isFirst ? '▼' : '▶'}</span>
                     </div>
@@ -374,8 +415,8 @@
                             <tr>
                                 <th>Dia</th>
                                 <th>Detalhe</th>
-                                <th style="text-align:right">Valor</th>
-                                ${modoAtual === 'admin' ? '<th class="td-acao"></th>' : ''}
+                                ${thValor}
+                                ${thAcao}
                             </tr>
                         </thead>
                         <tbody>
@@ -384,24 +425,24 @@
                                 let desc = item.tipoDia === 3 ? "Feriado" : item.tipoDia === 2 ? "Domingo" : "Útil";
                                 if (item.carga === 2) desc += " (Dobrado)";
                                 
-                                const acaoHTML = modoAtual === 'admin' 
-                                    ? `<td class="td-acao"><span style="color:red; cursor:pointer;" onclick="excluirRegistro(${item.id})">✖</span></td>` 
-                                    : '';
+                                let tdValor = '';
+                                let tdAcao = '';
+
+                                if (modoAtual === 'admin') {
+                                    tdValor = `<td class="td-valor">R$ ${item.total.toFixed(2)}</td>`;
+                                    tdAcao = `<td class="td-acao"><span style="color:red; cursor:pointer;" onclick="excluirRegistro(${item.id})">✖</span></td>`;
+                                }
 
                                 return `
                                     <tr>
                                         <td>${diaStr}/${(item.mes+1).toString().padStart(2,'0')}</td>
                                         <td>${desc}</td>
-                                        <td class="td-valor">R$ ${item.total.toFixed(2)}</td>
-                                        ${acaoHTML}
+                                        ${tdValor}
+                                        ${tdAcao}
                                     </tr>
                                 `;
                             }).join('')}
-                            <tr class="total-row">
-                                <td colspan="2">Total do Período</td>
-                                <td class="td-valor">${totalFormatado}</td>
-                                ${modoAtual === 'admin' ? '<td></td>' : ''}
-                            </tr>
+                            ${totalRowHTML}
                         </tbody>
                     </table>
                 </div>
@@ -414,18 +455,16 @@
         header.classList.toggle('active');
         const content = header.nextElementSibling;
         content.classList.toggle('open');
-        
-        // Atualiza a seta
         const seta = header.querySelector('span:last-child');
         seta.innerText = content.classList.contains('open') ? '▼' : '▶';
     }
 
     // --- ABA FINANCEIRA ---
     function renderizarFinanceiro() {
+        if (modoAtual !== 'admin') return;
+
         const container = document.getElementById('tabela-financeira-container');
-        
-        // Agrupar por Mês
-        const dadosMes = {}; // chave: "2026-1"
+        const dadosMes = {}; 
         
         registros.forEach(reg => {
             const chave = `${reg.ano}-${reg.mes}`;
@@ -436,7 +475,6 @@
             else dadosMes[chave].q2 += reg.total;
         });
 
-        // Ordenar Cronologicamente Inverso
         const chaves = Object.keys(dadosMes).sort((a,b) => {
              const [aA, aM] = a.split('-').map(Number);
              const [bA, bM] = b.split('-').map(Number);
@@ -479,9 +517,10 @@
         container.innerHTML = html;
     }
 
-    // --- PDF INTELIGENTE ---
+    // --- PDF ---
     function gerarPDF(chaveGrupo) {
-        // Encontrar os dados daquele grupo específico
+        if (modoAtual !== 'admin') return; // Bloqueio de segurança
+        
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
         const itens = registros.filter(r => r.ano === ano && r.mes === mes && r.quinzena === q);
         itens.sort((a, b) => new Date(a.data) - new Date(b.data));
@@ -491,21 +530,18 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // Cabeçalho PDF
-        doc.setFillColor(13, 71, 161); // Azul Escuro
+        doc.setFillColor(13, 71, 161);
         doc.rect(0, 0, 210, 25, 'F');
         doc.setFontSize(22);
         doc.setTextColor(255, 255, 255);
         doc.text("SARIPAN - Relatório de Serviços", 105, 17, null, null, 'center');
 
-        // Info
         doc.setTextColor(0,0,0);
         doc.setFontSize(12);
         const nomeMes = MESES[mes];
         doc.text(`Referência: ${q}ª Quinzena de ${nomeMes} de ${ano}`, 14, 40);
         doc.text(`Prestador: João Batista Rosa`, 14, 48);
 
-        // Contadores
         let dias = 0;
         let total = 0;
         itens.forEach(i => { dias += i.multiplicador; total += i.total; });
@@ -515,7 +551,6 @@
         doc.text(`Valor Total: R$ ${total.toFixed(2)}`, 100, 58);
         doc.setFont(undefined, 'normal');
 
-        // Tabela
         const bodyData = itens.map(i => {
             let tipo = i.tipoDia === 3 ? "Feriado" : i.tipoDia === 2 ? "Domingo" : "Dia Útil";
             if(i.carga === 2) tipo += " (Dobra)";
@@ -550,7 +585,6 @@
     }
 
     async function carregarDados() {
-        // Mudamos a chave para v2 para garantir estrutura limpa
         const snap = await database.ref('saripan_v2').get();
         if (snap.exists()) {
             registros = snap.val().dados || [];
@@ -560,7 +594,6 @@
         renderizarApontamentos();
     }
 
-    // SW Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
     }
