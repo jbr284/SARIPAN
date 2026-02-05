@@ -467,7 +467,6 @@
                             ${grupo.itens.map(item => {
                                 const diaStr = item.data.split('-')[2];
                                 
-                                // Nova Lógica de Exibição
                                 const tipoStr = item.carga === 1 ? 'Normal' : 'Dupla';
                                 const detalheStr = item.tipoDia === 1 ? 'Dia Útil' : item.tipoDia === 2 ? 'Domingo' : 'Feriado';
                                 
@@ -513,12 +512,10 @@
         const container = document.getElementById('financeiro-content');
         container.innerHTML = "";
 
-        // 1. Calcular Totais
         const dadosMes = {}; 
         const totaisAnuais = {};
 
         registros.forEach(reg => {
-            // Mensal
             const chaveMes = `${reg.ano}-${reg.mes}`;
             if (!dadosMes[chaveMes]) {
                 dadosMes[chaveMes] = { ano: reg.ano, mes: reg.mes, q1: 0, q2: 0 };
@@ -526,12 +523,10 @@
             if (reg.quinzena === 1) dadosMes[chaveMes].q1 += reg.total;
             else dadosMes[chaveMes].q2 += reg.total;
 
-            // Anual
             if (!totaisAnuais[reg.ano]) totaisAnuais[reg.ano] = 0;
             totaisAnuais[reg.ano] += reg.total;
         });
 
-        // 2. Ordenar
         const chavesMes = Object.keys(dadosMes).sort((a,b) => {
              const [aA, aM] = a.split('-').map(Number);
              const [bA, bM] = b.split('-').map(Number);
@@ -539,14 +534,13 @@
              return bM - aM;
         });
         
-        const anosOrdenados = Object.keys(totaisAnuais).sort((a,b) => b-a); // Mais recente primeiro
+        const anosOrdenados = Object.keys(totaisAnuais).sort((a,b) => b-a); 
 
         if (chavesMes.length === 0) {
             container.innerHTML = "<p style='text-align:center; padding:20px;'>Sem dados financeiros.</p>";
             return;
         }
 
-        // 3. Renderizar CARD DE TOTAIS ANUAIS
         let htmlAnual = '';
         anosOrdenados.forEach(ano => {
             const valor = totaisAnuais[ano].toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
@@ -559,7 +553,6 @@
         });
         container.innerHTML += htmlAnual;
 
-        // 4. Renderizar TABELA MENSAL
         let htmlTable = `
             <table class="fin-table">
                 <thead>
@@ -590,7 +583,7 @@
         container.innerHTML += htmlTable;
     }
 
-    // --- PDF (Mantido o design Grid/Planilha solicitado) ---
+    // --- PDF ---
     function gerarPDF(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         
@@ -600,7 +593,6 @@
 
         if (itens.length === 0) return alert("Erro: Sem dados.");
 
-        // Resumo
         let contagem = { normal: 0, dupla: 0, feriado: 0, domingo: 0, feriadoDupla: 0, domingoDupla: 0 };
         let totalMultiplicador = 0;
         let totalDinheiro = 0;
@@ -647,10 +639,8 @@
         doc.setFont(undefined, 'bold');
         y += 2;
         doc.text(`Total: ${totalMultiplicador} diárias a receber`, 14, y);
-        y += 6;
-        doc.text(`Total: ${totalMultiplicador} diárias`, 14, y);
+        // REMOVIDA A LINHA DUPLICADA AQUI
 
-        // NOVA ESTRUTURA DA TABELA DO PDF: Data | Tipo | Detalhes | Valor
         const bodyData = itens.map(i => {
             const tipoStr = i.carga === 1 ? 'Normal' : 'Dupla';
             const detalheStr = i.tipoDia === 1 ? 'Dia Útil' : i.tipoDia === 2 ? 'Domingo' : 'Feriado';
@@ -665,7 +655,7 @@
 
         doc.autoTable({
             startY: y + 10,
-            head: [['Data', 'Tipo', 'Detalhes', 'Valor']], // NOVAS COLUNAS
+            head: [['Data', 'Tipo', 'Detalhes', 'Valor']], 
             body: bodyData,
             theme: 'grid', 
             headStyles: { 
@@ -682,7 +672,7 @@
                 lineColor: [0, 0, 0],
                 lineWidth: 0.1
             },
-            foot: [['', '', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]], // Rodapé ajustado para 4 colunas
+            foot: [['', '', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
             footStyles: {
                 fillColor: [255, 255, 255],
                 textColor: [0, 0, 0],
