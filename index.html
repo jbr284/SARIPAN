@@ -106,8 +106,8 @@
           <div>
             <label>Carga:</label>
             <select id="tipoCarga">
-              <option value="1">Normal </option>
-              <option value="2">Dupla </option>
+              <option value="1">Normal (1x)</option>
+              <option value="2">Dupla (2x)</option>
             </select>
           </div>
           <div>
@@ -188,33 +188,30 @@
         
         if (modo === 'admin') {
             document.getElementById('area-formulario').classList.remove('hidden');
-            // Mostra aba financeiro
             document.getElementById('btn-tab-financeiro').style.display = 'block';
         } else {
             // Modo VIEW
             document.getElementById('area-formulario').classList.add('hidden');
-            // Esconde aba financeiro
             document.getElementById('btn-tab-financeiro').style.display = 'none';
         }
         
-        // Reinicia para a primeira aba
         mudarAba('apontamentos');
-        
-        // Data de hoje padrão
         document.getElementById('dataServico').valueAsDate = new Date();
         atualizarPreview();
-        
         carregarDados();
     }
 
     function sairApp() {
+        if (modoAtual === 'view') {
+            location.reload();
+            return;
+        }
         if(confirm("Sair do sistema?")) {
             location.reload();
         }
     }
 
     function mudarAba(aba) {
-        // Bloqueio extra de segurança
         if (aba === 'financeiro' && modoAtual !== 'admin') return;
 
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -232,10 +229,7 @@
 
     // --- LÓGICA DE CÁLCULO E PREVIEW ---
     function calcularValor(base, carga, tipoDia) {
-        // Regra: Domingo(2) ou Feriado(3) tem peso 2. Útil(1) peso 1.
         let pesoDia = (tipoDia === 3 || tipoDia === 2) ? 2 : 1;
-        
-        // Se for Carga Dupla(2) E PesoDia(2), vira 4x. Senão é Carga * Peso.
         let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
         
         return {
@@ -303,11 +297,8 @@
     async function excluirQuinzena(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         if (!confirm("ATENÇÃO: Isso apagará TODOS os registros desta quinzena.\n\nTem certeza?")) return;
-        
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
-        
         registros = registros.filter(r => !(r.ano === ano && r.mes === mes && r.quinzena === q));
-        
         await salvarFirebase();
         renderizarApontamentos();
     }
@@ -323,7 +314,6 @@
         }
         document.getElementById('msg-sem-dados').style.display = 'none';
 
-        // 1. Agrupar Registros
         const grupos = {};
         
         registros.forEach(reg => {
@@ -341,7 +331,6 @@
             grupos[chave].totalValor += reg.total;
         });
 
-        // 2. Ordenar Grupos (Mais recente primeiro)
         const chavesOrdenadas = Object.keys(grupos).sort((a, b) => {
             const [aA, aM, aQ] = a.split('-').map(Number);
             const [bA, bM, bQ] = b.split('-').map(Number);
@@ -350,7 +339,6 @@
             return bQ - aQ;
         });
 
-        // 3. Gerar HTML
         chavesOrdenadas.forEach((chave, index) => {
             const grupo = grupos[chave];
             grupo.itens.sort((a, b) => new Date(a.data) - new Date(b.data));
@@ -363,7 +351,6 @@
             const div = document.createElement('div');
             div.className = 'accordion-group';
             
-            // LÓGICA DE VISIBILIDADE (VIEW vs ADMIN)
             let btnPDF = '';
             let btnDeleteHTML = '';
             let metaTexto = '';
@@ -372,8 +359,9 @@
             let totalRowHTML = '';
 
             if (modoAtual === 'admin') {
-                // MODO ADMIN: Vê dinheiro, PDF e Excluir
+                // MODO ADMIN: Vê TUDO (Dinheiro, PDF, Delete)
                 metaTexto = `${grupo.itens.length} registros • Total: ${totalFormatado}`;
+                // [CORREÇÃO] Botão PDF APENAS AQUI
                 btnPDF = `<button class="btn-icon" style="color:#1976d2;" onclick="event.stopPropagation(); gerarPDF('${chave}')" title="Baixar PDF">📄</button>`;
                 btnDeleteHTML = `<button class="btn-icon" style="color:#d32f2f;" onclick="event.stopPropagation(); excluirQuinzena('${chave}')" title="Excluir Quinzena">🗑️</button>`;
                 thValor = '<th style="text-align:right">Valor</th>';
@@ -385,12 +373,12 @@
                         <td></td>
                     </tr>`;
             } else {
-                // MODO VIEW: Só vê quantidade, sem dinheiro, sem PDF
+                // MODO VIEW: Visualização limpa
                 metaTexto = `${grupo.itens.length} registros trabalhados`;
-                btnPDF = ''; // Sem PDF
-                btnDeleteHTML = ''; // Sem Delete
-                thValor = ''; // Sem coluna valor
-                thAcao = ''; // Sem coluna ação
+                btnPDF = ''; // [CORREÇÃO] Sem botão PDF
+                btnDeleteHTML = ''; 
+                thValor = ''; 
+                thAcao = ''; 
                 totalRowHTML = `
                     <tr class="total-row">
                         <td colspan="2">Total de Dias Trabalhados: ${grupo.itens.length}</td>
@@ -519,7 +507,7 @@
 
     // --- PDF ---
     function gerarPDF(chaveGrupo) {
-        if (modoAtual !== 'admin') return; // Bloqueio de segurança
+        if (modoAtual !== 'admin') return;
         
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
         const itens = registros.filter(r => r.ano === ano && r.mes === mes && r.quinzena === q);
