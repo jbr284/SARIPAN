@@ -1,5 +1,4 @@
-// ATUALIZE AQUI SEMPRE QUE MUDAR O CÓDIGO
-const CACHE_NAME = 'saripan-v2.0-auto'; 
+const CACHE_NAME = 'saripan-v2.2-view-fix'; 
 
 const ASSETS = [
   './',
@@ -32,8 +31,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Estratégia: Network First (Tenta pegar online, se falhar, pega cache)
-  // Isso garante que você sempre veja a versão mais nova do Firebase/App
   event.respondWith(
     fetch(event.request)
       .catch(() => caches.match(event.request))
