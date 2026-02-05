@@ -15,24 +15,24 @@
         background-color: #f0f2f5; 
         margin: 0; 
         padding: 0; 
-        height: 100vh; /* Ocupa 100% da altura da tela */
-        overflow: hidden; /* Impede a rolagem da página inteira */
+        height: 100vh; 
+        overflow: hidden; 
     }
 
     .container { 
         background-color: #fff; 
         max-width: 800px; 
         margin: 0 auto; 
-        height: 100%; /* Altura total */
-        display: flex; /* Layout Flexível */
-        flex-direction: column; /* Um item abaixo do outro */
+        height: 100%; 
+        display: flex; 
+        flex-direction: column; 
         box-shadow: 0 0 15px rgba(0,0,0,0.05); 
         position: relative; 
     }
 
     /* ÁREA FIXA (NÃO ROLA) */
     .fixed-area {
-        flex-shrink: 0; /* Não encolhe */
+        flex-shrink: 0;
         z-index: 10;
         background: white;
     }
@@ -57,8 +57,8 @@
 
     /* ÁREA DE ROLAGEM (SCROLL) */
     .scroll-content {
-        flex-grow: 1; /* Ocupa todo o espaço restante */
-        overflow-y: auto; /* Permite rolar apenas esta área */
+        flex-grow: 1; 
+        overflow-y: auto; 
         background: #f0f2f5;
         position: relative;
     }
@@ -67,7 +67,7 @@
     .panel { 
         display: none; 
         padding: 15px; 
-        padding-bottom: 80px; /* Espaço extra no final */
+        padding-bottom: 80px; 
         animation: fadeIn 0.3s; 
     }
     .panel.active { display: block; }
@@ -95,12 +95,12 @@
     .accordion-content.open { display: block; }
 
     /* Tabela Interna (Visual App) */
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 5px; text-align: left; border-bottom: 1px solid #eee; }
     th { background: #eee; color: #555; font-size: 12px; text-transform: uppercase; }
     tr:last-child td { border-bottom: none; }
     .td-valor { font-weight: bold; color: #2e7d32; text-align: right; }
-    .td-acao { text-align: center; width: 40px; }
+    .td-acao { text-align: center; width: 30px; }
     .total-row { background: #e8f5e9; font-weight: bold; }
 
     /* FINANCEIRO */
@@ -165,16 +165,16 @@
             
             <div class="grid-input">
               <div>
-                <label>Carga:</label>
+                <label>Tipo:</label>
                 <select id="tipoCarga">
-                  <option value="1">Normal (1x)</option>
-                  <option value="2">Dupla (2x)</option>
+                  <option value="1">Normal</option>
+                  <option value="2">Dupla</option>
                 </select>
               </div>
               <div>
-                <label>Dia:</label>
+                <label>Detalhes:</label>
                 <select id="tipoDia">
-                  <option value="1">Útil</option>
+                  <option value="1">Dia Útil</option>
                   <option value="2">Domingo</option>
                   <option value="3">Feriado</option>
                 </select>
@@ -424,7 +424,7 @@
                 thAcao = '<th class="td-acao"></th>';
                 totalRowHTML = `
                     <tr class="total-row">
-                        <td colspan="2">Total do Período</td>
+                        <td colspan="3">Total do Período</td>
                         <td class="td-valor">${totalFormatado}</td>
                         <td></td>
                     </tr>`;
@@ -436,7 +436,7 @@
                 thAcao = ''; 
                 totalRowHTML = `
                     <tr class="total-row">
-                        <td colspan="2">Total de Dias Trabalhados: ${grupo.itens.length}</td>
+                        <td colspan="3">Total de Dias Trabalhados: ${grupo.itens.length}</td>
                     </tr>`;
             }
 
@@ -456,8 +456,9 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Dia</th>
-                                <th>Detalhe</th>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Detalhes</th>
                                 ${thValor}
                                 ${thAcao}
                             </tr>
@@ -465,8 +466,10 @@
                         <tbody>
                             ${grupo.itens.map(item => {
                                 const diaStr = item.data.split('-')[2];
-                                let desc = item.tipoDia === 3 ? "Feriado" : item.tipoDia === 2 ? "Domingo" : "Útil";
-                                if (item.carga === 2) desc += " (Dobrado)";
+                                
+                                // Nova Lógica de Exibição
+                                const tipoStr = item.carga === 1 ? 'Normal' : 'Dupla';
+                                const detalheStr = item.tipoDia === 1 ? 'Dia Útil' : item.tipoDia === 2 ? 'Domingo' : 'Feriado';
                                 
                                 let tdValor = '';
                                 let tdAcao = '';
@@ -479,7 +482,8 @@
                                 return `
                                     <tr>
                                         <td>${diaStr}/${(item.mes+1).toString().padStart(2,'0')}</td>
-                                        <td>${desc}</td>
+                                        <td>${tipoStr}</td>
+                                        <td>${detalheStr}</td>
                                         ${tdValor}
                                         ${tdAcao}
                                     </tr>
@@ -646,19 +650,22 @@
         y += 6;
         doc.text(`Total: ${totalMultiplicador} diárias`, 14, y);
 
+        // NOVA ESTRUTURA DA TABELA DO PDF: Data | Tipo | Detalhes | Valor
         const bodyData = itens.map(i => {
-            let tipo = i.tipoDia === 3 ? "Feriado" : i.tipoDia === 2 ? "Domingo" : "Diária Normal";
-            if(i.carga === 2) tipo += " (Dobra)";
+            const tipoStr = i.carga === 1 ? 'Normal' : 'Dupla';
+            const detalheStr = i.tipoDia === 1 ? 'Dia Útil' : i.tipoDia === 2 ? 'Domingo' : 'Feriado';
+            
             return [
                 i.data.split('-').reverse().join('/'),
-                tipo,
+                tipoStr,
+                detalheStr,
                 `R$ ${i.total.toFixed(2)}`
             ];
         });
 
         doc.autoTable({
             startY: y + 10,
-            head: [['Data', 'Descrição', 'Valor']],
+            head: [['Data', 'Tipo', 'Detalhes', 'Valor']], // NOVAS COLUNAS
             body: bodyData,
             theme: 'grid', 
             headStyles: { 
@@ -675,7 +682,7 @@
                 lineColor: [0, 0, 0],
                 lineWidth: 0.1
             },
-            foot: [['', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
+            foot: [['', '', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]], // Rodapé ajustado para 4 colunas
             footStyles: {
                 fillColor: [255, 255, 255],
                 textColor: [0, 0, 0],
