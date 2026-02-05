@@ -10,207 +10,142 @@
 
   <style>
     /* Global Styles */
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f7fb;
-      margin: 0;
-      padding: 0;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; padding-bottom: 40px; }
+    .container { background-color: #fff; max-width: 800px; margin: 0 auto; min-height: 100vh; box-shadow: 0 0 15px rgba(0,0,0,0.05); position: relative; }
 
-    .container {
-      background-color: #fff;
-      border-radius: 12px;
-      padding: 20px;
-      width: 95%;
-      max-width: 800px;
-      margin: 20px auto;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-      position: relative;
-    }
-
-    /* Header */
-    .header-app {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    h1 {
-      color: #007bff;
-      margin: 0;
-      font-size: 24px;
-      text-align: center;
-    }
-
-    .subtitulo {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 16px;
-      color: #555;
-    }
-
-    /* Botão Voltar */
-    .btn-voltar {
-      position: absolute;
-      left: 0;
-      top: 0;
-      background-color: #6c757d;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .btn-voltar:hover { background-color: #5a6268; }
-
-    /* Estilos do Resumo Detalhado */
-    .resumo-box {
-      background: #f8f9fa;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 25px;
-    }
-    .resumo-titulo {
-      font-size: 18px;
-      font-weight: bold;
-      color: #0d47a1;
-      border-bottom: 2px solid #e0e0e0;
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-    }
-    .resumo-lista {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .resumo-lista li {
-      padding: 8px 0;
-      border-bottom: 1px dashed #eee;
-      color: #333;
-      font-size: 16px;
-    }
-    .resumo-total {
-      margin-top: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      text-align: right;
-      color: #d32f2f;
-    }
-
-    /* Total Monetário no Rodapé */
-    .total-rodape {
-      margin-top: 15px;
-      text-align: right;
-      font-size: 20px;
-      font-weight: bold;
-      color: #28a745;
-      padding: 15px;
-      background-color: #e8f5e9;
-      border-radius: 8px;
-      border: 1px solid #c8e6c9;
-    }
-
-    /* Inputs e Controles */
-    .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-    label { font-weight: 600; margin-bottom: 5px; display: block; color: #333; }
-    input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: #fff; box-sizing: border-box;}
+    /* Header e Navegação */
+    .app-header { background: #0d47a1; color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .app-title { font-size: 20px; font-weight: bold; margin: 0; }
+    .btn-nav-top { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
     
-    .apontamento-box { background: #e3f2fd; padding: 20px; border-radius: 12px; border: 1px solid #90caf9; margin-bottom: 25px; }
+    /* Abas Superiores */
+    .tabs-container { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
+    .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-size: 16px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; }
+    .tab-btn.active { color: #0d47a1; border-bottom: 3px solid #0d47a1; background: #f9f9f9; }
 
-    /* Botões de Ação */
-    .buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
-    button.action-btn { padding: 14px 24px; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 14px; border: none; color: white; flex: 1; min-width: 120px; }
-    
-    .btn-verde { background-color: #28a745; }
-    .btn-laranja { background-color: #fd7e14; }
-    .btn-azul { background-color: #17a2b8; }
-    .btn-vermelho { background-color: #dc3545; }
+    /* Painéis */
+    .panel { display: none; padding: 15px; animation: fadeIn 0.3s; }
+    .panel.active { display: block; }
 
-    /* Tabela */
-    .table-container { overflow-x: auto; margin-top: 20px; }
-    table { width: 100%; border-collapse: collapse; min-width: 500px; }
-    th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
-    th { background-color: #007bff; color: white; }
+    /* Formulário de Registro */
+    .form-box { background: #e3f2fd; padding: 15px; border-radius: 8px; border: 1px solid #bbdefb; margin-bottom: 20px; }
+    .form-title { margin-top: 0; color: #1565c0; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #bbdefb; padding-bottom: 5px; }
+    .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    label { font-size: 13px; font-weight: bold; color: #444; display: block; margin-bottom: 4px; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
+    .btn-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; margin-top: 10px; }
+    .btn-green { background-color: #2e7d32; }
+    .btn-red { background-color: #c62828; }
+
+    /* ACORDEÃO (Listas Quinzenais) */
+    .accordion-group { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
+    .accordion-header { background: #f5f5f5; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; border-left: 5px solid #0d47a1; }
+    .accordion-header.active { background: #e8eaf6; }
+    .accordion-title { font-weight: bold; color: #333; font-size: 15px; }
+    .accordion-meta { font-size: 12px; color: #666; margin-top: 2px; }
+    .accordion-actions { display: flex; gap: 10px; }
+    .btn-icon { background: none; border: none; font-size: 18px; cursor: pointer; padding: 5px; }
     
+    .accordion-content { display: none; padding: 0; }
+    .accordion-content.open { display: block; }
+
+    /* Tabela Interna */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #eee; color: #555; font-size: 12px; text-transform: uppercase; }
+    tr:last-child td { border-bottom: none; }
+    .td-valor { font-weight: bold; color: #2e7d32; text-align: right; }
+    .td-acao { text-align: center; width: 40px; }
+    .total-row { background: #e8f5e9; font-weight: bold; }
+
+    /* Tabela Financeira */
+    .fin-table { width: 100%; margin-top: 10px; border: 1px solid #ddd; }
+    .fin-table th { background: #0d47a1; color: white; }
+    .fin-table td { border: 1px solid #ddd; }
+    .fin-row-total { background: #fff3e0; font-weight: bold; }
+
+    /* Tela Inicial */
+    #inicio { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; }
+    .btn-big { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 30px; border: none; color: white; width: 80%; max-width: 300px; cursor: pointer; }
+
     .hidden { display: none !important; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
-  
-  <div id="inicio" style="text-align: center; padding: 40px;">
-    <h1 style="font-size: 32px; margin-bottom: 10px;">SARIPAN</h1>
-    <p class="subtitulo">Gestão de Serviços</p>
-    <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 30px auto;">
-      <button class="action-btn btn-verde" onclick="entrarApontamento()">📋 Modo Apontamento</button>
-      <button class="action-btn btn-azul" onclick="entrarAcompanhamento()">👁️ Modo Acompanhamento</button>
-    </div>
+
+  <div id="inicio">
+    <h1 style="color:#d32f2f; font-size: 40px; margin-bottom: 5px;">SARIPAN</h1>
+    <p style="color:#666; margin-bottom: 40px;">Gestão Inteligente de Diárias</p>
+    
+    <button class="btn-big btn-green" onclick="entrarModo('admin')">📋 Acessar Sistema</button>
+    <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ Apenas Visualizar</button>
   </div>
 
   <div id="app" class="container hidden">
     
-    <div class="header-app">
-        <button class="btn-voltar" onclick="voltarInicio()">⬅ Voltar</button>
-        <h1>SARIPAN</h1>
-    </div>
-    
-    <div class="resumo-box" id="boxResumo">
-        <div class="resumo-titulo" id="tituloQuinzena">Carregando...</div>
-        <p style="font-weight:bold; color:#555;">Dias trabalhados:</p>
-        <ul class="resumo-lista" id="listaResumo">
-            </ul>
-        <div class="resumo-total" id="textoTotalDiarias">Total: 0 diárias</div>
+    <div class="app-header">
+      <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
+      <div class="app-title">SARIPAN</div>
+      <div style="width: 50px;"></div> </div>
+
+    <div class="tabs-container">
+      <button class="tab-btn active" onclick="mudarAba('apontamentos')">📝 Apontamentos</button>
+      <button class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
     </div>
 
-    <div id="painelControle" class="hidden">
-        <div class="apontamento-box">
-            <h3 style="margin-top:0; color:#0d47a1;">Novo Registro</h3>
-            <label>Data do Serviço:</label>
-            <input type="date" id="dataServico" style="margin-bottom: 15px;">
-            <div class="grid-input">
-                <div>
-                    <label>Carga Horária:</label>
-                    <select id="tipoCarga">
-                        <option value="1">Diária Normal</option>
-                        <option value="2">Diária Dupla</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Tipo de Dia:</label>
-                    <select id="tipoDia">
-                        <option value="1">Dia Útil</option>
-                        <option value="2">Domingo</option>
-                        <option value="3">Feriado</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid-input">
-                <div><label>Valor Base (R$):</label><input type="number" id="valorBase" value="130.00"></div>
-                <div><label>Previsão:</label><input type="text" id="valorCalculadoPreview" value="R$ 130,00" readonly style="background:#eee;"></div>
-            </div>
-            <button class="action-btn btn-verde" style="width:100%;" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
+    <div id="painel-apontamentos" class="panel active">
+      
+      <div id="area-formulario" class="form-box hidden">
+        <h3 class="form-title">Novo Registro</h3>
+        
+        <label>Data do Serviço:</label>
+        <input type="date" id="dataServico" style="margin-bottom: 10px;">
+        
+        <div class="grid-input">
+          <div>
+            <label>Carga:</label>
+            <select id="tipoCarga">
+              <option value="1">Normal (1x)</option>
+              <option value="2">Dupla (2x)</option>
+            </select>
+          </div>
+          <div>
+            <label>Dia:</label>
+            <select id="tipoDia">
+              <option value="1">Útil</option>
+              <option value="2">Domingo</option>
+              <option value="3">Feriado</option>
+            </select>
+          </div>
         </div>
-        <div class="buttons">
-            <button class="action-btn btn-laranja" onclick="fecharQuinzena()">⚠️ Fechar Quinzena</button>
-            <button class="action-btn btn-azul" onclick="exportarPDF()">📄 Gerar PDF</button>
+
+        <div class="grid-input">
+          <div>
+            <label>Valor Base (R$):</label>
+            <input type="number" id="valorBase" value="130.00">
+          </div>
+          <div>
+            <label>Previsão:</label>
+            <input type="text" id="previewValor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;">
+          </div>
         </div>
+
+        <button class="btn-action btn-green" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
+      </div>
+
+      <div id="lista-quinzenas-container">
+        </div>
+      
+      <div id="msg-sem-dados" style="text-align:center; padding: 40px; color:#999; display:none;">
+        Nenhum registro encontrado.
+      </div>
     </div>
 
-    <div class="table-container">
-        <table id="tabelaRegistros">
-            <thead>
-                <tr><th>Data</th><th>Detalhes</th><th id="colunaValor">Valor</th><th id="colunaAcao">Ação</th></tr>
-            </thead>
-            <tbody id="tbodyRegistros"></tbody>
-        </table>
-    </div>
-
-    <div id="footerTotal" class="total-rodape hidden">
-        Total a Receber: R$ 0,00
+    <div id="painel-financeiro" class="panel">
+      <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Consolidado Mensal</h3>
+      <div id="tabela-financeira-container">
+        </div>
     </div>
 
   </div>
@@ -221,6 +156,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
   <script>
+    // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s",
       authDomain: "saripan-db.firebaseapp.com",
@@ -232,310 +168,401 @@
     };
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    
+
+    // --- ESTADO GLOBAL ---
     let modoAtual = ""; 
     let registros = [];
+    const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
     // --- NAVEGAÇÃO ---
-    function voltarInicio() {
-        document.getElementById('app').classList.add('hidden');
-        document.getElementById('inicio').classList.remove('hidden');
-        modoAtual = "";
-    }
-
-    // --- CÁLCULO DE PREVIEW ---
-    function atualizarPreview() {
-        const base = parseFloat(document.getElementById('valorBase').value) || 0;
-        const carga = parseInt(document.getElementById('tipoCarga').value);
-        const tipoInput = parseInt(document.getElementById('tipoDia').value);
-        
-        let pesoDia = (tipoInput === 3) ? 2 : tipoInput;
-        let mult = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
-        document.getElementById('valorCalculadoPreview').value = `R$ ${(base * mult).toFixed(2)}`;
-    }
-    ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
-
-    // --- LOGIN ---
-    window.entrarApontamento = async function() {
-        if(prompt("Senha:") !== "0305") return alert("Senha incorreta"); 
-        modoAtual = "admin";
-        iniciarApp();
-    };
-    window.entrarAcompanhamento = async function() {
-        modoAtual = "view";
-        iniciarApp();
-    };
-
-    async function iniciarApp() {
+    function entrarModo(modo) {
+        if (modo === 'admin') {
+            const senha = prompt("Senha de Acesso:");
+            if (senha !== "0305") return alert("Senha incorreta!");
+        }
+        modoAtual = modo;
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         
-        if (modoAtual === "admin") {
-            document.getElementById('painelControle').classList.remove('hidden');
-            document.getElementById('colunaAcao').classList.remove('hidden');
-            document.getElementById('colunaValor').classList.remove('hidden');
-            document.getElementById('footerTotal').classList.remove('hidden'); 
-            document.getElementById('dataServico').valueAsDate = new Date();
+        if (modo === 'admin') {
+            document.getElementById('area-formulario').classList.remove('hidden');
         } else {
-            document.getElementById('painelControle').classList.add('hidden');
-            document.getElementById('colunaAcao').classList.add('hidden');
-            document.getElementById('colunaValor').classList.add('hidden');
-            document.getElementById('footerTotal').classList.add('hidden');
+            document.getElementById('area-formulario').classList.add('hidden');
         }
-        await carregarDados();
+        
+        // Data de hoje padrão
+        document.getElementById('dataServico').valueAsDate = new Date();
+        atualizarPreview();
+        
+        carregarDados();
     }
 
-    // --- LÓGICA DE DADOS ---
+    function sairApp() {
+        if(confirm("Sair do sistema?")) {
+            location.reload();
+        }
+    }
+
+    function mudarAba(aba) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        
+        if (aba === 'apontamentos') {
+            document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+            document.getElementById('painel-apontamentos').classList.add('active');
+        } else {
+            document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+            document.getElementById('painel-financeiro').classList.add('active');
+            renderizarFinanceiro();
+        }
+    }
+
+    // --- LÓGICA DE CÁLCULO E PREVIEW ---
+    function calcularValor(base, carga, tipoDia) {
+        // Regra: Domingo(2) ou Feriado(3) tem peso 2. Útil(1) peso 1.
+        let pesoDia = (tipoDia === 3 || tipoDia === 2) ? 2 : 1;
+        
+        // Se for Carga Dupla(2) E PesoDia(2), vira 4x. Senão é Carga * Peso.
+        let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
+        
+        return {
+            multiplicador: multiplicador,
+            total: base * multiplicador
+        };
+    }
+
+    function atualizarPreview() {
+        const base = parseFloat(document.getElementById('valorBase').value) || 0;
+        const carga = parseInt(document.getElementById('tipoCarga').value);
+        const tipoDia = parseInt(document.getElementById('tipoDia').value);
+        const calc = calcularValor(base, carga, tipoDia);
+        document.getElementById('previewValor').value = `R$ ${calc.total.toFixed(2)}`;
+    }
+
+    ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
+
+    // --- CRUD ---
     async function adicionarRegistro() {
         const dataInput = document.getElementById('dataServico').value;
-        if (!dataInput) return alert("Selecione uma data!");
-        
+        if (!dataInput) return alert("Data inválida!");
+
         const base = parseFloat(document.getElementById('valorBase').value);
         const carga = parseInt(document.getElementById('tipoCarga').value);
-        const tipoDiaInput = parseInt(document.getElementById('tipoDia').value);
+        const tipoDia = parseInt(document.getElementById('tipoDia').value);
         
-        let pesoDia = (tipoDiaInput === 3) ? 2 : tipoDiaInput;
-        let mult = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
+        const calc = calcularValor(base, carga, tipoDia);
+        
+        // Extrair Metadados para Agrupamento
+        const dateObj = new Date(dataInput);
+        const ano = dateObj.getUTCFullYear();
+        const mesIndex = dateObj.getUTCMonth(); // 0-11
+        const dia = dateObj.getUTCDate();
+        const quinzena = dia <= 15 ? 1 : 2;
 
-        registros.push({
+        const novoReg = {
             id: Date.now(),
             data: dataInput,
-            dataFormatada: dataInput.split('-').reverse().join('/'),
+            ano: ano,
+            mes: mesIndex,
+            quinzena: quinzena,
             carga: carga,
-            tipoDia: tipoDiaInput,
-            multiplicador: mult,
-            valor: base * mult,
-            base: base
-        });
-        
-        registros.sort((a, b) => new Date(a.data) - new Date(b.data));
-        atualizarInterface();
-        await salvarFirebase();
-    }
-
-    function removerRegistro(id) {
-        if(confirm("Excluir?")) {
-            registros = registros.filter(r => r.id !== id);
-            atualizarInterface();
-            salvarFirebase();
-        }
-    }
-
-    function atualizarInterface() {
-        // TABELA
-        const tbody = document.getElementById('tbodyRegistros');
-        tbody.innerHTML = "";
-        
-        registros.forEach(reg => {
-            let desc = "";
-            
-            if (reg.tipoDia === 3) desc = "🎉 Feriado";
-            else if (reg.tipoDia === 2) desc = "🗓️ Domingo";
-            else desc = "Diária Normal";
-            
-            if (reg.carga === 2) {
-                if (reg.tipoDia === 1) {
-                    desc = "⏰ Diária Dupla";
-                } else {
-                    desc += " (Diária Dupla)";
-                }
-            }
-            
-            let html = `<td>${reg.dataFormatada}</td><td>${desc}</td>`;
-            if (modoAtual === "admin") html += `<td>R$ ${reg.valor.toFixed(2)}</td><td><button class="action-btn btn-vermelho" style="padding: 5px 10px; min-width: auto;" onclick="removerRegistro(${reg.id})">X</button></td>`;
-            else html += `<td class="hidden"></td><td class="hidden"></td>`;
-            
-            const tr = document.createElement('tr');
-            tr.innerHTML = html;
-            tbody.appendChild(tr);
-        });
-
-        // RESUMO E TÍTULO
-        const lista = document.getElementById('listaResumo');
-        lista.innerHTML = "";
-        
-        let contadores = { 
-            normal: 0, 
-            dupla: 0, 
-            domingo: 0, 
-            feriado: 0,
-            domingoDupla: 0,
-            feriadoDupla: 0
+            tipoDia: tipoDia,
+            valorBase: base,
+            multiplicador: calc.multiplicador,
+            total: calc.total
         };
-        let totalDiarias = 0;
-        let totalValor = 0;
 
+        registros.push(novoReg);
+        await salvarFirebase();
+        renderizarApontamentos();
+        alert("Registro salvo na " + quinzena + "ª Quinzena!");
+    }
+
+    async function excluirRegistro(id) {
+        if(!confirm("Excluir este registro?")) return;
+        registros = registros.filter(r => r.id !== id);
+        await salvarFirebase();
+        renderizarApontamentos();
+    }
+
+    async function excluirQuinzena(chaveGrupo) {
+        // chaveGrupo ex: "2026-1-2" (Ano-Mes-Q)
+        if (!confirm("ATENÇÃO: Isso apagará TODOS os registros desta quinzena.\n\nTem certeza?")) return;
+        
+        const [ano, mes, q] = chaveGrupo.split('-').map(Number);
+        
+        registros = registros.filter(r => !(r.ano === ano && r.mes === mes && r.quinzena === q));
+        
+        await salvarFirebase();
+        renderizarApontamentos();
+    }
+
+    // --- RENDERIZAÇÃO INTELIGENTE (ACORDEÃO) ---
+    function renderizarApontamentos() {
+        const container = document.getElementById('lista-quinzenas-container');
+        container.innerHTML = "";
+
+        if (registros.length === 0) {
+            document.getElementById('msg-sem-dados').style.display = 'block';
+            return;
+        }
+        document.getElementById('msg-sem-dados').style.display = 'none';
+
+        // 1. Agrupar Registros
+        // Chave: "ANO-MES-QUINZENA"
+        const grupos = {};
+        
         registros.forEach(reg => {
-            totalDiarias += reg.multiplicador;
-            totalValor += reg.valor;
-
-            if (reg.carga === 1 && reg.tipoDia === 1) contadores.normal++;
-            else if (reg.carga === 2 && reg.tipoDia === 1) contadores.dupla++;
-            else if (reg.carga === 1 && reg.tipoDia === 2) contadores.domingo++;
-            else if (reg.carga === 1 && reg.tipoDia === 3) contadores.feriado++;
-            else if (reg.carga === 2 && reg.tipoDia === 2) contadores.domingoDupla++;
-            else if (reg.carga === 2 && reg.tipoDia === 3) contadores.feriadoDupla++;
+            const chave = `${reg.ano}-${reg.mes}-${reg.quinzena}`;
+            if (!grupos[chave]) {
+                grupos[chave] = {
+                    ano: reg.ano,
+                    mes: reg.mes,
+                    quinzena: reg.quinzena,
+                    itens: [],
+                    totalValor: 0
+                };
+            }
+            grupos[chave].itens.push(reg);
+            grupos[chave].totalValor += reg.total;
         });
 
-        let textoPeriodo = "Sem registros";
-        if (registros.length > 0) {
-            const dataObj = new Date(registros[0].data);
-            const dia = dataObj.getUTCDate();
+        // 2. Ordenar Grupos (Mais recente primeiro)
+        const chavesOrdenadas = Object.keys(grupos).sort((a, b) => {
+            const [aA, aM, aQ] = a.split('-').map(Number);
+            const [bA, bM, bQ] = b.split('-').map(Number);
+            // Compara Ano, depois Mês, depois Quinzena (Decrescente)
+            if (aA !== bA) return bA - aA;
+            if (aM !== bM) return bM - aM;
+            return bQ - aQ;
+        });
+
+        // 3. Gerar HTML
+        chavesOrdenadas.forEach((chave, index) => {
+            const grupo = grupos[chave];
+            // Ordenar itens dentro do grupo por dia
+            grupo.itens.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+            const isFirst = index === 0; // Primeiro item (mais recente) vem aberto
+            const nomeMes = MESES[grupo.mes];
+            const titulo = `${grupo.quinzena}ª Quinzena de ${nomeMes} ${grupo.ano}`;
+            const totalFormatado = grupo.totalValor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+
+            const div = document.createElement('div');
+            div.className = 'accordion-group';
             
-            // CORREÇÃO: Meses manuais para evitar erro de fuso
-            const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            const mes = meses[dataObj.getUTCMonth()];
+            // Botões de Ação do Header (Só Admin vê Excluir)
+            const btnDeleteHTML = modoAtual === 'admin' 
+                ? `<button class="btn-icon" style="color:#d32f2f;" onclick="event.stopPropagation(); excluirQuinzena('${chave}')" title="Excluir Quinzena">🗑️</button>` 
+                : '';
 
-            const quinzena = dia <= 15 ? "1ª Quinzena" : "2ª Quinzena";
-            textoPeriodo = `${quinzena} de ${mes}`;
+            div.innerHTML = `
+                <div class="accordion-header ${isFirst ? 'active' : ''}" onclick="toggleAccordion(this)">
+                    <div>
+                        <div class="accordion-title">${titulo}</div>
+                        <div class="accordion-meta">${grupo.itens.length} registros • Total: ${totalFormatado}</div>
+                    </div>
+                    <div class="accordion-actions">
+                        <button class="btn-icon" style="color:#1976d2;" onclick="event.stopPropagation(); gerarPDF('${chave}')" title="Baixar PDF">📄</button>
+                        ${btnDeleteHTML}
+                        <span style="margin-left:5px; font-size:12px;">${isFirst ? '▼' : '▶'}</span>
+                    </div>
+                </div>
+                <div class="accordion-content ${isFirst ? 'open' : ''}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Dia</th>
+                                <th>Detalhe</th>
+                                <th style="text-align:right">Valor</th>
+                                ${modoAtual === 'admin' ? '<th class="td-acao"></th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${grupo.itens.map(item => {
+                                const diaStr = item.data.split('-')[2];
+                                let desc = item.tipoDia === 3 ? "Feriado" : item.tipoDia === 2 ? "Domingo" : "Útil";
+                                if (item.carga === 2) desc += " (Dobrado)";
+                                
+                                const acaoHTML = modoAtual === 'admin' 
+                                    ? `<td class="td-acao"><span style="color:red; cursor:pointer;" onclick="excluirRegistro(${item.id})">✖</span></td>` 
+                                    : '';
+
+                                return `
+                                    <tr>
+                                        <td>${diaStr}/${(item.mes+1).toString().padStart(2,'0')}</td>
+                                        <td>${desc}</td>
+                                        <td class="td-valor">R$ ${item.total.toFixed(2)}</td>
+                                        ${acaoHTML}
+                                    </tr>
+                                `;
+                            }).join('')}
+                            <tr class="total-row">
+                                <td colspan="2">Total do Período</td>
+                                <td class="td-valor">${totalFormatado}</td>
+                                ${modoAtual === 'admin' ? '<td></td>' : ''}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function toggleAccordion(header) {
+        header.classList.toggle('active');
+        const content = header.nextElementSibling;
+        content.classList.toggle('open');
+        
+        // Atualiza a seta
+        const seta = header.querySelector('span:last-child');
+        seta.innerText = content.classList.contains('open') ? '▼' : '▶';
+    }
+
+    // --- ABA FINANCEIRA ---
+    function renderizarFinanceiro() {
+        const container = document.getElementById('tabela-financeira-container');
+        
+        // Agrupar por Mês
+        const dadosMes = {}; // chave: "2026-1"
+        
+        registros.forEach(reg => {
+            const chave = `${reg.ano}-${reg.mes}`;
+            if (!dadosMes[chave]) {
+                dadosMes[chave] = { ano: reg.ano, mes: reg.mes, q1: 0, q2: 0 };
+            }
+            if (reg.quinzena === 1) dadosMes[chave].q1 += reg.total;
+            else dadosMes[chave].q2 += reg.total;
+        });
+
+        // Ordenar Cronologicamente Inverso
+        const chaves = Object.keys(dadosMes).sort((a,b) => {
+             const [aA, aM] = a.split('-').map(Number);
+             const [bA, bM] = b.split('-').map(Number);
+             if (aA !== bA) return bA - aA;
+             return bM - aM;
+        });
+
+        if (chaves.length === 0) {
+            container.innerHTML = "<p style='text-align:center'>Sem dados financeiros.</p>";
+            return;
         }
-        document.getElementById('tituloQuinzena').innerText = textoPeriodo;
 
-        if (contadores.normal > 0) lista.innerHTML += `<li>${contadores.normal} diária(s) normal</li>`;
-        if (contadores.dupla > 0) lista.innerHTML += `<li>${contadores.dupla} diária(s) dupla</li>`;
-        if (contadores.domingo > 0) lista.innerHTML += `<li>${contadores.domingo} domingo(s)</li>`;
-        if (contadores.feriado > 0) lista.innerHTML += `<li>${contadores.feriado} feriado(s)</li>`;
-        if (contadores.domingoDupla > 0) lista.innerHTML += `<li>${contadores.domingoDupla} domingo(s) Diária Dupla</li>`;
-        if (contadores.feriadoDupla > 0) lista.innerHTML += `<li>${contadores.feriadoDupla} feriado(s) Diária Dupla</li>`;
+        let html = `
+            <table class="fin-table">
+                <thead>
+                    <tr>
+                        <th>Mês/Ano</th>
+                        <th style="text-align:right">1ª Quinz.</th>
+                        <th style="text-align:right">2ª Quinz.</th>
+                        <th style="text-align:right; background:#003c8f;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
 
-        if (registros.length === 0) lista.innerHTML = "<li>Nenhum dia trabalhado registrado.</li>";
+        chaves.forEach(k => {
+            const d = dadosMes[k];
+            const total = d.q1 + d.q2;
+            html += `
+                <tr>
+                    <td>${MESES[d.mes]} ${d.ano}</td>
+                    <td style="text-align:right">R$ ${d.q1.toFixed(2)}</td>
+                    <td style="text-align:right">R$ ${d.q2.toFixed(2)}</td>
+                    <td style="text-align:right" class="fin-row-total">R$ ${total.toFixed(2)}</td>
+                </tr>
+            `;
+        });
 
-        document.getElementById('textoTotalDiarias').innerText = `Total: ${totalDiarias} diárias`;
-        document.getElementById('footerTotal').innerText = `Total a Receber: R$ ${totalValor.toFixed(2)}`;
+        html += `</tbody></table>`;
+        container.innerHTML = html;
     }
 
-    async function salvarFirebase() {
-        if (modoAtual === "admin") await database.ref('saripan').set({ ultAtualizacao: new Date().toISOString(), dados: registros });
-    }
-    async function carregarDados() {
-        const snap = await database.ref('saripan').get();
-        if (snap.exists()) registros = snap.val().dados || [];
-        atualizarInterface();
-    }
-    async function fecharQuinzena() {
-        if(confirm("Limpar tudo para nova quinzena?")) { registros = []; atualizarInterface(); await salvarFirebase(); }
-    }
+    // --- PDF INTELIGENTE ---
+    function gerarPDF(chaveGrupo) {
+        // Encontrar os dados daquele grupo específico
+        const [ano, mes, q] = chaveGrupo.split('-').map(Number);
+        const itens = registros.filter(r => r.ano === ano && r.mes === mes && r.quinzena === q);
+        itens.sort((a, b) => new Date(a.data) - new Date(b.data));
 
-    // --- PDF ATUALIZADO ---
-    async function exportarPDF() {
+        if (itens.length === 0) return alert("Erro: Sem dados.");
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        doc.setFontSize(18); doc.setTextColor(0,123,255); doc.text("SARIPAN - Relatório", 14, 20);
-        doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text("Prestador: João Batista Rosa", 14, 30);
+        // Cabeçalho PDF
+        doc.setFillColor(13, 71, 161); // Azul Escuro
+        doc.rect(0, 0, 210, 25, 'F');
+        doc.setFontSize(22);
+        doc.setTextColor(255, 255, 255);
+        doc.text("SARIPAN - Relatório de Serviços", 105, 17, null, null, 'center');
+
+        // Info
+        doc.setTextColor(0,0,0);
+        doc.setFontSize(12);
+        const nomeMes = MESES[mes];
+        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes} de ${ano}`, 14, 40);
+        doc.text(`Prestador: João Batista Rosa`, 14, 48);
+
+        // Contadores
+        let dias = 0;
+        let total = 0;
+        itens.forEach(i => { dias += i.multiplicador; total += i.total; });
         
-        const textoPeriodo = document.getElementById('tituloQuinzena').innerText;
-        doc.text(`Referência: ${textoPeriodo}`, 14, 38);
-
-        let contadores = { normal: 0, dupla: 0, domingo: 0, feriado: 0, domingoDupla: 0, feriadoDupla: 0 };
-        let totalDiarias = 0;
-        let totalGeral = 0;
-
-        registros.forEach(reg => {
-            totalDiarias += reg.multiplicador;
-            totalGeral += reg.valor;
-            if (reg.carga === 1 && reg.tipoDia === 1) contadores.normal++;
-            else if (reg.carga === 2 && reg.tipoDia === 1) contadores.dupla++;
-            else if (reg.carga === 1 && reg.tipoDia === 2) contadores.domingo++;
-            else if (reg.carga === 1 && reg.tipoDia === 3) contadores.feriado++;
-            else if (reg.carga === 2 && reg.tipoDia === 2) contadores.domingoDupla++;
-            else if (reg.carga === 2 && reg.tipoDia === 3) contadores.feriadoDupla++;
-        });
-
-        let y = 48;
-        doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
-        doc.text("Resumo do Período:", 14, y);
+        doc.text(`Total de Diárias (Peso): ${dias}`, 14, 58);
+        doc.text(`Valor Total: R$ ${total.toFixed(2)}`, 100, 58);
         doc.setFont(undefined, 'normal');
-        y += 7;
 
-        if (contadores.normal > 0) { doc.text(`- ${contadores.normal} diária(s) normal`, 14, y); y += 6; }
-        if (contadores.dupla > 0) { doc.text(`- ${contadores.dupla} diária(s) dupla`, 14, y); y += 6; }
-        if (contadores.domingo > 0) { doc.text(`- ${contadores.domingo} domingo(s)`, 14, y); y += 6; }
-        if (contadores.feriado > 0) { doc.text(`- ${contadores.feriado} feriado(s)`, 14, y); y += 6; }
-        if (contadores.domingoDupla > 0) { doc.text(`- ${contadores.domingoDupla} domingo(s) Diária Dupla`, 14, y); y += 6; }
-        if (contadores.feriadoDupla > 0) { doc.text(`- ${contadores.feriadoDupla} feriado(s) Diária Dupla`, 14, y); y += 6; }
-        
-        y += 4;
-        doc.setFont(undefined, 'bold');
-        doc.setTextColor(211, 47, 47);
-        doc.text(`Total: ${totalDiarias} diárias`, 14, y);
-        
-        doc.setTextColor(0, 0, 0); 
-        doc.setFont(undefined, 'normal');
-        y += 10; 
-
-        let dadosTabela = registros.map(reg => {
-            let desc = "";
-            
-            if (reg.tipoDia === 3) desc = "Feriado";
-            else if (reg.tipoDia === 2) desc = "Domingo";
-            else desc = "Diária Normal";
-            
-            if (reg.carga === 2) {
-                if (reg.tipoDia === 1) {
-                    desc = "Diária Dupla"; 
-                } else {
-                    if (reg.tipoDia === 3) desc = "Feriado (Diária Dupla)";
-                    if (reg.tipoDia === 2) desc = "Domingo (Diária Dupla)";
-                }
-            }
-            
+        // Tabela
+        const bodyData = itens.map(i => {
+            let tipo = i.tipoDia === 3 ? "Feriado" : i.tipoDia === 2 ? "Domingo" : "Dia Útil";
+            if(i.carga === 2) tipo += " (Dobra)";
             return [
-                reg.dataFormatada,
-                desc,
-                `R$ ${reg.valor.toFixed(2)}`
+                i.data.split('-').reverse().join('/'),
+                tipo,
+                `R$ ${i.total.toFixed(2)}`
             ];
         });
 
-        doc.autoTable({ 
-            startY: y,
-            head: [['Data', 'Descrição', 'Valor']], 
-            body: dadosTabela, 
-            theme: 'grid',
-            headStyles: { fillColor: [0, 123, 255] },
-            columnStyles: { 0: { cellWidth: 30 }, 2: { cellWidth: 35, halign: 'right' } }
+        doc.autoTable({
+            startY: 65,
+            head: [['Data', 'Tipo de Serviço', 'Valor']],
+            body: bodyData,
+            theme: 'striped',
+            headStyles: { fillColor: [13, 71, 161] },
+            foot: [['', 'TOTAL', `R$ ${total.toFixed(2)}`]],
+            footStyles: { fillColor: [200, 200, 200], textColor: [0,0,0], fontStyle: 'bold' }
         });
-        
-        let finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(14); doc.setFont(undefined, 'bold');
-        doc.text(`Valor Total: R$ ${totalGeral.toFixed(2)}`, 14, finalY);
-        
-        doc.save('relatorio_saripan.pdf');
+
+        doc.save(`Saripan_${nomeMes}_${ano}_Q${q}.pdf`);
     }
-  </script>
 
-  <script>
+    // --- FIREBASE SYNC ---
+    async function salvarFirebase() {
+        if (modoAtual === "admin") {
+            await database.ref('saripan_v2').set({ 
+                ultAtualizacao: new Date().toISOString(), 
+                dados: registros 
+            });
+        }
+    }
+
+    async function carregarDados() {
+        // Mudamos a chave para v2 para garantir estrutura limpa
+        const snap = await database.ref('saripan_v2').get();
+        if (snap.exists()) {
+            registros = snap.val().dados || [];
+        } else {
+            registros = [];
+        }
+        renderizarApontamentos();
+    }
+
+    // SW Registration
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').then((registration) => {
-          console.log('SW registrado com sucesso:', registration.scope);
-          
-          // Se detectar que um novo SW foi encontrado (mudança de versão)
-          registration.onupdatefound = () => {
-            const newWorker = registration.installing;
-            newWorker.onstatechange = () => {
-              if (newWorker.state === 'installed') {
-                if (navigator.serviceWorker.controller) {
-                  // Nova atualização disponível!
-                  console.log('Nova versão disponível. Recarregando...');
-                  window.location.reload(); // Recarrega a página automaticamente
-                }
-              }
-            };
-          };
-        }).catch((err) => {
-          console.log('Falha ao registrar SW:', err);
-        });
-      });
-
-      // Garante que a página recarregue se o SW assumir o controle
-      let refreshing;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        window.location.reload();
-        refreshing = true;
-      });
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
     }
   </script>
 </body>
