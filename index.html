@@ -502,7 +502,7 @@
         container.innerHTML = html;
     }
 
-    // --- PDF COM ESTILO RETRÔ/GRID (IGUAL ANEXO) ---
+    // --- PDF COM CABEÇALHO DETALHADO (SOLICITADO) ---
     function gerarPDF(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         
@@ -512,32 +512,66 @@
 
         if (itens.length === 0) return alert("Erro: Sem dados.");
 
+        // 1. CALCULAR O RESUMO DETALHADO
+        let contagem = {
+            normal: 0,
+            dupla: 0,
+            feriado: 0,
+            domingo: 0,
+            feriadoDupla: 0,
+            domingoDupla: 0
+        };
+        let totalMultiplicador = 0;
+        let totalDinheiro = 0;
+
+        itens.forEach(i => {
+            totalMultiplicador += i.multiplicador;
+            totalDinheiro += i.total;
+
+            if (i.carga === 1) {
+                if (i.tipoDia === 1) contagem.normal++;
+                else if (i.tipoDia === 2) contagem.domingo++;
+                else if (i.tipoDia === 3) contagem.feriado++;
+            } else { // Carga Dupla
+                if (i.tipoDia === 1) contagem.dupla++;
+                else if (i.tipoDia === 2) contagem.domingoDupla++;
+                else if (i.tipoDia === 3) contagem.feriadoDupla++;
+            }
+        });
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // Cabeçalho da Página (Mantido simples)
-        doc.setFontSize(18);
-        doc.setTextColor(13, 71, 161);
+        // 2. CABEÇALHO PERSONALIZADO (SEM AZULÃO)
+        doc.setFontSize(16);
+        doc.setFont(undefined, 'bold');
         doc.text("SARIPAN - Relatório", 14, 20);
         
         doc.setFontSize(12);
-        doc.setTextColor(0,0,0);
+        doc.setFont(undefined, 'normal');
+        doc.text("Prestador: João Batista Rosa", 14, 28);
         const nomeMes = MESES[mes];
-        doc.text(`Prestador: João Batista Rosa`, 14, 30);
-        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes} de ${ano}`, 14, 38);
-
-        // Resumo
-        let dias = 0;
-        let total = 0;
-        itens.forEach(i => { dias += i.multiplicador; total += i.total; });
+        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes}`, 14, 34);
         
         doc.setFont(undefined, 'bold');
-        doc.text("Resumo do Período:", 14, 48);
+        doc.text("Resumo do Período:", 14, 44);
         doc.setFont(undefined, 'normal');
-        doc.text(`${itens.length} diária(s) registrada(s)`, 14, 54);
-        doc.text(`Total Peso: ${dias}`, 14, 60);
+        
+        let y = 50;
+        if (contagem.normal > 0) { doc.text(`- ${contagem.normal} diária(s) normal`, 14, y); y += 6; }
+        if (contagem.dupla > 0) { doc.text(`- ${contagem.dupla} diária(s) dupla`, 14, y); y += 6; }
+        if (contagem.feriado > 0) { doc.text(`- ${contagem.feriado} feriado(s) normal`, 14, y); y += 6; }
+        if (contagem.domingo > 0) { doc.text(`- ${contagem.domingo} domingo(s)`, 14, y); y += 6; }
+        if (contagem.feriadoDupla > 0) { doc.text(`- ${contagem.feriadoDupla} feriado(s) dupla`, 14, y); y += 6; }
+        if (contagem.domingoDupla > 0) { doc.text(`- ${contagem.domingoDupla} domingo(s) dupla`, 14, y); y += 6; }
 
-        // Dados da Tabela
+        doc.setFont(undefined, 'bold');
+        y += 2;
+        doc.text(`Total: ${totalMultiplicador} diárias a receber`, 14, y);
+        y += 6;
+        doc.text(`Total: ${totalMultiplicador} diárias`, 14, y);
+
+        // 3. TABELA ESTILO PLANILHA (AZUL CIANO + BORDAS PRETAS)
         const bodyData = itens.map(i => {
             let tipo = i.tipoDia === 3 ? "Feriado" : i.tipoDia === 2 ? "Domingo" : "Diária Normal";
             if(i.carga === 2) tipo += " (Dobra)";
@@ -548,40 +582,34 @@
             ];
         });
 
-        // ESTILO ESPECÍFICO DO PDF (GRID AZUL CIANO E PRETO)
         doc.autoTable({
-            startY: 65,
+            startY: y + 10,
             head: [['Data', 'Descrição', 'Valor']],
             body: bodyData,
-            theme: 'grid', // FORÇA AS BORDAS
+            theme: 'grid', // BORDAS PRETAS
             
-            // ESTILO DO CABEÇALHO (AZUL CIANO E PRETO)
             headStyles: { 
                 fillColor: [0, 176, 240], // Azul Ciano (#00b0f0)
                 textColor: [0, 0, 0],     // Texto Preto
                 fontStyle: 'bold',
                 halign: 'center',
-                lineColor: [0, 0, 0],     // Linha Preta
-                lineWidth: 0.1
-            },
-            
-            // ESTILO DO CORPO (BRANCO E PRETO)
-            bodyStyles: {
-                textColor: [0, 0, 0],
-                halign: 'center',         // Centralizado como na imagem
                 lineColor: [0, 0, 0],
                 lineWidth: 0.1
             },
             
-            // Coluna do meio alinhada à esquerda? A imagem parece centralizada.
-            // Mas vou manter centralizado para garantir.
+            bodyStyles: {
+                textColor: [0, 0, 0],
+                halign: 'center',
+                lineColor: [0, 0, 0],
+                lineWidth: 0.1
+            },
             
-            // RODAPÉ TOTAL
-            foot: [['', 'Valor Total:', `R$ ${total.toFixed(2)}`]],
+            foot: [['', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
             footStyles: {
-                fillColor: [255, 255, 255], // Fundo branco
-                textColor: [0, 0, 0],       // Texto Preto
+                fillColor: [255, 255, 255],
+                textColor: [0, 0, 0],
                 fontStyle: 'bold',
+                halign: 'center',
                 lineColor: [0, 0, 0],
                 lineWidth: 0.1
             }
