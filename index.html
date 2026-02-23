@@ -50,9 +50,9 @@
     .app-title { font-size: 20px; font-weight: bold; margin: 0; }
     .btn-nav-top { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
     
-    /* Abas Superiores */
+    /* Abas Superiores (Agora são 3) */
     .tabs-container { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
-    .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-size: 16px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: background 0.2s; }
+    .tab-btn { flex: 1; padding: 15px 5px; border: none; background: none; font-size: 15px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: background 0.2s; }
     .tab-btn.active { color: #0d47a1; border-bottom: 3px solid #0d47a1; background: #f9f9f9; }
 
     /* ÁREA DE ROLAGEM (SCROLL) */
@@ -73,14 +73,14 @@
     .panel.active { display: block; }
 
     /* Formulário de Registro */
-    .form-box { background: #e3f2fd; padding: 15px; border-radius: 8px; border: 1px solid #bbdefb; margin-bottom: 20px; }
-    .form-title { margin-top: 0; color: #1565c0; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #bbdefb; padding-bottom: 5px; }
-    .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .form-box { background: #e3f2fd; padding: 20px; border-radius: 12px; border: 1px solid #bbdefb; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .form-title { margin-top: 0; color: #1565c0; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #bbdefb; padding-bottom: 8px; text-align: center; }
+    .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     label { font-size: 13px; font-weight: bold; color: #444; display: block; margin-bottom: 4px; }
-    input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
-    .btn-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; margin-top: 10px; }
+    input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
+    .btn-action { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 18px; margin-top: 15px; box-shadow: 0 4px 6px rgba(46,125,50,0.3); transition: transform 0.1s; }
+    .btn-action:active { transform: scale(0.98); }
     .btn-green { background-color: #2e7d32; }
-    .btn-red { background-color: #c62828; }
 
     /* MODAL LOGIN */
     .modal-overlay {
@@ -95,7 +95,18 @@
     }
     .modal-title { font-size: 20px; font-weight: bold; color: #0d47a1; margin-bottom: 20px; }
     .input-login { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; }
-    .btn-close-modal { background: #ccc; margin-top: 10px; color: #333; }
+    .btn-close-modal { background: #ccc; margin-top: 10px; color: #333; box-shadow: none; font-size: 16px; padding: 12px;}
+
+    /* TOAST DE SUCESSO */
+    #toast {
+        visibility: hidden; min-width: 250px; background-color: #2e7d32; color: #fff; 
+        text-align: center; border-radius: 8px; padding: 16px; position: fixed; 
+        z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); 
+        font-size: 16px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    #toast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 2.5s; }
+    @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+    @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
     /* ACORDEÃO (Listas Quinzenais) */
     .accordion-group { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
@@ -105,11 +116,10 @@
     .accordion-meta { font-size: 12px; color: #666; margin-top: 2px; }
     .accordion-actions { display: flex; gap: 10px; }
     .btn-icon { background: none; border: none; font-size: 18px; cursor: pointer; padding: 5px; }
-    
     .accordion-content { display: none; padding: 0; }
     .accordion-content.open { display: block; }
 
-    /* Tabela Interna (Visual App) */
+    /* Tabela Interna */
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 10px 5px; text-align: left; border-bottom: 1px solid #eee; }
     th { background: #eee; color: #555; font-size: 12px; text-transform: uppercase; }
@@ -119,13 +129,9 @@
     .total-row { background: #e8f5e9; font-weight: bold; }
 
     /* FINANCEIRO */
-    .year-summary { 
-        background: #fff8e1; border: 1px solid #ffe0b2; border-radius: 8px; padding: 15px; 
-        margin-bottom: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
+    .year-summary { background: #fff8e1; border: 1px solid #ffe0b2; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .year-summary h4 { margin: 0; color: #f57c00; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
     .year-total-value { font-size: 24px; font-weight: bold; color: #333; margin-top: 5px; }
-
     .fin-table { width: 100%; border: 1px solid #ddd; background: white; }
     .fin-table th { background: #0d47a1; color: white; }
     .fin-table td { border: 1px solid #ddd; }
@@ -136,27 +142,28 @@
     .btn-big { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 30px; border: none; color: white; width: 80%; max-width: 300px; cursor: pointer; }
 
     .hidden { display: none !important; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
+
+  <div id="toast">✅ Apontamento salvo com sucesso!</div>
 
   <div id="modal-login" class="modal-overlay hidden">
     <div class="modal-content">
         <div class="modal-title">🔐 Acesso Administrativo</div>
         <input type="email" id="emailLogin" class="input-login" placeholder="E-mail" autocomplete="username">
         <input type="password" id="senhaLogin" class="input-login" placeholder="Senha" autocomplete="current-password">
-        <button class="btn-action btn-green" onclick="fazerLogin()">Entrar</button>
+        <button class="btn-action btn-green" onclick="fazerLogin()" style="margin-top: 5px;">Entrar</button>
         <button class="btn-action btn-close-modal" onclick="fecharModalLogin()">Cancelar</button>
     </div>
   </div>
 
   <div id="inicio">
     <h1 style="color:#d32f2f; font-size: 40px; margin-bottom: 5px;">SARIPAN</h1>
-    <p style="color:#666; margin-bottom: 40px;">Registro de Prestação de serviços</p>
+    <p style="color:#666; margin-bottom: 40px;">Registro de Prestação de Serviços</p>
     
     <button class="btn-big btn-green" onclick="entrarModo('admin')">📋 APONTAMENTOS</button>
-    <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ VISUALIZAR APONTAMENTOS</button>
+    <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ VISUALIZAR</button>
   </div>
 
   <div id="app" class="container hidden">
@@ -169,19 +176,21 @@
         </div>
 
         <div class="tabs-container">
-          <button class="tab-btn active" onclick="mudarAba('apontamentos')">📝 Apontamentos</button>
+          <button id="btn-tab-registrar" class="tab-btn active" onclick="mudarAba('registrar')">⏱️ Registrar</button>
+          <button id="btn-tab-historico" class="tab-btn" onclick="mudarAba('historico')">📋 Histórico</button>
           <button id="btn-tab-financeiro" class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
         </div>
     </div>
 
     <div class="scroll-content">
         
-        <div id="painel-apontamentos" class="panel active">
+        <div id="painel-registrar" class="panel active">
           
-          <div id="area-formulario" class="form-box hidden">
-            <h3 class="form-title">Novo Registro</h3>
+          <div id="area-formulario" class="form-box">
+            <h3 class="form-title">Novo Apontamento</h3>
+            
             <label>Data do Serviço:</label>
-            <input type="date" id="dataServico" style="margin-bottom: 10px;">
+            <input type="date" id="dataServico" style="margin-bottom: 15px; padding: 15px; font-size: 16px;">
             
             <div class="grid-input">
               <div>
@@ -215,21 +224,46 @@
             <button class="btn-action btn-green" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
           </div>
 
-          <div id="lista-quinzenas-container"></div>
-          
-          <div id="msg-sem-dados" style="text-align:center; padding: 40px; color:#999; display:none;">
-            Nenhum registro encontrado.
+          <div id="rodape-dinamico" style="margin-top: 25px; padding: 0 10px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: center; border: 1px solid #000; font-size: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <thead>
+                    <tr style="background-color: #5b9bd5; color: white;">
+                        <th style="border: 1px solid #000; padding: 12px; font-weight: bold;">QTD de diárias</th>
+                        <th style="border: 1px solid #000; padding: 12px; font-weight: bold;">Total (R$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="rodape-qtd" style="border: 1px solid #000; padding: 12px; background: white; font-weight: bold; font-size: 18px; color: #333;">0</td>
+                        <td id="rodape-total" style="border: 1px solid #000; padding: 12px; background: white; font-weight: bold; font-size: 18px; color: #2e7d32;">R$ 0,00</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="rodape-ref" style="text-align: center; font-size: 13px; color: #666; margin-top: 8px; font-weight: bold;">
+                Selecione uma data para ver o resumo.
+            </div>
           </div>
         </div>
 
+        <div id="painel-historico" class="panel">
+            <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Registros e Relatórios</h3>
+            <div id="lista-quinzenas-container"></div>
+            <div id="msg-sem-dados" style="text-align:center; padding: 40px; color:#999; display:none;">
+              Nenhum registro encontrado.
+            </div>
+        </div>
+
         <div id="painel-financeiro" class="panel">
+          <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Consolidado Mensal</h3>
           <div id="financeiro-content"></div>
         </div>
 
-    </div> </div>
+    </div>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
@@ -238,30 +272,26 @@
     let modoAtual = ""; 
     let registros = [];
     let database = null; 
-    let auth = null; // Instância de autenticação
+    let auth = null; 
     const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-    // --- SISTEMA DE LOGIN VIA E-MAIL (NOVO) ---
+    // --- LOGIN ---
     function entrarModo(modo) {
         if (!database || !auth) {
             iniciarFirebase();
-            if(!database) return alert("Erro: Conexão com Firebase falhou. Verifique internet.");
+            if(!database) return alert("Erro: Conexão com Firebase falhou. Verifique a internet.");
         }
 
         modoAtual = modo;
 
         if (modo === 'admin') {
-            // Verifica se JÁ está logado
             const user = auth.currentUser;
             if (user) {
-                // Já logado, entra direto
                 abrirAppAdmin();
             } else {
-                // Não logado, abre modal
                 document.getElementById('modal-login').classList.remove('hidden');
             }
         } else {
-            // Modo View não precisa de login
             abrirAppView();
         }
     }
@@ -278,9 +308,7 @@
 
         auth.signInWithEmailAndPassword(email, senha)
             .then((userCredential) => {
-                // Sucesso
                 fecharModalLogin();
-                // Limpa campos
                 document.getElementById('emailLogin').value = '';
                 document.getElementById('senhaLogin').value = '';
                 abrirAppAdmin();
@@ -291,18 +319,18 @@
                 if (error.code === 'auth/user-not-found') msg = "Usuário não encontrado.";
                 if (error.code === 'auth/invalid-email') msg = "E-mail inválido.";
                 alert(msg);
-                console.error(error);
             });
     }
 
+    // --- CONTROLE DE TELAS E ABAS (MODIFICADO) ---
     function abrirAppAdmin() {
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         
-        document.getElementById('area-formulario').classList.remove('hidden');
+        document.getElementById('btn-tab-registrar').style.display = 'block';
         document.getElementById('btn-tab-financeiro').style.display = 'block';
         
-        mudarAba('apontamentos');
+        mudarAba('registrar');
         document.getElementById('dataServico').valueAsDate = new Date();
         atualizarPreview();
         carregarDados();
@@ -312,10 +340,11 @@
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         
-        document.getElementById('area-formulario').classList.add('hidden');
+        // Esconde abas de ação do Gestor
+        document.getElementById('btn-tab-registrar').style.display = 'none';
         document.getElementById('btn-tab-financeiro').style.display = 'none';
         
-        mudarAba('apontamentos');
+        mudarAba('historico');
         carregarDados();
     }
 
@@ -324,35 +353,74 @@
             location.reload();
             return;
         }
-        
         if(confirm("Sair do sistema?")) {
             if (auth) {
-                auth.signOut().then(() => {
-                    location.reload();
-                });
+                auth.signOut().then(() => location.reload());
             } else {
                 location.reload();
             }
         }
     }
 
-    // --- DEMIAS FUNÇÕES (IGUAIS ANTERIORMENTE) ---
     function mudarAba(aba) {
-        if (aba === 'financeiro' && modoAtual !== 'admin') return;
-
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         
-        if (aba === 'apontamentos') {
-            document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
-            document.getElementById('painel-apontamentos').classList.add('active');
-        } else {
+        if (aba === 'registrar') {
+            document.getElementById('btn-tab-registrar').classList.add('active');
+            document.getElementById('painel-registrar').classList.add('active');
+            atualizarRodapeDinamico();
+        } else if (aba === 'historico') {
+            document.getElementById('btn-tab-historico').classList.add('active');
+            document.getElementById('painel-historico').classList.add('active');
+            renderizarApontamentos();
+        } else if (aba === 'financeiro') {
             document.getElementById('btn-tab-financeiro').classList.add('active');
             document.getElementById('painel-financeiro').classList.add('active');
             renderizarFinanceiro();
         }
     }
 
+    function mostrarToast() {
+        const toast = document.getElementById("toast");
+        toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2900);
+    }
+
+    // --- RODAPÉ DINÂMICO (NOVO) ---
+    function atualizarRodapeDinamico() {
+        if (modoAtual !== 'admin') return;
+
+        const dataInput = document.getElementById('dataServico').value;
+        if (!dataInput) return;
+
+        // Pega as infos da data que está digitada no formulário
+        const dateObj = new Date(dataInput);
+        const ano = dateObj.getUTCFullYear();
+        const mesIndex = dateObj.getUTCMonth(); 
+        const dia = dateObj.getUTCDate();
+        const quinzena = dia <= 15 ? 1 : 2;
+
+        let qtdPeso = 0;
+        let totalValor = 0;
+
+        // Soma apenas os registros da quinzena da data selecionada
+        registros.forEach(reg => {
+            if (reg.ano === ano && reg.mes === mesIndex && reg.quinzena === quinzena) {
+                qtdPeso += reg.multiplicador; // Diárias a receber (peso)
+                totalValor += reg.total;      // Total R$
+            }
+        });
+
+        document.getElementById('rodape-qtd').innerText = qtdPeso;
+        document.getElementById('rodape-total').innerText = totalValor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        document.getElementById('rodape-ref').innerText = `Referência: ${quinzena}ª Quinz. de ${MESES[mesIndex]} ${ano}`;
+    }
+
+    // Listener para o calendário (Atualiza o rodapé ao trocar o dia)
+    document.getElementById('dataServico').addEventListener('change', atualizarRodapeDinamico);
+
+    // --- CÁLCULOS E PREVIEW ---
     function calcularValor(base, carga, tipoDia) {
         let pesoDia = (tipoDia === 3 || tipoDia === 2) ? 2 : 1;
         let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
@@ -367,6 +435,7 @@
         document.getElementById('previewValor').value = `R$ ${calc.total.toFixed(2)}`;
     }
 
+    // --- CRUD ---
     async function adicionarRegistro() {
         if (modoAtual !== 'admin') return;
 
@@ -378,7 +447,6 @@
         const tipoDia = parseInt(document.getElementById('tipoDia').value);
         
         const calc = calcularValor(base, carga, tipoDia);
-        
         const dateObj = new Date(dataInput);
         const ano = dateObj.getUTCFullYear();
         const mesIndex = dateObj.getUTCMonth(); 
@@ -400,8 +468,11 @@
 
         registros.push(novoReg);
         await salvarFirebase();
-        renderizarApontamentos();
-        alert("Registro salvo!");
+        
+        // Ações Pós-Salvar (O fluxo limpo)
+        renderizarApontamentos(); // Mantém o histórico atualizado em background
+        atualizarRodapeDinamico(); // Atualiza os números azuis na hora
+        mostrarToast(); // Dá o aviso de sucesso na tela
     }
 
     async function excluirRegistro(id) {
@@ -410,6 +481,7 @@
         registros = registros.filter(r => r.id !== id);
         await salvarFirebase();
         renderizarApontamentos();
+        atualizarRodapeDinamico();
     }
 
     async function excluirQuinzena(chaveGrupo) {
@@ -419,6 +491,7 @@
         registros = registros.filter(r => !(r.ano === ano && r.mes === mes && r.quinzena === q));
         await salvarFirebase();
         renderizarApontamentos();
+        atualizarRodapeDinamico();
     }
 
     function toggleAccordion(header) {
@@ -443,13 +516,7 @@
         registros.forEach(reg => {
             const chave = `${reg.ano}-${reg.mes}-${reg.quinzena}`;
             if (!grupos[chave]) {
-                grupos[chave] = {
-                    ano: reg.ano,
-                    mes: reg.mes,
-                    quinzena: reg.quinzena,
-                    itens: [],
-                    totalValor: 0
-                };
+                grupos[chave] = { ano: reg.ano, mes: reg.mes, quinzena: reg.quinzena, itens: [], totalValor: 0 };
             }
             grupos[chave].itens.push(reg);
             grupos[chave].totalValor += reg.total;
@@ -543,13 +610,7 @@
                 <div class="accordion-content ${isFirst ? 'open' : ''}">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Tipo</th>
-                                <th>Detalhes</th>
-                                ${thValor}
-                                ${thAcao}
-                            </tr>
+                            <tr><th>Data</th><th>Tipo</th><th>Detalhes</th>${thValor}${thAcao}</tr>
                         </thead>
                         <tbody>
                             ${grupo.itens.map(item => {
@@ -565,15 +626,7 @@
                                     tdAcao = `<td class="td-acao"><span style="color:red; cursor:pointer;" onclick="excluirRegistro(${item.id})">✖</span></td>`;
                                 }
 
-                                return `
-                                    <tr>
-                                        <td>${diaStr}/${(item.mes+1).toString().padStart(2,'0')}</td>
-                                        <td>${tipoStr}</td>
-                                        <td>${detalheStr}</td>
-                                        ${tdValor}
-                                        ${tdAcao}
-                                    </tr>
-                                `;
+                                return `<tr><td>${diaStr}/${(item.mes+1).toString().padStart(2,'0')}</td><td>${tipoStr}</td><td>${detalheStr}</td>${tdValor}${tdAcao}</tr>`;
                             }).join('')}
                             ${totalRowHTML}
                         </tbody>
@@ -622,39 +675,16 @@
         let htmlAnual = '';
         anosOrdenados.forEach(ano => {
             const valor = totaisAnuais[ano].toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-            htmlAnual += `
-                <div class="year-summary">
-                    <h4>Total Acumulado ${ano}</h4>
-                    <div class="year-total-value">${valor}</div>
-                </div>
-            `;
+            htmlAnual += `<div class="year-summary"><h4>Total Acumulado ${ano}</h4><div class="year-total-value">${valor}</div></div>`;
         });
         container.innerHTML += htmlAnual;
 
-        let htmlTable = `
-            <table class="fin-table">
-                <thead>
-                    <tr>
-                        <th>Mês/Ano</th>
-                        <th style="text-align:right">1ª Q.</th>
-                        <th style="text-align:right">2ª Q.</th>
-                        <th style="text-align:right; background:#003c8f; color:white;">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+        let htmlTable = `<table class="fin-table"><thead><tr><th>Mês/Ano</th><th style="text-align:right">1ª Q.</th><th style="text-align:right">2ª Q.</th><th style="text-align:right; background:#003c8f; color:white;">Total</th></tr></thead><tbody>`;
 
         chavesMes.forEach(k => {
             const d = dadosMes[k];
             const total = d.q1 + d.q2;
-            htmlTable += `
-                <tr>
-                    <td>${MESES[d.mes]} ${d.ano}</td>
-                    <td style="text-align:right">R$ ${d.q1.toFixed(2)}</td>
-                    <td style="text-align:right">R$ ${d.q2.toFixed(2)}</td>
-                    <td style="text-align:right" class="fin-row-total">R$ ${total.toFixed(2)}</td>
-                </tr>
-            `;
+            htmlTable += `<tr><td>${MESES[d.mes]} ${d.ano}</td><td style="text-align:right">R$ ${d.q1.toFixed(2)}</td><td style="text-align:right">R$ ${d.q2.toFixed(2)}</td><td style="text-align:right" class="fin-row-total">R$ ${total.toFixed(2)}</td></tr>`;
         });
 
         htmlTable += `</tbody></table>`;
@@ -663,11 +693,9 @@
 
     function gerarPDF(chaveGrupo) {
         if (modoAtual !== 'admin') return;
-        
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
         const itens = registros.filter(r => r.ano === ano && r.mes === mes && r.quinzena === q);
         itens.sort((a, b) => new Date(a.data) - new Date(b.data));
-
         if (itens.length === 0) return alert("Erro: Sem dados.");
 
         let contagem = { normal: 0, dupla: 0, feriado: 0, domingo: 0, feriadoDupla: 0, domingoDupla: 0 };
@@ -678,32 +706,19 @@
             totalMultiplicador += i.multiplicador;
             totalDinheiro += i.total;
             if (i.carga === 1) {
-                if (i.tipoDia === 1) contagem.normal++;
-                else if (i.tipoDia === 2) contagem.domingo++;
-                else if (i.tipoDia === 3) contagem.feriado++;
+                if (i.tipoDia === 1) contagem.normal++; else if (i.tipoDia === 2) contagem.domingo++; else if (i.tipoDia === 3) contagem.feriado++;
             } else { 
-                if (i.tipoDia === 1) contagem.dupla++;
-                else if (i.tipoDia === 2) contagem.domingoDupla++;
-                else if (i.tipoDia === 3) contagem.feriadoDupla++;
+                if (i.tipoDia === 1) contagem.dupla++; else if (i.tipoDia === 2) contagem.domingoDupla++; else if (i.tipoDia === 3) contagem.feriadoDupla++;
             }
         });
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        doc.setFontSize(16);
-        doc.setFont(undefined, 'bold');
-        doc.text("SARIPAN - Relatório", 14, 20);
-        
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'normal');
-        doc.text("Prestador: João Batista Rosa", 14, 28);
-        const nomeMes = MESES[mes];
-        doc.text(`Referência: ${q}ª Quinzena de ${nomeMes}`, 14, 34);
-        
-        doc.setFont(undefined, 'bold');
-        doc.text("Resumo do Período:", 14, 44);
-        doc.setFont(undefined, 'normal');
+        doc.setFontSize(16); doc.setFont(undefined, 'bold'); doc.text("SARIPAN - Relatório", 14, 20);
+        doc.setFontSize(12); doc.setFont(undefined, 'normal'); doc.text("Prestador: João Batista Rosa", 14, 28);
+        const nomeMes = MESES[mes]; doc.text(`Referência: ${q}ª Quinzena de ${nomeMes}`, 14, 34);
+        doc.setFont(undefined, 'bold'); doc.text("Resumo do Período:", 14, 44); doc.setFont(undefined, 'normal');
         
         let y = 50;
         if (contagem.normal > 0) { doc.text(`- ${contagem.normal} diária(s) normal`, 14, y); y += 6; }
@@ -713,50 +728,20 @@
         if (contagem.feriadoDupla > 0) { doc.text(`- ${contagem.feriadoDupla} feriado(s) dupla`, 14, y); y += 6; }
         if (contagem.domingoDupla > 0) { doc.text(`- ${contagem.domingoDupla} domingo(s) dupla`, 14, y); y += 6; }
 
-        doc.setFont(undefined, 'bold');
-        y += 2;
-        doc.text(`Total: ${totalMultiplicador} diárias a receber`, 14, y);
+        doc.setFont(undefined, 'bold'); y += 2; doc.text(`Total: ${totalMultiplicador} diárias a receber`, 14, y);
 
         const bodyData = itens.map(i => {
             const tipoStr = i.carga === 1 ? 'Normal' : 'Dupla';
             const detalheStr = i.tipoDia === 1 ? 'Dia Útil' : i.tipoDia === 2 ? 'Domingo' : 'Feriado';
-            
-            return [
-                i.data.split('-').reverse().join('/'),
-                tipoStr,
-                detalheStr,
-                `R$ ${i.total.toFixed(2)}`
-            ];
+            return [ i.data.split('-').reverse().join('/'), tipoStr, detalheStr, `R$ ${i.total.toFixed(2)}` ];
         });
 
         doc.autoTable({
-            startY: y + 10,
-            head: [['Data', 'Tipo', 'Detalhes', 'Valor']], 
-            body: bodyData,
-            theme: 'grid', 
-            headStyles: { 
-                fillColor: [0, 176, 240], 
-                textColor: [0, 0, 0],     
-                fontStyle: 'bold',
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            },
-            bodyStyles: {
-                textColor: [0, 0, 0],
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            },
+            startY: y + 10, head: [['Data', 'Tipo', 'Detalhes', 'Valor']], body: bodyData, theme: 'grid', 
+            headStyles: { fillColor: [0, 176, 240], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', lineColor: [0, 0, 0], lineWidth: 0.1 },
+            bodyStyles: { textColor: [0, 0, 0], halign: 'center', lineColor: [0, 0, 0], lineWidth: 0.1 },
             foot: [['', '', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
-            footStyles: {
-                fillColor: [255, 255, 255],
-                textColor: [0, 0, 0],
-                fontStyle: 'bold',
-                halign: 'center',
-                lineColor: [0, 0, 0],
-                lineWidth: 0.1
-            }
+            footStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', lineColor: [0, 0, 0], lineWidth: 0.1 }
         });
 
         doc.save(`Saripan_${nomeMes}_${ano}_Q${q}.pdf`);
@@ -764,10 +749,7 @@
 
     async function salvarFirebase() {
         if (modoAtual === "admin" && database) {
-            await database.ref('saripan_v2').set({ 
-                ultAtualizacao: new Date().toISOString(), 
-                dados: registros 
-            });
+            await database.ref('saripan_v2').set({ ultAtualizacao: new Date().toISOString(), dados: registros });
         }
     }
 
@@ -781,44 +763,29 @@
                 registros = [];
             }
             renderizarApontamentos();
+            atualizarRodapeDinamico(); // Atualiza o rodapé assim que carregar o banco
         } catch (e) {
             console.error("Erro ao carregar:", e);
         }
     }
 
-    // --- SETUP INICIAL BLINDADO ---
     function iniciarFirebase() {
         try {
             const firebaseConfig = {
-              apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s",
-              authDomain: "saripan-db.firebaseapp.com",
-              databaseURL: "https://saripan-db-default-rtdb.firebaseio.com",
-              projectId: "saripan-db",
-              storageBucket: "saripan-db.firebasestorage.app",
-              messagingSenderId: "1:80320414744:web:958b3a99462d97575e2f6d",
-              appId: "G-9W62N5PFV9"
+              apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s", authDomain: "saripan-db.firebaseapp.com",
+              databaseURL: "https://saripan-db-default-rtdb.firebaseio.com", projectId: "saripan-db",
+              storageBucket: "saripan-db.firebasestorage.app", messagingSenderId: "1:80320414744:web:958b3a99462d97575e2f6d", appId: "G-9W62N5PFV9"
             };
             if (typeof firebase !== 'undefined') {
-                firebase.initializeApp(firebaseConfig);
-                database = firebase.database();
-                auth = firebase.auth(); // Inicia Auth
-                console.log("Firebase e Auth conectados.");
-            } else {
-                console.warn("Firebase SDK não carregado (Offline?).");
+                firebase.initializeApp(firebaseConfig); database = firebase.database(); auth = firebase.auth();
             }
-        } catch (e) {
-            console.error("Erro ao iniciar Firebase:", e);
-        }
+        } catch (e) { console.error("Erro Firebase:", e); }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
         iniciarFirebase();
-        
         ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
-        
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('./sw.js');
-        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
     });
   </script>
 </body>
