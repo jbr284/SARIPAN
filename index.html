@@ -19,6 +19,19 @@
         overflow: hidden; 
     }
 
+    /* MODO PRIVACIDADE (A Mágica do Olhinho) */
+    body.modo-privacidade .esconder-valor {
+        filter: blur(6px);
+        opacity: 0.6;
+        pointer-events: none; /* Evita clicar/selecionar o texto borrado */
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+    
+    .esconder-valor {
+        transition: all 0.2s ease;
+    }
+
     .container { 
         background-color: #fff; 
         max-width: 800px; 
@@ -48,9 +61,9 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
     }
     .app-title { font-size: 20px; font-weight: bold; margin: 0; }
-    .btn-nav-top { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .btn-nav-top { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
     
-    /* Abas Superiores (Agora são 3) */
+    /* Abas Superiores */
     .tabs-container { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
     .tab-btn { flex: 1; padding: 15px 5px; border: none; background: none; font-size: 15px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: background 0.2s; }
     .tab-btn.active { color: #0d47a1; border-bottom: 3px solid #0d47a1; background: #f9f9f9; }
@@ -172,7 +185,7 @@
         <div class="app-header">
           <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
           <div class="app-title">SARIPAN</div>
-          <div style="width: 50px;"></div>
+          <button id="btn-privacidade" class="btn-nav-top" onclick="togglePrivacidade()" style="font-size: 18px; width: 44px;">👁️</button>
         </div>
 
         <div class="tabs-container">
@@ -217,7 +230,7 @@
               </div>
               <div>
                 <label>Previsão:</label>
-                <input type="text" id="previewValor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;">
+                <input type="text" id="previewValor" class="esconder-valor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;">
               </div>
             </div>
 
@@ -235,7 +248,7 @@
                 <tbody>
                     <tr>
                         <td id="rodape-qtd" style="border: 1px solid #000; padding: 12px; background: white; font-weight: bold; font-size: 18px; color: #333;">0</td>
-                        <td id="rodape-total" style="border: 1px solid #000; padding: 12px; background: white; font-weight: bold; font-size: 18px; color: #2e7d32;">R$ 0,00</td>
+                        <td id="rodape-total" class="esconder-valor" style="border: 1px solid #000; padding: 12px; background: white; font-weight: bold; font-size: 18px; color: #2e7d32;">R$ 0,00</td>
                     </tr>
                 </tbody>
             </table>
@@ -274,6 +287,29 @@
     let database = null; 
     let auth = null; 
     const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+    // --- MODO PRIVACIDADE (NOVO) ---
+    function togglePrivacidade() {
+        const estaOculto = document.body.classList.contains('modo-privacidade');
+        const btn = document.getElementById('btn-privacidade');
+        
+        if (estaOculto) {
+            document.body.classList.remove('modo-privacidade');
+            localStorage.setItem('saripan_privacidade', 'false');
+            btn.innerText = '👁️';
+        } else {
+            document.body.classList.add('modo-privacidade');
+            localStorage.setItem('saripan_privacidade', 'true');
+            btn.innerText = '🙈';
+        }
+    }
+
+    function aplicarPrivacidadeSalva() {
+        if (localStorage.getItem('saripan_privacidade') === 'true') {
+            document.body.classList.add('modo-privacidade');
+            document.getElementById('btn-privacidade').innerText = '🙈';
+        }
+    }
 
     // --- LOGIN ---
     function entrarModo(modo) {
@@ -322,13 +358,14 @@
             });
     }
 
-    // --- CONTROLE DE TELAS E ABAS (MODIFICADO) ---
+    // --- CONTROLE DE TELAS E ABAS ---
     function abrirAppAdmin() {
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         
         document.getElementById('btn-tab-registrar').style.display = 'block';
         document.getElementById('btn-tab-financeiro').style.display = 'block';
+        document.getElementById('btn-privacidade').style.display = 'flex'; // Mostra olhinho
         
         mudarAba('registrar');
         document.getElementById('dataServico').valueAsDate = new Date();
@@ -340,9 +377,10 @@
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         
-        // Esconde abas de ação do Gestor
+        // Esconde abas e olhinho do Gestor
         document.getElementById('btn-tab-registrar').style.display = 'none';
         document.getElementById('btn-tab-financeiro').style.display = 'none';
+        document.getElementById('btn-privacidade').style.display = 'none';
         
         mudarAba('historico');
         carregarDados();
@@ -387,14 +425,12 @@
         setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2900);
     }
 
-    // --- RODAPÉ DINÂMICO (NOVO) ---
+    // --- RODAPÉ DINÂMICO ---
     function atualizarRodapeDinamico() {
         if (modoAtual !== 'admin') return;
-
         const dataInput = document.getElementById('dataServico').value;
         if (!dataInput) return;
 
-        // Pega as infos da data que está digitada no formulário
         const dateObj = new Date(dataInput);
         const ano = dateObj.getUTCFullYear();
         const mesIndex = dateObj.getUTCMonth(); 
@@ -404,11 +440,10 @@
         let qtdPeso = 0;
         let totalValor = 0;
 
-        // Soma apenas os registros da quinzena da data selecionada
         registros.forEach(reg => {
             if (reg.ano === ano && reg.mes === mesIndex && reg.quinzena === quinzena) {
-                qtdPeso += reg.multiplicador; // Diárias a receber (peso)
-                totalValor += reg.total;      // Total R$
+                qtdPeso += reg.multiplicador; 
+                totalValor += reg.total;      
             }
         });
 
@@ -417,7 +452,6 @@
         document.getElementById('rodape-ref').innerText = `Referência: ${quinzena}ª Quinz. de ${MESES[mesIndex]} ${ano}`;
     }
 
-    // Listener para o calendário (Atualiza o rodapé ao trocar o dia)
     document.getElementById('dataServico').addEventListener('change', atualizarRodapeDinamico);
 
     // --- CÁLCULOS E PREVIEW ---
@@ -454,25 +488,16 @@
         const quinzena = dia <= 15 ? 1 : 2;
 
         const novoReg = {
-            id: Date.now(),
-            data: dataInput,
-            ano: ano,
-            mes: mesIndex,
-            quinzena: quinzena,
-            carga: carga,
-            tipoDia: tipoDia,
-            valorBase: base,
-            multiplicador: calc.multiplicador,
-            total: calc.total
+            id: Date.now(), data: dataInput, ano: ano, mes: mesIndex, quinzena: quinzena,
+            carga: carga, tipoDia: tipoDia, valorBase: base, multiplicador: calc.multiplicador, total: calc.total
         };
 
         registros.push(novoReg);
         await salvarFirebase();
         
-        // Ações Pós-Salvar (O fluxo limpo)
-        renderizarApontamentos(); // Mantém o histórico atualizado em background
-        atualizarRodapeDinamico(); // Atualiza os números azuis na hora
-        mostrarToast(); // Dá o aviso de sucesso na tela
+        renderizarApontamentos(); 
+        atualizarRodapeDinamico(); 
+        mostrarToast(); 
     }
 
     async function excluirRegistro(id) {
@@ -533,18 +558,13 @@
         let chavesFinais = chavesOrdenadas;
         if (modoAtual === 'view') {
             const hoje = new Date();
-            const anoH = hoje.getFullYear();
-            const mesH = hoje.getMonth();
-            const diaH = hoje.getDate();
+            const anoH = hoje.getFullYear(); const mesH = hoje.getMonth(); const diaH = hoje.getDate();
             const quinzH = diaH <= 15 ? 1 : 2;
             const chaveVigente = `${anoH}-${mesH}-${quinzH}`;
             chavesFinais = chavesOrdenadas.filter(k => k === chaveVigente);
             
             if (chavesFinais.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:30px; color:#666;">
-                    <h3>Nenhum registro para a quinzena vigente.</h3>
-                    <p>Referência: ${quinzH}ª Quinzena de ${MESES[mesH]}</p>
-                </div>`;
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:#666;"><h3>Nenhum registro para a quinzena vigente.</h3><p>Referência: ${quinzH}ª Quinzena de ${MESES[mesH]}</p></div>`;
                 return;
             }
         }
@@ -561,71 +581,41 @@
             const div = document.createElement('div');
             div.className = 'accordion-group';
             
-            let btnPDF = '';
-            let btnDeleteHTML = '';
-            let metaTexto = '';
-            let thValor = '';
-            let thAcao = '';
-            let totalRowHTML = '';
+            let btnPDF = '', btnDeleteHTML = '', metaTexto = '', thValor = '', thAcao = '', totalRowHTML = '';
 
             if (modoAtual === 'admin') {
-                metaTexto = `${grupo.itens.length} registros • Total: ${totalFormatado}`;
+                // CLASSE esconder-valor APLICADA NO META TEXTO E NAS COLUNAS DE VALOR
+                metaTexto = `${grupo.itens.length} registros • Total: <span class="esconder-valor">${totalFormatado}</span>`;
                 btnPDF = `<button class="btn-icon" style="color:#1976d2;" onclick="event.stopPropagation(); gerarPDF('${chave}')" title="Baixar PDF">📄</button>`;
                 btnDeleteHTML = `<button class="btn-icon" style="color:#d32f2f;" onclick="event.stopPropagation(); excluirQuinzena('${chave}')" title="Excluir Quinzena">🗑️</button>`;
                 thValor = '<th style="text-align:right">Valor</th>';
                 thAcao = '<th class="td-acao"></th>';
-                totalRowHTML = `
-                    <tr class="total-row">
-                        <td colspan="3">Total do Período</td>
-                        <td class="td-valor">${totalFormatado}</td>
-                        <td></td>
-                    </tr>`;
+                totalRowHTML = `<tr class="total-row"><td colspan="3">Total do Período</td><td class="td-valor esconder-valor">${totalFormatado}</td><td></td></tr>`;
             } else {
                 metaTexto = `${grupo.itens.length} registros trabalhados`;
-                btnPDF = ''; 
-                btnDeleteHTML = ''; 
-                thValor = ''; 
-                thAcao = ''; 
-                totalRowHTML = `
-                    <tr class="total-row">
-                        <td colspan="3" style="text-align: left; padding: 12px;">
-                            <div style="margin-bottom:4px;">Total de Dias Trabalhados: ${grupo.itens.length}</div>
-                            <div style="color:#0d47a1; font-weight:bold;">Total de Diárias a receber: ${totalPeso}</div>
-                        </td>
-                    </tr>`;
+                totalRowHTML = `<tr class="total-row"><td colspan="3" style="text-align: left; padding: 12px;"><div style="margin-bottom:4px;">Total de Dias Trabalhados: ${grupo.itens.length}</div><div style="color:#0d47a1; font-weight:bold;">Total de Diárias a receber: ${totalPeso}</div></td></tr>`;
             }
 
             div.innerHTML = `
                 <div class="accordion-header ${isFirst ? 'active' : ''}" onclick="toggleAccordion(this)">
-                    <div>
-                        <div class="accordion-title">${titulo}</div>
-                        <div class="accordion-meta">${metaTexto}</div>
-                    </div>
-                    <div class="accordion-actions">
-                        ${btnPDF}
-                        ${btnDeleteHTML}
-                        <span style="margin-left:5px; font-size:12px;">${isFirst ? '▼' : '▶'}</span>
-                    </div>
+                    <div><div class="accordion-title">${titulo}</div><div class="accordion-meta">${metaTexto}</div></div>
+                    <div class="accordion-actions">${btnPDF}${btnDeleteHTML}<span style="margin-left:5px; font-size:12px;">${isFirst ? '▼' : '▶'}</span></div>
                 </div>
                 <div class="accordion-content ${isFirst ? 'open' : ''}">
                     <table>
-                        <thead>
-                            <tr><th>Data</th><th>Tipo</th><th>Detalhes</th>${thValor}${thAcao}</tr>
-                        </thead>
+                        <thead><tr><th>Data</th><th>Tipo</th><th>Detalhes</th>${thValor}${thAcao}</tr></thead>
                         <tbody>
                             ${grupo.itens.map(item => {
                                 const diaStr = item.data.split('-')[2];
                                 const tipoStr = item.carga === 1 ? 'Normal' : 'Dupla';
                                 const detalheStr = item.tipoDia === 1 ? 'Dia Útil' : item.tipoDia === 2 ? 'Domingo' : 'Feriado';
                                 
-                                let tdValor = '';
-                                let tdAcao = '';
-
+                                let tdValor = '', tdAcao = '';
                                 if (modoAtual === 'admin') {
-                                    tdValor = `<td class="td-valor">R$ ${item.total.toFixed(2)}</td>`;
+                                    // CLASSE esconder-valor APLICADA NA CÉLULA
+                                    tdValor = `<td class="td-valor esconder-valor">R$ ${item.total.toFixed(2)}</td>`;
                                     tdAcao = `<td class="td-acao"><span style="color:red; cursor:pointer;" onclick="excluirRegistro(${item.id})">✖</span></td>`;
                                 }
-
                                 return `<tr><td>${diaStr}/${(item.mes+1).toString().padStart(2,'0')}</td><td>${tipoStr}</td><td>${detalheStr}</td>${tdValor}${tdAcao}</tr>`;
                             }).join('')}
                             ${totalRowHTML}
@@ -639,32 +629,24 @@
 
     function renderizarFinanceiro() {
         if (modoAtual !== 'admin') return;
-
         const container = document.getElementById('financeiro-content');
         container.innerHTML = "";
 
-        const dadosMes = {}; 
-        const totaisAnuais = {};
+        const dadosMes = {}; const totaisAnuais = {};
 
         registros.forEach(reg => {
             const chaveMes = `${reg.ano}-${reg.mes}`;
-            if (!dadosMes[chaveMes]) {
-                dadosMes[chaveMes] = { ano: reg.ano, mes: reg.mes, q1: 0, q2: 0 };
-            }
-            if (reg.quinzena === 1) dadosMes[chaveMes].q1 += reg.total;
-            else dadosMes[chaveMes].q2 += reg.total;
+            if (!dadosMes[chaveMes]) dadosMes[chaveMes] = { ano: reg.ano, mes: reg.mes, q1: 0, q2: 0 };
+            if (reg.quinzena === 1) dadosMes[chaveMes].q1 += reg.total; else dadosMes[chaveMes].q2 += reg.total;
 
             if (!totaisAnuais[reg.ano]) totaisAnuais[reg.ano] = 0;
             totaisAnuais[reg.ano] += reg.total;
         });
 
         const chavesMes = Object.keys(dadosMes).sort((a,b) => {
-             const [aA, aM] = a.split('-').map(Number);
-             const [bA, bM] = b.split('-').map(Number);
-             if (aA !== bA) return bA - aA;
-             return bM - aM;
+             const [aA, aM] = a.split('-').map(Number); const [bA, bM] = b.split('-').map(Number);
+             if (aA !== bA) return bA - aA; return bM - aM;
         });
-        
         const anosOrdenados = Object.keys(totaisAnuais).sort((a,b) => b-a); 
 
         if (chavesMes.length === 0) {
@@ -675,16 +657,17 @@
         let htmlAnual = '';
         anosOrdenados.forEach(ano => {
             const valor = totaisAnuais[ano].toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-            htmlAnual += `<div class="year-summary"><h4>Total Acumulado ${ano}</h4><div class="year-total-value">${valor}</div></div>`;
+            // CLASSE esconder-valor APLICADA NO TOTAL ANUAL
+            htmlAnual += `<div class="year-summary"><h4>Total Acumulado ${ano}</h4><div class="year-total-value esconder-valor">${valor}</div></div>`;
         });
         container.innerHTML += htmlAnual;
 
         let htmlTable = `<table class="fin-table"><thead><tr><th>Mês/Ano</th><th style="text-align:right">1ª Q.</th><th style="text-align:right">2ª Q.</th><th style="text-align:right; background:#003c8f; color:white;">Total</th></tr></thead><tbody>`;
 
         chavesMes.forEach(k => {
-            const d = dadosMes[k];
-            const total = d.q1 + d.q2;
-            htmlTable += `<tr><td>${MESES[d.mes]} ${d.ano}</td><td style="text-align:right">R$ ${d.q1.toFixed(2)}</td><td style="text-align:right">R$ ${d.q2.toFixed(2)}</td><td style="text-align:right" class="fin-row-total">R$ ${total.toFixed(2)}</td></tr>`;
+            const d = dadosMes[k]; const total = d.q1 + d.q2;
+            // CLASSE esconder-valor APLICADA NAS CÉLULAS DE MESES
+            htmlTable += `<tr><td>${MESES[d.mes]} ${d.ano}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q1.toFixed(2)}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q2.toFixed(2)}</td><td style="text-align:right" class="fin-row-total esconder-valor">R$ ${total.toFixed(2)}</td></tr>`;
         });
 
         htmlTable += `</tbody></table>`;
@@ -699,12 +682,10 @@
         if (itens.length === 0) return alert("Erro: Sem dados.");
 
         let contagem = { normal: 0, dupla: 0, feriado: 0, domingo: 0, feriadoDupla: 0, domingoDupla: 0 };
-        let totalMultiplicador = 0;
-        let totalDinheiro = 0;
+        let totalMultiplicador = 0; let totalDinheiro = 0;
 
         itens.forEach(i => {
-            totalMultiplicador += i.multiplicador;
-            totalDinheiro += i.total;
+            totalMultiplicador += i.multiplicador; totalDinheiro += i.total;
             if (i.carga === 1) {
                 if (i.tipoDia === 1) contagem.normal++; else if (i.tipoDia === 2) contagem.domingo++; else if (i.tipoDia === 3) contagem.feriado++;
             } else { 
@@ -712,8 +693,7 @@
             }
         });
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
         
         doc.setFontSize(16); doc.setFont(undefined, 'bold'); doc.text("SARIPAN - Relatório", 14, 20);
         doc.setFontSize(12); doc.setFont(undefined, 'normal'); doc.text("Prestador: João Batista Rosa", 14, 28);
@@ -743,7 +723,6 @@
             foot: [['', '', 'Valor Total:', `R$ ${totalDinheiro.toFixed(2)}`]],
             footStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', lineColor: [0, 0, 0], lineWidth: 0.1 }
         });
-
         doc.save(`Saripan_${nomeMes}_${ano}_Q${q}.pdf`);
     }
 
@@ -763,7 +742,7 @@
                 registros = [];
             }
             renderizarApontamentos();
-            atualizarRodapeDinamico(); // Atualiza o rodapé assim que carregar o banco
+            atualizarRodapeDinamico(); 
         } catch (e) {
             console.error("Erro ao carregar:", e);
         }
@@ -784,6 +763,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
         iniciarFirebase();
+        aplicarPrivacidadeSalva(); // <--- Aplica o modo oculto se estiver salvo ao abrir
         ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
     });
