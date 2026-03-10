@@ -185,7 +185,7 @@
         <div class="app-header">
           <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
           <div class="app-title">SARIPAN</div>
-          <button id="btn-privacidade" class="btn-nav-top" onclick="togglePrivacidade()" style="font-size: 18px; width: 44px;">👁️</button>
+          <button id="btn-privacidade" class="btn-nav-top" onclick="togglePrivacidade()" style="width: 44px; height: 36px; padding: 6px;"></button>
         </div>
 
         <div class="tabs-container">
@@ -288,7 +288,11 @@
     let auth = null; 
     const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-    // --- MODO PRIVACIDADE (NOVO) ---
+    // --- MODO PRIVACIDADE (COM ÍCONES PROFISSIONAIS SVG) ---
+    const iconeOlhoAberto = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    
+    const iconeOlhoFechado = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+
     function togglePrivacidade() {
         const estaOculto = document.body.classList.contains('modo-privacidade');
         const btn = document.getElementById('btn-privacidade');
@@ -296,18 +300,21 @@
         if (estaOculto) {
             document.body.classList.remove('modo-privacidade');
             localStorage.setItem('saripan_privacidade', 'false');
-            btn.innerText = '👁️';
+            btn.innerHTML = iconeOlhoAberto; // Coloca o olho normal
         } else {
             document.body.classList.add('modo-privacidade');
             localStorage.setItem('saripan_privacidade', 'true');
-            btn.innerText = '🙈';
+            btn.innerHTML = iconeOlhoFechado; // Coloca o olho riscado
         }
     }
 
     function aplicarPrivacidadeSalva() {
+        const btn = document.getElementById('btn-privacidade');
         if (localStorage.getItem('saripan_privacidade') === 'true') {
             document.body.classList.add('modo-privacidade');
-            document.getElementById('btn-privacidade').innerText = '🙈';
+            btn.innerHTML = iconeOlhoFechado;
+        } else {
+            btn.innerHTML = iconeOlhoAberto;
         }
     }
 
@@ -763,7 +770,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
         iniciarFirebase();
-        aplicarPrivacidadeSalva(); // <--- Aplica o modo oculto se estiver salvo ao abrir
+        aplicarPrivacidadeSalva(); // <--- Aplica o modo oculto se estiver salvo ao abrir e já insere o ícone correto
         ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
     });
