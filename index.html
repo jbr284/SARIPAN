@@ -267,7 +267,7 @@
         </div>
 
         <div id="painel-financeiro" class="panel">
-          <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Consolidado Mensal</h3>
+          <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Gestão e Resultados</h3>
           <div id="financeiro-content"></div>
         </div>
 
@@ -279,8 +279,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-
-  <script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script>
     // --- VARIÁVEIS GLOBAIS ---
     let modoAtual = ""; 
     let registros = [];
@@ -290,21 +289,19 @@
 
     // --- MODO PRIVACIDADE (COM ÍCONES PROFISSIONAIS SVG) ---
     const iconeOlhoAberto = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-    
     const iconeOlhoFechado = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
     function togglePrivacidade() {
         const estaOculto = document.body.classList.contains('modo-privacidade');
         const btn = document.getElementById('btn-privacidade');
-        
         if (estaOculto) {
             document.body.classList.remove('modo-privacidade');
             localStorage.setItem('saripan_privacidade', 'false');
-            btn.innerHTML = iconeOlhoAberto; // Coloca o olho normal
+            btn.innerHTML = iconeOlhoAberto;
         } else {
             document.body.classList.add('modo-privacidade');
             localStorage.setItem('saripan_privacidade', 'true');
-            btn.innerHTML = iconeOlhoFechado; // Coloca o olho riscado
+            btn.innerHTML = iconeOlhoFechado;
         }
     }
 
@@ -318,35 +315,27 @@
         }
     }
 
-    // --- LOGIN ---
+    // --- LOGIN E NAVEGAÇÃO ---
     function entrarModo(modo) {
         if (!database || !auth) {
             iniciarFirebase();
             if(!database) return alert("Erro: Conexão com Firebase falhou. Verifique a internet.");
         }
-
         modoAtual = modo;
-
         if (modo === 'admin') {
             const user = auth.currentUser;
-            if (user) {
-                abrirAppAdmin();
-            } else {
-                document.getElementById('modal-login').classList.remove('hidden');
-            }
+            if (user) abrirAppAdmin();
+            else document.getElementById('modal-login').classList.remove('hidden');
         } else {
             abrirAppView();
         }
     }
 
-    function fecharModalLogin() {
-        document.getElementById('modal-login').classList.add('hidden');
-    }
+    function fecharModalLogin() { document.getElementById('modal-login').classList.add('hidden'); }
 
     function fazerLogin() {
         const email = document.getElementById('emailLogin').value;
         const senha = document.getElementById('senhaLogin').value;
-
         if (!email || !senha) return alert("Preencha e-mail e senha.");
 
         auth.signInWithEmailAndPassword(email, senha)
@@ -360,20 +349,16 @@
                 let msg = "Erro ao entrar.";
                 if (error.code === 'auth/wrong-password') msg = "Senha incorreta.";
                 if (error.code === 'auth/user-not-found') msg = "Usuário não encontrado.";
-                if (error.code === 'auth/invalid-email') msg = "E-mail inválido.";
                 alert(msg);
             });
     }
 
-    // --- CONTROLE DE TELAS E ABAS ---
     function abrirAppAdmin() {
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
-        
         document.getElementById('btn-tab-registrar').style.display = 'block';
         document.getElementById('btn-tab-financeiro').style.display = 'block';
-        document.getElementById('btn-privacidade').style.display = 'flex'; // Mostra olhinho
-        
+        document.getElementById('btn-privacidade').style.display = 'flex'; 
         mudarAba('registrar');
         document.getElementById('dataServico').valueAsDate = new Date();
         atualizarPreview();
@@ -383,34 +368,24 @@
     function abrirAppView() {
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
-        
-        // Esconde abas e olhinho do Gestor
         document.getElementById('btn-tab-registrar').style.display = 'none';
         document.getElementById('btn-tab-financeiro').style.display = 'none';
         document.getElementById('btn-privacidade').style.display = 'none';
-        
         mudarAba('historico');
         carregarDados();
     }
 
     function sairApp() {
-        if (modoAtual === 'view') {
-            location.reload();
-            return;
-        }
+        if (modoAtual === 'view') { location.reload(); return; }
         if(confirm("Sair do sistema?")) {
-            if (auth) {
-                auth.signOut().then(() => location.reload());
-            } else {
-                location.reload();
-            }
+            if (auth) auth.signOut().then(() => location.reload());
+            else location.reload();
         }
     }
 
     function mudarAba(aba) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        
         if (aba === 'registrar') {
             document.getElementById('btn-tab-registrar').classList.add('active');
             document.getElementById('painel-registrar').classList.add('active');
@@ -422,7 +397,7 @@
         } else if (aba === 'financeiro') {
             document.getElementById('btn-tab-financeiro').classList.add('active');
             document.getElementById('painel-financeiro').classList.add('active');
-            renderizarFinanceiro();
+            renderizarFinanceiro(); // Chama a função que desenha o gráfico novo
         }
     }
 
@@ -432,7 +407,7 @@
         setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2900);
     }
 
-    // --- RODAPÉ DINÂMICO ---
+    // --- RODAPÉ DINÂMICO E CÁLCULOS ---
     function atualizarRodapeDinamico() {
         if (modoAtual !== 'admin') return;
         const dataInput = document.getElementById('dataServico').value;
@@ -444,13 +419,10 @@
         const dia = dateObj.getUTCDate();
         const quinzena = dia <= 15 ? 1 : 2;
 
-        let qtdPeso = 0;
-        let totalValor = 0;
-
+        let qtdPeso = 0; let totalValor = 0;
         registros.forEach(reg => {
             if (reg.ano === ano && reg.mes === mesIndex && reg.quinzena === quinzena) {
-                qtdPeso += reg.multiplicador; 
-                totalValor += reg.total;      
+                qtdPeso += reg.multiplicador; totalValor += reg.total;      
             }
         });
 
@@ -458,10 +430,8 @@
         document.getElementById('rodape-total').innerText = totalValor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
         document.getElementById('rodape-ref').innerText = `Referência: ${quinzena}ª Quinz. de ${MESES[mesIndex]} ${ano}`;
     }
-
     document.getElementById('dataServico').addEventListener('change', atualizarRodapeDinamico);
 
-    // --- CÁLCULOS E PREVIEW ---
     function calcularValor(base, carga, tipoDia) {
         let pesoDia = (tipoDia === 3 || tipoDia === 2) ? 2 : 1;
         let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
@@ -479,19 +449,16 @@
     // --- CRUD ---
     async function adicionarRegistro() {
         if (modoAtual !== 'admin') return;
-
         const dataInput = document.getElementById('dataServico').value;
         if (!dataInput) return alert("Data inválida!");
 
         const base = parseFloat(document.getElementById('valorBase').value);
         const carga = parseInt(document.getElementById('tipoCarga').value);
         const tipoDia = parseInt(document.getElementById('tipoDia').value);
-        
         const calc = calcularValor(base, carga, tipoDia);
+        
         const dateObj = new Date(dataInput);
-        const ano = dateObj.getUTCFullYear();
-        const mesIndex = dateObj.getUTCMonth(); 
-        const dia = dateObj.getUTCDate();
+        const ano = dateObj.getUTCFullYear(); const mesIndex = dateObj.getUTCMonth(); const dia = dateObj.getUTCDate();
         const quinzena = dia <= 15 ? 1 : 2;
 
         const novoReg = {
@@ -534,32 +501,24 @@
         seta.innerText = content.classList.contains('open') ? '▼' : '▶';
     }
 
+    // --- RENDERIZAR HISTÓRICO ---
     function renderizarApontamentos() {
         const container = document.getElementById('lista-quinzenas-container');
         container.innerHTML = "";
-
-        if (registros.length === 0) {
-            document.getElementById('msg-sem-dados').style.display = 'block';
-            return;
-        }
+        if (registros.length === 0) { document.getElementById('msg-sem-dados').style.display = 'block'; return; }
         document.getElementById('msg-sem-dados').style.display = 'none';
 
         const grupos = {};
         registros.forEach(reg => {
             const chave = `${reg.ano}-${reg.mes}-${reg.quinzena}`;
-            if (!grupos[chave]) {
-                grupos[chave] = { ano: reg.ano, mes: reg.mes, quinzena: reg.quinzena, itens: [], totalValor: 0 };
-            }
+            if (!grupos[chave]) grupos[chave] = { ano: reg.ano, mes: reg.mes, quinzena: reg.quinzena, itens: [], totalValor: 0 };
             grupos[chave].itens.push(reg);
             grupos[chave].totalValor += reg.total;
         });
 
         const chavesOrdenadas = Object.keys(grupos).sort((a, b) => {
-            const [aA, aM, aQ] = a.split('-').map(Number);
-            const [bA, bM, bQ] = b.split('-').map(Number);
-            if (aA !== bA) return bA - aA;
-            if (aM !== bM) return bM - aM;
-            return bQ - aQ;
+            const [aA, aM, aQ] = a.split('-').map(Number); const [bA, bM, bQ] = b.split('-').map(Number);
+            if (aA !== bA) return bA - aA; if (aM !== bM) return bM - aM; return bQ - aQ;
         });
 
         let chavesFinais = chavesOrdenadas;
@@ -581,22 +540,18 @@
             grupo.itens.sort((a, b) => new Date(a.data) - new Date(b.data));
             const totalPeso = grupo.itens.reduce((acc, item) => acc + item.multiplicador, 0);
             const isFirst = index === 0; 
-            const nomeMes = MESES[grupo.mes];
-            const titulo = `${grupo.quinzena}ª Quinzena de ${nomeMes} ${grupo.ano}`;
+            const titulo = `${grupo.quinzena}ª Quinzena de ${MESES[grupo.mes]} ${grupo.ano}`;
             const totalFormatado = grupo.totalValor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
 
             const div = document.createElement('div');
             div.className = 'accordion-group';
-            
             let btnPDF = '', btnDeleteHTML = '', metaTexto = '', thValor = '', thAcao = '', totalRowHTML = '';
 
             if (modoAtual === 'admin') {
-                // CLASSE esconder-valor APLICADA NO META TEXTO E NAS COLUNAS DE VALOR
                 metaTexto = `${grupo.itens.length} registros • Total: <span class="esconder-valor">${totalFormatado}</span>`;
                 btnPDF = `<button class="btn-icon" style="color:#1976d2;" onclick="event.stopPropagation(); gerarPDF('${chave}')" title="Baixar PDF">📄</button>`;
                 btnDeleteHTML = `<button class="btn-icon" style="color:#d32f2f;" onclick="event.stopPropagation(); excluirQuinzena('${chave}')" title="Excluir Quinzena">🗑️</button>`;
-                thValor = '<th style="text-align:right">Valor</th>';
-                thAcao = '<th class="td-acao"></th>';
+                thValor = '<th style="text-align:right">Valor</th>'; thAcao = '<th class="td-acao"></th>';
                 totalRowHTML = `<tr class="total-row"><td colspan="3">Total do Período</td><td class="td-valor esconder-valor">${totalFormatado}</td><td></td></tr>`;
             } else {
                 metaTexto = `${grupo.itens.length} registros trabalhados`;
@@ -616,10 +571,8 @@
                                 const diaStr = item.data.split('-')[2];
                                 const tipoStr = item.carga === 1 ? 'Normal' : 'Dupla';
                                 const detalheStr = item.tipoDia === 1 ? 'Dia Útil' : item.tipoDia === 2 ? 'Domingo' : 'Feriado';
-                                
                                 let tdValor = '', tdAcao = '';
                                 if (modoAtual === 'admin') {
-                                    // CLASSE esconder-valor APLICADA NA CÉLULA
                                     tdValor = `<td class="td-valor esconder-valor">R$ ${item.total.toFixed(2)}</td>`;
                                     tdAcao = `<td class="td-acao"><span style="color:red; cursor:pointer;" onclick="excluirRegistro(${item.id})">✖</span></td>`;
                                 }
@@ -634,9 +587,16 @@
         });
     }
 
+    // --- NOVA ABA FINANCEIRO: GRÁFICO E MÉDIA SALARIAL ---
     function renderizarFinanceiro() {
         if (modoAtual !== 'admin') return;
         const container = document.getElementById('financeiro-content');
+        
+        // 1. Limpar gráficos antigos da memória para evitar duplicações/erros
+        if (window.chartsAtivos) {
+            window.chartsAtivos.forEach(c => c.destroy());
+        }
+        window.chartsAtivos = [];
         container.innerHTML = "";
 
         const dadosMes = {}; const totaisAnuais = {};
@@ -661,26 +621,110 @@
             return;
         }
 
-        let htmlAnual = '';
+        let htmlFinal = '';
+
+        // 2. Loop Ano a Ano para criar o Dashboard completo
         anosOrdenados.forEach(ano => {
-            const valor = totaisAnuais[ano].toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-            // CLASSE esconder-valor APLICADA NO TOTAL ANUAL
-            htmlAnual += `<div class="year-summary"><h4>Total Acumulado ${ano}</h4><div class="year-total-value esconder-valor">${valor}</div></div>`;
+            const mesesDesteAno = chavesMes.filter(k => k.startsWith(`${ano}-`));
+            let totalAcumuladoAno = 0;
+            
+            // Arrays que vão alimentar o Chart.js
+            const labelsDoGrafico = [];
+            const dadosDoGrafico = [];
+
+            // A Tabela tradicional
+            let htmlTabela = `<table class="fin-table" style="margin-bottom:30px;"><thead><tr><th>Mês</th><th style="text-align:right">1ª Q.</th><th style="text-align:right">2ª Q.</th><th style="text-align:right; background:#003c8f; color:white;">Total</th></tr></thead><tbody>`;
+
+            mesesDesteAno.forEach(k => {
+                const d = dadosMes[k]; 
+                const totalDoMes = d.q1 + d.q2;
+                totalAcumuladoAno += totalDoMes;
+                
+                // Preenche os dados para o Gráfico de Barras
+                labelsDoGrafico.push(MESES[d.mes].substring(0, 3)); // Pega só 'Jan', 'Fev'
+                dadosDoGrafico.push(totalDoMes);
+
+                htmlTabela += `<tr><td>${MESES[d.mes]}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q1.toFixed(2)}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q2.toFixed(2)}</td><td style="text-align:right" class="fin-row-total esconder-valor">R$ ${totalDoMes.toFixed(2)}</td></tr>`;
+            });
+            htmlTabela += `</tbody></table>`;
+
+            // 3. O Cálculo da Média Salarial Dinâmica
+            const qtdMesesTrabalhados = mesesDesteAno.length;
+            const mediaMensal = qtdMesesTrabalhados > 0 ? (totalAcumuladoAno / qtdMesesTrabalhados) : 0;
+            
+            const valorTotalStr = totalAcumuladoAno.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            const valorMediaStr = mediaMensal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+
+            // Título do Ano
+            htmlFinal += `<h4 style="margin-top: 10px; color: #555; border-bottom: 2px solid #ddd; padding-bottom: 5px; text-transform: uppercase;">Resumo de ${ano}</h4>`;
+
+            // CAIXAS COM OS VALORES (Total e Média)
+            htmlFinal += `
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div class="year-summary" style="flex: 1; margin-bottom: 0; padding: 10px;">
+                    <h4 style="font-size: 12px;">Total Acumulado</h4>
+                    <div class="year-total-value esconder-valor" style="font-size: 18px;">${valorTotalStr}</div>
+                </div>
+                <div class="year-summary" style="flex: 1; margin-bottom: 0; padding: 10px; background: #e3f2fd; border-color: #90caf9;">
+                    <h4 style="color: #1565c0; font-size: 12px;">Média Mensal</h4>
+                    <div class="year-total-value esconder-valor" style="color: #0d47a1; font-size: 18px;">${valorMediaStr}</div>
+                </div>
+            </div>`;
+
+            // TELA DO GRÁFICO (O Canvas que será preenchido pelo Chart.js)
+            // Note que o canvas tem a classe "esconder-valor" para embaçar com o olho de privacidade
+            htmlFinal += `
+            <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <div style="position: relative; height: 200px; width: 100%;">
+                    <canvas id="grafico-${ano}" class="esconder-valor"></canvas>
+                </div>
+            </div>`;
+
+            htmlFinal += htmlTabela;
+
+            // Salva os dados temporariamente para ativar o gráfico depois que o HTML for injetado
+            if (!window.dadosGraficosTemp) window.dadosGraficosTemp = [];
+            window.dadosGraficosTemp.push({ ano: ano, labels: labelsDoGrafico, dados: dadosDoGrafico });
         });
-        container.innerHTML += htmlAnual;
 
-        let htmlTable = `<table class="fin-table"><thead><tr><th>Mês/Ano</th><th style="text-align:right">1ª Q.</th><th style="text-align:right">2ª Q.</th><th style="text-align:right; background:#003c8f; color:white;">Total</th></tr></thead><tbody>`;
+        // Injete o HTML na tela
+        container.innerHTML = htmlFinal;
 
-        chavesMes.forEach(k => {
-            const d = dadosMes[k]; const total = d.q1 + d.q2;
-            // CLASSE esconder-valor APLICADA NAS CÉLULAS DE MESES
-            htmlTable += `<tr><td>${MESES[d.mes]} ${d.ano}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q1.toFixed(2)}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q2.toFixed(2)}</td><td style="text-align:right" class="fin-row-total esconder-valor">R$ ${total.toFixed(2)}</td></tr>`;
-        });
-
-        htmlTable += `</tbody></table>`;
-        container.innerHTML += htmlTable;
+        // 4. Iniciar os Gráficos na Tela
+        if (window.dadosGraficosTemp) {
+            window.dadosGraficosTemp.forEach(g => {
+                const ctx = document.getElementById(`grafico-${g.ano}`);
+                if (ctx) {
+                    const myChart = new Chart(ctx, {
+                        type: 'bar', // Tipo barra
+                        data: {
+                            labels: g.labels, // Eixo X
+                            datasets: [{
+                                label: 'Remuneração no mês',
+                                data: g.dados, // Eixo Y
+                                backgroundColor: '#1976d2', // Azul padrão do app
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false } // Esconde a legenda para ganhar espaço
+                            },
+                            scales: {
+                                y: { beginAtZero: true } // Força o gráfico a começar do zero
+                            }
+                        }
+                    });
+                    window.chartsAtivos.push(myChart); // Guarda na memória para limpar depois
+                }
+            });
+            window.dadosGraficosTemp = []; // Limpa o array temporário
+        }
     }
 
+    // --- FUNÇÕES DE BASE (PDF E FIREBASE) ---
     function gerarPDF(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
@@ -701,7 +745,6 @@
         });
 
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        
         doc.setFontSize(16); doc.setFont(undefined, 'bold'); doc.text("SARIPAN - Relatório", 14, 20);
         doc.setFontSize(12); doc.setFont(undefined, 'normal'); doc.text("Prestador: João Batista Rosa", 14, 28);
         const nomeMes = MESES[mes]; doc.text(`Referência: ${q}ª Quinzena de ${nomeMes}`, 14, 34);
@@ -750,9 +793,7 @@
             }
             renderizarApontamentos();
             atualizarRodapeDinamico(); 
-        } catch (e) {
-            console.error("Erro ao carregar:", e);
-        }
+        } catch (e) { console.error("Erro ao carregar:", e); }
     }
 
     function iniciarFirebase() {
@@ -770,7 +811,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
         iniciarFirebase();
-        aplicarPrivacidadeSalva(); // <--- Aplica o modo oculto se estiver salvo ao abrir e já insere o ícone correto
+        aplicarPrivacidadeSalva();
         ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
     });
