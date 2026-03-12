@@ -508,7 +508,7 @@
         });
     }
 
-    // --- ABA FINANCEIRO (NOMES ATUALIZADOS) ---
+    // --- ABA FINANCEIRO (GRÁFICO VERDE 🟢) ---
     function renderizarFinanceiro() {
         if (modoAtual !== 'admin') return;
         const container = document.getElementById('financeiro-content');
@@ -584,7 +584,6 @@
 
             htmlFinal += `<h4 style="margin-top: 10px; color: #555; border-bottom: 2px solid #ddd; padding-bottom: 5px; text-transform: uppercase;">Resumo de ${ano}</h4>`;
 
-            // CARD COM OS TEXTOS ALTERADOS CONFORME SOLICITADO
             htmlFinal += `
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <div class="year-summary" style="flex: 1; margin-bottom: 0; padding: 10px;">
@@ -632,7 +631,10 @@
                         data: {
                             labels: g.labels, 
                             datasets: [{
-                                label: 'Remuneração no mês', data: g.dados, backgroundColor: '#1976d2', borderRadius: 4
+                                label: 'Remuneração no mês', 
+                                data: g.dados, 
+                                backgroundColor: '#2e7d32', /* AQUI ESTÁ A MUDANÇA PARA O VERDE FORTE! */
+                                borderRadius: 4
                             }]
                         },
                         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
