@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saripan-v9-grafico'; 
+const CACHE_NAME = 'saripan-v10-medias'; 
 
 const ASSETS = [
   './',
@@ -8,7 +8,7 @@ const ASSETS = [
   './icons/icon-512x512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js',
-  'https://cdn.jsdelivr.net/npm/chart.js' // <--- A nova biblioteca adicionada aqui!
+  'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
 self.addEventListener('install', (event) => {
