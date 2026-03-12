@@ -508,7 +508,7 @@
         });
     }
 
-    // --- ABA FINANCEIRO (COM MÉDIA PARCIAL E TOTAL) ---
+    // --- ABA FINANCEIRO (NOMES ATUALIZADOS) ---
     function renderizarFinanceiro() {
         if (modoAtual !== 'admin') return;
         const container = document.getElementById('financeiro-content');
@@ -541,10 +541,9 @@
 
         let htmlFinal = '';
 
-        // Obter data real de hoje para o cálculo da Parcial
         const hoje = new Date();
         const anoAtual = hoje.getFullYear();
-        const mesAtual = hoje.getMonth(); // Janeiro é 0, Fevereiro é 1...
+        const mesAtual = hoje.getMonth(); 
 
         anosOrdenados.forEach(ano => {
             const mesesDesteAno = chavesMes.filter(k => k.startsWith(`${ano}-`));
@@ -563,9 +562,6 @@
                 const totalDoMes = d.q1 + d.q2;
                 totalAcumuladoAno += totalDoMes;
                 
-                // --- LÓGICA DO MÊS FECHADO ---
-                // Se o ano do registro for menor que o ano atual, 100% dos meses estão fechados.
-                // Se o ano for igual ao atual, o mês do registro tem que ser menor que o mês atual.
                 const isFechado = (d.ano < anoAtual) || (d.ano === anoAtual && d.mes < mesAtual);
                 if (isFechado) {
                     totalFechadoAno += totalDoMes;
@@ -579,7 +575,6 @@
             });
             htmlTabela += `</tbody></table>`;
 
-            // --- CÁLCULO DAS MÉDIAS ---
             const mediaTotal = mesesDesteAno.length > 0 ? (totalAcumuladoAno / mesesDesteAno.length) : 0;
             const mediaParcial = qtdMesesFechados > 0 ? (totalFechadoAno / qtdMesesFechados) : 0;
             
@@ -589,11 +584,11 @@
 
             htmlFinal += `<h4 style="margin-top: 10px; color: #555; border-bottom: 2px solid #ddd; padding-bottom: 5px; text-transform: uppercase;">Resumo de ${ano}</h4>`;
 
-            // NOVO LAYOUT DO CARD (Parcial e Total)
+            // CARD COM OS TEXTOS ALTERADOS CONFORME SOLICITADO
             htmlFinal += `
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <div class="year-summary" style="flex: 1; margin-bottom: 0; padding: 10px;">
-                    <h4 style="font-size: 11px;">Total Acumulado</h4>
+                    <h4 style="font-size: 11px;">RENDIMENTO ANUAL</h4>
                     <div class="year-total-value esconder-valor" style="font-size: 17px; margin-top: 10px;">${valorTotalStr}</div>
                 </div>
                 
@@ -601,12 +596,12 @@
                     <h4 style="color: #1565c0; font-size: 11px; margin-bottom: 10px;">Média Salarial</h4>
                     <div style="display: flex; justify-content: space-around; font-size: 14px; color: #0d47a1;">
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; text-transform: uppercase; font-weight: bold;">Parcial (Fechados)</span><br>
+                            <span style="font-size: 10px; text-transform: uppercase; font-weight: bold;">PARCIAL</span><br>
                             <strong class="esconder-valor" style="font-size: 15px;">${valorMediaParcialStr}</strong>
                         </div>
                         <div style="width: 1px; background: #bbdefb; margin: 0 5px;"></div>
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; text-transform: uppercase; font-weight: bold;">Total (Geral)</span><br>
+                            <span style="font-size: 10px; text-transform: uppercase; font-weight: bold;">TOTAL</span><br>
                             <strong class="esconder-valor" style="font-size: 15px;">${valorMediaTotalStr}</strong>
                         </div>
                     </div>
