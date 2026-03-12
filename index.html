@@ -19,18 +19,16 @@
         overflow: hidden; 
     }
 
-    /* MODO PRIVACIDADE (A Mágica do Olhinho) */
+    /* MODO PRIVACIDADE */
     body.modo-privacidade .esconder-valor {
         filter: blur(6px);
         opacity: 0.6;
-        pointer-events: none; /* Evita clicar/selecionar o texto borrado */
+        pointer-events: none;
         user-select: none;
         transition: all 0.2s ease;
     }
     
-    .esconder-valor {
-        transition: all 0.2s ease;
-    }
+    .esconder-valor { transition: all 0.2s ease; }
 
     .container { 
         background-color: #fff; 
@@ -43,49 +41,31 @@
         position: relative; 
     }
 
-    /* ÁREA FIXA (NÃO ROLA) */
-    .fixed-area {
-        flex-shrink: 0;
-        z-index: 10;
-        background: white;
-    }
+    /* ÁREA FIXA */
+    .fixed-area { flex-shrink: 0; z-index: 10; background: white; }
 
     /* Header */
     .app-header { 
-        background: #0d47a1; 
-        color: white; 
-        padding: 15px; 
-        display: flex; 
-        align-items: center; 
-        justify-content: space-between; 
+        background: #0d47a1; color: white; padding: 15px; 
+        display: flex; align-items: center; justify-content: space-between; 
         box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
     }
     .app-title { font-size: 20px; font-weight: bold; margin: 0; }
     .btn-nav-top { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
     
-    /* Abas Superiores */
+    /* Abas */
     .tabs-container { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
     .tab-btn { flex: 1; padding: 15px 5px; border: none; background: none; font-size: 15px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: background 0.2s; }
     .tab-btn.active { color: #0d47a1; border-bottom: 3px solid #0d47a1; background: #f9f9f9; }
 
-    /* ÁREA DE ROLAGEM (SCROLL) */
-    .scroll-content {
-        flex-grow: 1; 
-        overflow-y: auto; 
-        background: #f0f2f5;
-        position: relative;
-    }
+    /* ROLAGEM */
+    .scroll-content { flex-grow: 1; overflow-y: auto; background: #f0f2f5; position: relative; }
 
     /* Painéis */
-    .panel { 
-        display: none; 
-        padding: 15px; 
-        padding-bottom: 80px; 
-        animation: fadeIn 0.3s; 
-    }
+    .panel { display: none; padding: 15px; padding-bottom: 80px; animation: fadeIn 0.3s; }
     .panel.active { display: block; }
 
-    /* Formulário de Registro */
+    /* Formulário */
     .form-box { background: #e3f2fd; padding: 20px; border-radius: 12px; border: 1px solid #bbdefb; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .form-title { margin-top: 0; color: #1565c0; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #bbdefb; padding-bottom: 8px; text-align: center; }
     .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
@@ -95,33 +75,20 @@
     .btn-action:active { transform: scale(0.98); }
     .btn-green { background-color: #2e7d32; }
 
-    /* MODAL LOGIN */
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.6); z-index: 2000;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .modal-content {
-        background: white; padding: 25px; border-radius: 12px;
-        width: 90%; max-width: 350px; text-align: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
+    /* MODAL */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     .modal-title { font-size: 20px; font-weight: bold; color: #0d47a1; margin-bottom: 20px; }
     .input-login { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; }
     .btn-close-modal { background: #ccc; margin-top: 10px; color: #333; box-shadow: none; font-size: 16px; padding: 12px;}
 
-    /* TOAST DE SUCESSO */
-    #toast {
-        visibility: hidden; min-width: 250px; background-color: #2e7d32; color: #fff; 
-        text-align: center; border-radius: 8px; padding: 16px; position: fixed; 
-        z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); 
-        font-size: 16px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
+    /* TOAST */
+    #toast { visibility: hidden; min-width: 250px; background-color: #2e7d32; color: #fff; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 16px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     #toast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 2.5s; }
     @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
     @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
-    /* ACORDEÃO (Listas Quinzenais) */
+    /* ACORDEÃO */
     .accordion-group { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
     .accordion-header { background: #f5f5f5; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; border-left: 5px solid #0d47a1; }
     .accordion-header.active { background: #e8eaf6; }
@@ -132,7 +99,7 @@
     .accordion-content { display: none; padding: 0; }
     .accordion-content.open { display: block; }
 
-    /* Tabela Interna */
+    /* TABELAS */
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 10px 5px; text-align: left; border-bottom: 1px solid #eee; }
     th { background: #eee; color: #555; font-size: 12px; text-transform: uppercase; }
@@ -153,7 +120,6 @@
     /* Tela Inicial */
     #inicio { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; width: 100%; position: absolute; top:0; left:0; z-index: 200; }
     .btn-big { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 30px; border: none; color: white; width: 80%; max-width: 300px; cursor: pointer; }
-
     .hidden { display: none !important; }
   </style>
 </head>
@@ -279,7 +245,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+
+  <script>
     // --- VARIÁVEIS GLOBAIS ---
     let modoAtual = ""; 
     let registros = [];
@@ -287,7 +255,7 @@
     let auth = null; 
     const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-    // --- MODO PRIVACIDADE (COM ÍCONES PROFISSIONAIS SVG) ---
+    // --- MODO PRIVACIDADE ---
     const iconeOlhoAberto = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     const iconeOlhoFechado = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
@@ -315,44 +283,27 @@
         }
     }
 
-    // --- LOGIN E NAVEGAÇÃO ---
+    // --- LOGIN ---
     function entrarModo(modo) {
         if (!database || !auth) {
             iniciarFirebase();
-            if(!database) return alert("Erro: Conexão com Firebase falhou. Verifique a internet.");
+            if(!database) return alert("Erro: Conexão com Firebase falhou.");
         }
         modoAtual = modo;
         if (modo === 'admin') {
-            const user = auth.currentUser;
-            if (user) abrirAppAdmin();
+            if (auth.currentUser) abrirAppAdmin();
             else document.getElementById('modal-login').classList.remove('hidden');
-        } else {
-            abrirAppView();
-        }
+        } else abrirAppView();
     }
-
     function fecharModalLogin() { document.getElementById('modal-login').classList.add('hidden'); }
-
     function fazerLogin() {
         const email = document.getElementById('emailLogin').value;
         const senha = document.getElementById('senhaLogin').value;
         if (!email || !senha) return alert("Preencha e-mail e senha.");
-
         auth.signInWithEmailAndPassword(email, senha)
-            .then((userCredential) => {
-                fecharModalLogin();
-                document.getElementById('emailLogin').value = '';
-                document.getElementById('senhaLogin').value = '';
-                abrirAppAdmin();
-            })
-            .catch((error) => {
-                let msg = "Erro ao entrar.";
-                if (error.code === 'auth/wrong-password') msg = "Senha incorreta.";
-                if (error.code === 'auth/user-not-found') msg = "Usuário não encontrado.";
-                alert(msg);
-            });
+            .then(() => { fecharModalLogin(); document.getElementById('emailLogin').value=''; document.getElementById('senhaLogin').value=''; abrirAppAdmin(); })
+            .catch((e) => alert("Erro ao entrar: " + e.message));
     }
-
     function abrirAppAdmin() {
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
@@ -364,7 +315,6 @@
         atualizarPreview();
         carregarDados();
     }
-
     function abrirAppView() {
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
@@ -374,7 +324,6 @@
         mudarAba('historico');
         carregarDados();
     }
-
     function sairApp() {
         if (modoAtual === 'view') { location.reload(); return; }
         if(confirm("Sair do sistema?")) {
@@ -382,7 +331,6 @@
             else location.reload();
         }
     }
-
     function mudarAba(aba) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -397,35 +345,27 @@
         } else if (aba === 'financeiro') {
             document.getElementById('btn-tab-financeiro').classList.add('active');
             document.getElementById('painel-financeiro').classList.add('active');
-            renderizarFinanceiro(); // Chama a função que desenha o gráfico novo
+            renderizarFinanceiro(); 
         }
     }
-
     function mostrarToast() {
         const toast = document.getElementById("toast");
         toast.className = "show";
         setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2900);
     }
 
-    // --- RODAPÉ DINÂMICO E CÁLCULOS ---
+    // --- RODAPÉ DINÂMICO ---
     function atualizarRodapeDinamico() {
         if (modoAtual !== 'admin') return;
         const dataInput = document.getElementById('dataServico').value;
         if (!dataInput) return;
-
         const dateObj = new Date(dataInput);
-        const ano = dateObj.getUTCFullYear();
-        const mesIndex = dateObj.getUTCMonth(); 
-        const dia = dateObj.getUTCDate();
+        const ano = dateObj.getUTCFullYear(); const mesIndex = dateObj.getUTCMonth(); const dia = dateObj.getUTCDate();
         const quinzena = dia <= 15 ? 1 : 2;
-
         let qtdPeso = 0; let totalValor = 0;
         registros.forEach(reg => {
-            if (reg.ano === ano && reg.mes === mesIndex && reg.quinzena === quinzena) {
-                qtdPeso += reg.multiplicador; totalValor += reg.total;      
-            }
+            if (reg.ano === ano && reg.mes === mesIndex && reg.quinzena === quinzena) { qtdPeso += reg.multiplicador; totalValor += reg.total; }
         });
-
         document.getElementById('rodape-qtd').innerText = qtdPeso;
         document.getElementById('rodape-total').innerText = totalValor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
         document.getElementById('rodape-ref').innerText = `Referência: ${quinzena}ª Quinz. de ${MESES[mesIndex]} ${ano}`;
@@ -437,7 +377,6 @@
         let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
         return { multiplicador: multiplicador, total: base * multiplicador };
     }
-
     function atualizarPreview() {
         const base = parseFloat(document.getElementById('valorBase').value) || 0;
         const carga = parseInt(document.getElementById('tipoCarga').value);
@@ -451,57 +390,41 @@
         if (modoAtual !== 'admin') return;
         const dataInput = document.getElementById('dataServico').value;
         if (!dataInput) return alert("Data inválida!");
-
         const base = parseFloat(document.getElementById('valorBase').value);
         const carga = parseInt(document.getElementById('tipoCarga').value);
         const tipoDia = parseInt(document.getElementById('tipoDia').value);
         const calc = calcularValor(base, carga, tipoDia);
-        
         const dateObj = new Date(dataInput);
         const ano = dateObj.getUTCFullYear(); const mesIndex = dateObj.getUTCMonth(); const dia = dateObj.getUTCDate();
         const quinzena = dia <= 15 ? 1 : 2;
-
-        const novoReg = {
-            id: Date.now(), data: dataInput, ano: ano, mes: mesIndex, quinzena: quinzena,
-            carga: carga, tipoDia: tipoDia, valorBase: base, multiplicador: calc.multiplicador, total: calc.total
-        };
-
+        const novoReg = { id: Date.now(), data: dataInput, ano: ano, mes: mesIndex, quinzena: quinzena, carga: carga, tipoDia: tipoDia, valorBase: base, multiplicador: calc.multiplicador, total: calc.total };
         registros.push(novoReg);
         await salvarFirebase();
-        
-        renderizarApontamentos(); 
-        atualizarRodapeDinamico(); 
-        mostrarToast(); 
+        renderizarApontamentos(); atualizarRodapeDinamico(); mostrarToast(); 
     }
-
     async function excluirRegistro(id) {
         if (modoAtual !== 'admin') return;
         if(!confirm("Excluir este registro?")) return;
         registros = registros.filter(r => r.id !== id);
         await salvarFirebase();
-        renderizarApontamentos();
-        atualizarRodapeDinamico();
+        renderizarApontamentos(); atualizarRodapeDinamico();
     }
-
     async function excluirQuinzena(chaveGrupo) {
         if (modoAtual !== 'admin') return;
-        if (!confirm("ATENÇÃO: Isso apagará TODOS os registros desta quinzena.\n\nTem certeza?")) return;
+        if (!confirm("ATENÇÃO: Isso apagará TODOS os registros.\n\nTem certeza?")) return;
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
         registros = registros.filter(r => !(r.ano === ano && r.mes === mes && r.quinzena === q));
         await salvarFirebase();
-        renderizarApontamentos();
-        atualizarRodapeDinamico();
+        renderizarApontamentos(); atualizarRodapeDinamico();
     }
-
     function toggleAccordion(header) {
         header.classList.toggle('active');
         const content = header.nextElementSibling;
         content.classList.toggle('open');
-        const seta = header.querySelector('span:last-child');
-        seta.innerText = content.classList.contains('open') ? '▼' : '▶';
+        header.querySelector('span:last-child').innerText = content.classList.contains('open') ? '▼' : '▶';
     }
 
-    // --- RENDERIZAR HISTÓRICO ---
+    // --- HISTÓRICO ---
     function renderizarApontamentos() {
         const container = document.getElementById('lista-quinzenas-container');
         container.innerHTML = "";
@@ -512,8 +435,7 @@
         registros.forEach(reg => {
             const chave = `${reg.ano}-${reg.mes}-${reg.quinzena}`;
             if (!grupos[chave]) grupos[chave] = { ano: reg.ano, mes: reg.mes, quinzena: reg.quinzena, itens: [], totalValor: 0 };
-            grupos[chave].itens.push(reg);
-            grupos[chave].totalValor += reg.total;
+            grupos[chave].itens.push(reg); grupos[chave].totalValor += reg.total;
         });
 
         const chavesOrdenadas = Object.keys(grupos).sort((a, b) => {
@@ -528,9 +450,8 @@
             const quinzH = diaH <= 15 ? 1 : 2;
             const chaveVigente = `${anoH}-${mesH}-${quinzH}`;
             chavesFinais = chavesOrdenadas.filter(k => k === chaveVigente);
-            
             if (chavesFinais.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:30px; color:#666;"><h3>Nenhum registro para a quinzena vigente.</h3><p>Referência: ${quinzH}ª Quinzena de ${MESES[mesH]}</p></div>`;
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:#666;"><h3>Nenhum registro para a quinzena vigente.</h3></div>`;
                 return;
             }
         }
@@ -587,15 +508,12 @@
         });
     }
 
-    // --- NOVA ABA FINANCEIRO: GRÁFICO E MÉDIA SALARIAL ---
+    // --- ABA FINANCEIRO (COM MÉDIA PARCIAL E TOTAL) ---
     function renderizarFinanceiro() {
         if (modoAtual !== 'admin') return;
         const container = document.getElementById('financeiro-content');
         
-        // 1. Limpar gráficos antigos da memória para evitar duplicações/erros
-        if (window.chartsAtivos) {
-            window.chartsAtivos.forEach(c => c.destroy());
-        }
+        if (window.chartsAtivos) { window.chartsAtivos.forEach(c => c.destroy()); }
         window.chartsAtivos = [];
         container.innerHTML = "";
 
@@ -623,16 +541,21 @@
 
         let htmlFinal = '';
 
-        // 2. Loop Ano a Ano para criar o Dashboard completo
+        // Obter data real de hoje para o cálculo da Parcial
+        const hoje = new Date();
+        const anoAtual = hoje.getFullYear();
+        const mesAtual = hoje.getMonth(); // Janeiro é 0, Fevereiro é 1...
+
         anosOrdenados.forEach(ano => {
             const mesesDesteAno = chavesMes.filter(k => k.startsWith(`${ano}-`));
-            let totalAcumuladoAno = 0;
             
-            // Arrays que vão alimentar o Chart.js
+            let totalAcumuladoAno = 0;
+            let totalFechadoAno = 0;
+            let qtdMesesFechados = 0;
+            
             const labelsDoGrafico = [];
             const dadosDoGrafico = [];
 
-            // A Tabela tradicional
             let htmlTabela = `<table class="fin-table" style="margin-bottom:30px;"><thead><tr><th>Mês</th><th style="text-align:right">1ª Q.</th><th style="text-align:right">2ª Q.</th><th style="text-align:right; background:#003c8f; color:white;">Total</th></tr></thead><tbody>`;
 
             mesesDesteAno.forEach(k => {
@@ -640,39 +563,56 @@
                 const totalDoMes = d.q1 + d.q2;
                 totalAcumuladoAno += totalDoMes;
                 
-                // Preenche os dados para o Gráfico de Barras
-                labelsDoGrafico.push(MESES[d.mes].substring(0, 3)); // Pega só 'Jan', 'Fev'
+                // --- LÓGICA DO MÊS FECHADO ---
+                // Se o ano do registro for menor que o ano atual, 100% dos meses estão fechados.
+                // Se o ano for igual ao atual, o mês do registro tem que ser menor que o mês atual.
+                const isFechado = (d.ano < anoAtual) || (d.ano === anoAtual && d.mes < mesAtual);
+                if (isFechado) {
+                    totalFechadoAno += totalDoMes;
+                    qtdMesesFechados++;
+                }
+
+                labelsDoGrafico.push(MESES[d.mes].substring(0, 3)); 
                 dadosDoGrafico.push(totalDoMes);
 
                 htmlTabela += `<tr><td>${MESES[d.mes]}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q1.toFixed(2)}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q2.toFixed(2)}</td><td style="text-align:right" class="fin-row-total esconder-valor">R$ ${totalDoMes.toFixed(2)}</td></tr>`;
             });
             htmlTabela += `</tbody></table>`;
 
-            // 3. O Cálculo da Média Salarial Dinâmica
-            const qtdMesesTrabalhados = mesesDesteAno.length;
-            const mediaMensal = qtdMesesTrabalhados > 0 ? (totalAcumuladoAno / qtdMesesTrabalhados) : 0;
+            // --- CÁLCULO DAS MÉDIAS ---
+            const mediaTotal = mesesDesteAno.length > 0 ? (totalAcumuladoAno / mesesDesteAno.length) : 0;
+            const mediaParcial = qtdMesesFechados > 0 ? (totalFechadoAno / qtdMesesFechados) : 0;
             
             const valorTotalStr = totalAcumuladoAno.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-            const valorMediaStr = mediaMensal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            const valorMediaTotalStr = mediaTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            const valorMediaParcialStr = mediaParcial.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
 
-            // Título do Ano
             htmlFinal += `<h4 style="margin-top: 10px; color: #555; border-bottom: 2px solid #ddd; padding-bottom: 5px; text-transform: uppercase;">Resumo de ${ano}</h4>`;
 
-            // CAIXAS COM OS VALORES (Total e Média)
+            // NOVO LAYOUT DO CARD (Parcial e Total)
             htmlFinal += `
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <div class="year-summary" style="flex: 1; margin-bottom: 0; padding: 10px;">
-                    <h4 style="font-size: 12px;">Total Acumulado</h4>
-                    <div class="year-total-value esconder-valor" style="font-size: 18px;">${valorTotalStr}</div>
+                    <h4 style="font-size: 11px;">Total Acumulado</h4>
+                    <div class="year-total-value esconder-valor" style="font-size: 17px; margin-top: 10px;">${valorTotalStr}</div>
                 </div>
-                <div class="year-summary" style="flex: 1; margin-bottom: 0; padding: 10px; background: #e3f2fd; border-color: #90caf9;">
-                    <h4 style="color: #1565c0; font-size: 12px;">Média Mensal</h4>
-                    <div class="year-total-value esconder-valor" style="color: #0d47a1; font-size: 18px;">${valorMediaStr}</div>
+                
+                <div class="year-summary" style="flex: 1.8; margin-bottom: 0; padding: 10px; background: #e3f2fd; border-color: #90caf9;">
+                    <h4 style="color: #1565c0; font-size: 11px; margin-bottom: 10px;">Média Salarial</h4>
+                    <div style="display: flex; justify-content: space-around; font-size: 14px; color: #0d47a1;">
+                        <div style="text-align: center;">
+                            <span style="font-size: 10px; text-transform: uppercase; font-weight: bold;">Parcial (Fechados)</span><br>
+                            <strong class="esconder-valor" style="font-size: 15px;">${valorMediaParcialStr}</strong>
+                        </div>
+                        <div style="width: 1px; background: #bbdefb; margin: 0 5px;"></div>
+                        <div style="text-align: center;">
+                            <span style="font-size: 10px; text-transform: uppercase; font-weight: bold;">Total (Geral)</span><br>
+                            <strong class="esconder-valor" style="font-size: 15px;">${valorMediaTotalStr}</strong>
+                        </div>
+                    </div>
                 </div>
             </div>`;
 
-            // TELA DO GRÁFICO (O Canvas que será preenchido pelo Chart.js)
-            // Note que o canvas tem a classe "esconder-valor" para embaçar com o olho de privacidade
             htmlFinal += `
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                 <div style="position: relative; height: 200px; width: 100%;">
@@ -682,59 +622,41 @@
 
             htmlFinal += htmlTabela;
 
-            // Salva os dados temporariamente para ativar o gráfico depois que o HTML for injetado
             if (!window.dadosGraficosTemp) window.dadosGraficosTemp = [];
             window.dadosGraficosTemp.push({ ano: ano, labels: labelsDoGrafico, dados: dadosDoGrafico });
         });
 
-        // Injete o HTML na tela
         container.innerHTML = htmlFinal;
 
-        // 4. Iniciar os Gráficos na Tela
         if (window.dadosGraficosTemp) {
             window.dadosGraficosTemp.forEach(g => {
                 const ctx = document.getElementById(`grafico-${g.ano}`);
                 if (ctx) {
                     const myChart = new Chart(ctx, {
-                        type: 'bar', // Tipo barra
+                        type: 'bar', 
                         data: {
-                            labels: g.labels, // Eixo X
+                            labels: g.labels, 
                             datasets: [{
-                                label: 'Remuneração no mês',
-                                data: g.dados, // Eixo Y
-                                backgroundColor: '#1976d2', // Azul padrão do app
-                                borderRadius: 4
+                                label: 'Remuneração no mês', data: g.dados, backgroundColor: '#1976d2', borderRadius: 4
                             }]
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false } // Esconde a legenda para ganhar espaço
-                            },
-                            scales: {
-                                y: { beginAtZero: true } // Força o gráfico a começar do zero
-                            }
-                        }
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
                     });
-                    window.chartsAtivos.push(myChart); // Guarda na memória para limpar depois
+                    window.chartsAtivos.push(myChart); 
                 }
             });
-            window.dadosGraficosTemp = []; // Limpa o array temporário
+            window.dadosGraficosTemp = []; 
         }
     }
 
-    // --- FUNÇÕES DE BASE (PDF E FIREBASE) ---
     function gerarPDF(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
         const itens = registros.filter(r => r.ano === ano && r.mes === mes && r.quinzena === q);
         itens.sort((a, b) => new Date(a.data) - new Date(b.data));
         if (itens.length === 0) return alert("Erro: Sem dados.");
-
         let contagem = { normal: 0, dupla: 0, feriado: 0, domingo: 0, feriadoDupla: 0, domingoDupla: 0 };
         let totalMultiplicador = 0; let totalDinheiro = 0;
-
         itens.forEach(i => {
             totalMultiplicador += i.multiplicador; totalDinheiro += i.total;
             if (i.carga === 1) {
@@ -743,13 +665,11 @@
                 if (i.tipoDia === 1) contagem.dupla++; else if (i.tipoDia === 2) contagem.domingoDupla++; else if (i.tipoDia === 3) contagem.feriadoDupla++;
             }
         });
-
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
         doc.setFontSize(16); doc.setFont(undefined, 'bold'); doc.text("SARIPAN - Relatório", 14, 20);
         doc.setFontSize(12); doc.setFont(undefined, 'normal'); doc.text("Prestador: João Batista Rosa", 14, 28);
         const nomeMes = MESES[mes]; doc.text(`Referência: ${q}ª Quinzena de ${nomeMes}`, 14, 34);
         doc.setFont(undefined, 'bold'); doc.text("Resumo do Período:", 14, 44); doc.setFont(undefined, 'normal');
-        
         let y = 50;
         if (contagem.normal > 0) { doc.text(`- ${contagem.normal} diária(s) normal`, 14, y); y += 6; }
         if (contagem.dupla > 0) { doc.text(`- ${contagem.dupla} diária(s) dupla`, 14, y); y += 6; }
@@ -757,15 +677,12 @@
         if (contagem.domingo > 0) { doc.text(`- ${contagem.domingo} domingo(s)`, 14, y); y += 6; }
         if (contagem.feriadoDupla > 0) { doc.text(`- ${contagem.feriadoDupla} feriado(s) dupla`, 14, y); y += 6; }
         if (contagem.domingoDupla > 0) { doc.text(`- ${contagem.domingoDupla} domingo(s) dupla`, 14, y); y += 6; }
-
         doc.setFont(undefined, 'bold'); y += 2; doc.text(`Total: ${totalMultiplicador} diárias a receber`, 14, y);
-
         const bodyData = itens.map(i => {
             const tipoStr = i.carga === 1 ? 'Normal' : 'Dupla';
             const detalheStr = i.tipoDia === 1 ? 'Dia Útil' : i.tipoDia === 2 ? 'Domingo' : 'Feriado';
             return [ i.data.split('-').reverse().join('/'), tipoStr, detalheStr, `R$ ${i.total.toFixed(2)}` ];
         });
-
         doc.autoTable({
             startY: y + 10, head: [['Data', 'Tipo', 'Detalhes', 'Valor']], body: bodyData, theme: 'grid', 
             headStyles: { fillColor: [0, 176, 240], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', lineColor: [0, 0, 0], lineWidth: 0.1 },
@@ -777,41 +694,29 @@
     }
 
     async function salvarFirebase() {
-        if (modoAtual === "admin" && database) {
-            await database.ref('saripan_v2').set({ ultAtualizacao: new Date().toISOString(), dados: registros });
-        }
+        if (modoAtual === "admin" && database) await database.ref('saripan_v2').set({ ultAtualizacao: new Date().toISOString(), dados: registros });
     }
 
     async function carregarDados() {
         if (!database) return;
         try {
             const snap = await database.ref('saripan_v2').get();
-            if (snap.exists()) {
-                registros = snap.val().dados || [];
-            } else {
-                registros = [];
-            }
-            renderizarApontamentos();
-            atualizarRodapeDinamico(); 
+            if (snap.exists()) registros = snap.val().dados || []; else registros = [];
+            renderizarApontamentos(); atualizarRodapeDinamico(); 
         } catch (e) { console.error("Erro ao carregar:", e); }
     }
 
     function iniciarFirebase() {
         try {
             const firebaseConfig = {
-              apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s", authDomain: "saripan-db.firebaseapp.com",
-              databaseURL: "https://saripan-db-default-rtdb.firebaseio.com", projectId: "saripan-db",
-              storageBucket: "saripan-db.firebasestorage.app", messagingSenderId: "1:80320414744:web:958b3a99462d97575e2f6d", appId: "G-9W62N5PFV9"
+              apiKey: "AIzaSyDSVOvdkIaV37Cxm3btE_T3zuDOQm2Uu5s", authDomain: "saripan-db.firebaseapp.com", databaseURL: "https://saripan-db-default-rtdb.firebaseio.com", projectId: "saripan-db", storageBucket: "saripan-db.firebasestorage.app", messagingSenderId: "1:80320414744:web:958b3a99462d97575e2f6d", appId: "G-9W62N5PFV9"
             };
-            if (typeof firebase !== 'undefined') {
-                firebase.initializeApp(firebaseConfig); database = firebase.database(); auth = firebase.auth();
-            }
+            if (typeof firebase !== 'undefined') { firebase.initializeApp(firebaseConfig); database = firebase.database(); auth = firebase.auth(); }
         } catch (e) { console.error("Erro Firebase:", e); }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        iniciarFirebase();
-        aplicarPrivacidadeSalva();
+        iniciarFirebase(); aplicarPrivacidadeSalva();
         ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', atualizarPreview));
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
     });
