@@ -253,6 +253,7 @@
     let registros = [];
     let database = null; 
     let auth = null; 
+    let dadosCarregadosComSucesso = false; // TRAVA DE SEGURANÇA
     const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
     // --- MODO PRIVACIDADE ---
@@ -295,7 +296,9 @@
             else document.getElementById('modal-login').classList.remove('hidden');
         } else abrirAppView();
     }
+    
     function fecharModalLogin() { document.getElementById('modal-login').classList.add('hidden'); }
+    
     function fazerLogin() {
         const email = document.getElementById('emailLogin').value;
         const senha = document.getElementById('senhaLogin').value;
@@ -304,6 +307,7 @@
             .then(() => { fecharModalLogin(); document.getElementById('emailLogin').value=''; document.getElementById('senhaLogin').value=''; abrirAppAdmin(); })
             .catch((e) => alert("Erro ao entrar: " + e.message));
     }
+    
     function abrirAppAdmin() {
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
@@ -315,6 +319,7 @@
         atualizarPreview();
         carregarDados();
     }
+    
     function abrirAppView() {
         document.getElementById('inicio').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
@@ -324,6 +329,7 @@
         mudarAba('historico');
         carregarDados();
     }
+    
     function sairApp() {
         if (modoAtual === 'view') { location.reload(); return; }
         if(confirm("Sair do sistema?")) {
@@ -331,6 +337,7 @@
             else location.reload();
         }
     }
+    
     function mudarAba(aba) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -348,6 +355,7 @@
             renderizarFinanceiro(); 
         }
     }
+    
     function mostrarToast() {
         const toast = document.getElementById("toast");
         toast.className = "show";
@@ -377,6 +385,7 @@
         let multiplicador = (pesoDia === 2 && carga === 2) ? 4 : (carga * pesoDia);
         return { multiplicador: multiplicador, total: base * multiplicador };
     }
+    
     function atualizarPreview() {
         const base = parseFloat(document.getElementById('valorBase').value) || 0;
         const carga = parseInt(document.getElementById('tipoCarga').value);
@@ -385,11 +394,12 @@
         document.getElementById('previewValor').value = `R$ ${calc.total.toFixed(2)}`;
     }
 
-    // --- CRUD ---
+    // --- CRUD DE APONTAMENTOS ---
     async function adicionarRegistro() {
         if (modoAtual !== 'admin') return;
         const dataInput = document.getElementById('dataServico').value;
         if (!dataInput) return alert("Data inválida!");
+        
         const base = parseFloat(document.getElementById('valorBase').value);
         const carga = parseInt(document.getElementById('tipoCarga').value);
         const tipoDia = parseInt(document.getElementById('tipoDia').value);
@@ -397,26 +407,35 @@
         const dateObj = new Date(dataInput);
         const ano = dateObj.getUTCFullYear(); const mesIndex = dateObj.getUTCMonth(); const dia = dateObj.getUTCDate();
         const quinzena = dia <= 15 ? 1 : 2;
+        
         const novoReg = { id: Date.now(), data: dataInput, ano: ano, mes: mesIndex, quinzena: quinzena, carga: carga, tipoDia: tipoDia, valorBase: base, multiplicador: calc.multiplicador, total: calc.total };
         registros.push(novoReg);
+        
         await salvarFirebase();
-        renderizarApontamentos(); atualizarRodapeDinamico(); mostrarToast(); 
+        renderizarApontamentos(); 
+        atualizarRodapeDinamico(); 
+        mostrarToast(); 
     }
+    
     async function excluirRegistro(id) {
         if (modoAtual !== 'admin') return;
         if(!confirm("Excluir este registro?")) return;
         registros = registros.filter(r => r.id !== id);
         await salvarFirebase();
-        renderizarApontamentos(); atualizarRodapeDinamico();
+        renderizarApontamentos(); 
+        atualizarRodapeDinamico();
     }
+    
     async function excluirQuinzena(chaveGrupo) {
         if (modoAtual !== 'admin') return;
         if (!confirm("ATENÇÃO: Isso apagará TODOS os registros.\n\nTem certeza?")) return;
         const [ano, mes, q] = chaveGrupo.split('-').map(Number);
         registros = registros.filter(r => !(r.ano === ano && r.mes === mes && r.quinzena === q));
         await salvarFirebase();
-        renderizarApontamentos(); atualizarRodapeDinamico();
+        renderizarApontamentos(); 
+        atualizarRodapeDinamico();
     }
+    
     function toggleAccordion(header) {
         header.classList.toggle('active');
         const content = header.nextElementSibling;
@@ -508,7 +527,7 @@
         });
     }
 
-    // --- ABA FINANCEIRO (GRÁFICO POR QUINZENA) ---
+    // --- ABA FINANCEIRO ---
     function renderizarFinanceiro() {
         if (modoAtual !== 'admin') return;
         const container = document.getElementById('financeiro-content');
@@ -540,7 +559,6 @@
         }
 
         let htmlFinal = '';
-
         const hoje = new Date();
         const anoAtual = hoje.getFullYear();
         const mesAtual = hoje.getMonth(); 
@@ -553,7 +571,6 @@
             let qtdMesesFechados = 0;
             
             const labelsDoGrafico = [];
-            // NOVOS ARRAYS SEPARADOS PARA O GRÁFICO
             const dadosQ1Grafico = [];
             const dadosQ2Grafico = [];
 
@@ -571,8 +588,6 @@
                 }
 
                 labelsDoGrafico.push(MESES[d.mes].substring(0, 3)); 
-                
-                // PREENCHE AS LISTAS SEPARADAS
                 dadosQ1Grafico.push(d.q1);
                 dadosQ2Grafico.push(d.q2);
 
@@ -612,7 +627,6 @@
                 </div>
             </div>`;
 
-            // Gráfico um pouco maior para acomodar a legenda
             htmlFinal += `
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                 <div style="position: relative; height: 220px; width: 100%;">
@@ -628,7 +642,6 @@
 
         container.innerHTML = htmlFinal;
 
-        // INICIALIZANDO O GRÁFICO COM OS DOIS DATASETS
         if (window.dadosGraficosTemp) {
             window.dadosGraficosTemp.forEach(g => {
                 const ctx = document.getElementById(`grafico-${g.ano}`);
@@ -638,30 +651,13 @@
                         data: {
                             labels: g.labels, 
                             datasets: [
-                                {
-                                    label: '1ª Quinzena', 
-                                    data: g.dadosQ1, 
-                                    backgroundColor: '#81c784', // Verde mais claro
-                                    borderRadius: 4
-                                },
-                                {
-                                    label: '2ª Quinzena', 
-                                    data: g.dadosQ2, 
-                                    backgroundColor: '#2e7d32', // Verde forte original
-                                    borderRadius: 4
-                                }
+                                { label: '1ª Quinzena', data: g.dadosQ1, backgroundColor: '#81c784', borderRadius: 4 },
+                                { label: '2ª Quinzena', data: g.dadosQ2, backgroundColor: '#2e7d32', borderRadius: 4 }
                             ]
                         },
                         options: { 
-                            responsive: true, 
-                            maintainAspectRatio: false, 
-                            plugins: { 
-                                legend: { 
-                                    display: true, 
-                                    position: 'top',
-                                    labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } } 
-                                } 
-                            }, 
+                            responsive: true, maintainAspectRatio: false, 
+                            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } } } }, 
                             scales: { y: { beginAtZero: true } } 
                         }
                     });
@@ -716,18 +712,53 @@
         doc.save(`Saripan_${nomeMes}_${ano}_Q${q}.pdf`);
     }
 
+    // =========================================================================
+    // SEGURANÇA MÁXIMA APLICADA - SALVAMENTO BLINDADO
+    // =========================================================================
     async function salvarFirebase() {
-        if (modoAtual === "admin" && database) await database.ref('saripan_v2').set({ ultAtualizacao: new Date().toISOString(), dados: registros });
+        if (modoAtual !== "admin" || !database) return;
+        
+        // Se a base não foi carregada com sucesso na abertura, bloqueia qualquer escrita
+        if (!dadosCarregadosComSucesso) {
+            alert("ERRO DE SEGURANÇA: O sistema não conseguiu confirmar o carregamento dos dados antigos. O salvamento foi bloqueado para proteger o seu histórico. Recarregue a página e tente novamente.");
+            return;
+        }
+
+        try {
+            // Utilizamos o update() no nó raiz para atualizar a árvore sem destruir os outros dados possíveis
+            await database.ref('saripan_v2').update({ 
+                ultAtualizacao: new Date().toISOString(), 
+                dados: registros 
+            });
+        } catch (error) {
+            console.error("Falha ao salvar:", error);
+            alert("Falha de conexão ao tentar guardar as informações.");
+        }
     }
 
     async function carregarDados() {
         if (!database) return;
         try {
             const snap = await database.ref('saripan_v2').get();
-            if (snap.exists()) registros = snap.val().dados || []; else registros = [];
-            renderizarApontamentos(); atualizarRodapeDinamico(); 
-        } catch (e) { console.error("Erro ao carregar:", e); }
+            if (snap.exists()) {
+                registros = snap.val().dados || []; 
+            } else {
+                registros = [];
+            }
+            
+            // Só ativa a permissão de salvar depois do sucesso desta leitura
+            dadosCarregadosComSucesso = true; 
+            
+            renderizarApontamentos(); 
+            atualizarRodapeDinamico(); 
+        } catch (e) { 
+            console.error("Erro ao carregar:", e); 
+            alert("Erro ao carregar o histórico. Por favor, NÃO tente salvar nenhum dado agora.");
+            // Mantém bloqueado
+            dadosCarregadosComSucesso = false; 
+        }
     }
+    // =========================================================================
 
     function iniciarFirebase() {
         try {
