@@ -1,8 +1,11 @@
-const CACHE_NAME = 'saripan-v12-quinzenas'; 
+// Mudamos para v13 para forçar o telemóvel a apagar a v12 e baixar o Firestore
+const CACHE_NAME = 'saripan-v13-firestore'; 
 
 const ASSETS = [
   './',
   './index.html',
+  './style.css',     // Novo arquivo de visual adicionado
+  './app.js',        // Novo arquivo de motor adicionado
   './manifest.json',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
@@ -23,6 +26,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((keyList) => {
       return Promise.all(
         keyList.map((key) => {
+          // Apaga qualquer cache que não seja o v13-firestore
           if (key !== CACHE_NAME) return caches.delete(key);
         })
       );
@@ -31,6 +35,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Mantida a sua estratégia: Tenta a rede primeiro, se falhar puxa do Cache
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
