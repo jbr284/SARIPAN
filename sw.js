@@ -1,5 +1,5 @@
 // Mudamos para v14 para forçar a limpeza do erro antigo
-const CACHE_NAME = 'saripan-v14-firestore'; 
+const CACHE_NAME = 'saripan-v15-Atual. Med. Sal.'; 
 
 const ASSETS = [
   './',
