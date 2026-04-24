@@ -77,7 +77,7 @@ window.abrirModulo = (modulo) => {
     if (modulo === 'modular') {
         renderizarHistoricoModular();
         document.getElementById('valorOutras').value = "";
-        document.getElementById('nomeOutras').value = ""; // Limpa a descrição também
+        document.getElementById('nomeOutras').value = "";
     }
     if (modulo === 'geral') renderizarDashboardGeral();
 };
@@ -406,7 +406,15 @@ function renderizarHistoricoModular() {
         return;
     }
 
-    let tableHtml = `<table><thead><tr><th>Período</th><th style="text-align:right">Adiant/Liq</th><th style="text-align:right">Extras</th><th style="text-align:right; background:#002f6c; color:white;">Total</th><th></th></tr></thead><tbody>`;
+    // AQUI: Tabela atualizada com 3 colunas distintas + Total
+    let tableHtml = `<table><thead><tr>
+        <th>Período</th>
+        <th style="text-align:right">Adiant.</th>
+        <th style="text-align:right">Sal. Líq.</th>
+        <th style="text-align:right">Extras</th>
+        <th style="text-align:right; background:#002f6c; color:white;">Total</th>
+        <th></th>
+    </tr></thead><tbody>`;
     
     regs.forEach(r => {
         const nomeDoExtra = r.nomeOutras ? r.nomeOutras : 'Extra';
@@ -414,9 +422,10 @@ function renderizarHistoricoModular() {
         
         tableHtml += `<tr>
             <td>${MESES[r.mes]} ${r.ano}</td>
-            <td class="esconder-valor" style="text-align:right; font-size:11px;">R$ ${(r.adiantamento + r.salario).toFixed(2)}</td>
-            <td class="esconder-valor" style="text-align:right; color:#1565c0;">${extrasStr}</td>
-            <td class="esconder-valor" style="text-align:right; font-weight:bold; color:#0d47a1;">R$ ${r.total.toFixed(2)}</td>
+            <td class="esconder-valor" style="text-align:right; font-size:12px;">R$ ${r.adiantamento.toFixed(2)}</td>
+            <td class="esconder-valor" style="text-align:right; font-size:12px;">R$ ${r.salario.toFixed(2)}</td>
+            <td class="esconder-valor" style="text-align:right; color:#1565c0; font-size:12px;">${extrasStr}</td>
+            <td class="esconder-valor" style="text-align:right; font-weight:bold; color:#0d47a1; font-size:12px;">R$ ${r.total.toFixed(2)}</td>
             <td style="text-align:center;"><span style="color:red; cursor:pointer;" onclick="window.excluirRegistroModular('${r.id}')">✖</span></td>
         </tr>`;
     });
