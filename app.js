@@ -409,7 +409,6 @@ function renderizarHistoricoModular() {
     let tableHtml = `<table><thead><tr><th>Período</th><th style="text-align:right">Adiant/Liq</th><th style="text-align:right">Extras</th><th style="text-align:right; background:#002f6c; color:white;">Total</th><th></th></tr></thead><tbody>`;
     
     regs.forEach(r => {
-        // Se houver valor extra, mostra o nome salvo junto com o valor formatado
         const nomeDoExtra = r.nomeOutras ? r.nomeOutras : 'Extra';
         const extrasStr = (r.outras && r.outras > 0) ? `<div style="font-size:10px; color:#666; font-weight:bold;">${nomeDoExtra}</div>R$ ${r.outras.toFixed(2)}` : "-";
         
@@ -455,13 +454,25 @@ function renderizarDashboardGeral() {
         const mesesDoAno = Object.values(dadosGerais).filter(d => d.ano === ano).sort((a,b) => a.mes - b.mes);
         let totalAno = 0;
         const labels = [], dataSari = [], dataMod = [];
+        
+        let htmlTabela = `<table class="fin-table" style="margin-top:20px; margin-bottom:30px;"><thead><tr><th>Mês</th><th style="text-align:right">Saripan</th><th style="text-align:right">Modular</th><th style="text-align:right; background:#003c8f; color:white;">Total do Mês</th></tr></thead><tbody>`;
 
         mesesDoAno.forEach(m => {
             labels.push(MESES[m.mes].substring(0,3));
             dataSari.push(m.saripan);
             dataMod.push(m.modular);
-            totalAno += (m.saripan + m.modular);
+            
+            const totalMes = m.saripan + m.modular;
+            totalAno += totalMes;
+            
+            htmlTabela += `<tr>
+                <td>${MESES[m.mes]}</td>
+                <td class="esconder-valor" style="text-align:right">R$ ${m.saripan.toFixed(2)}</td>
+                <td class="esconder-valor" style="text-align:right">R$ ${m.modular.toFixed(2)}</td>
+                <td class="esconder-valor fin-row-total" style="text-align:right">R$ ${totalMes.toFixed(2)}</td>
+            </tr>`;
         });
+        htmlTabela += `</tbody></table>`;
 
         const media = mesesDoAno.length > 0 ? (totalAno / mesesDoAno.length) : 0;
 
@@ -481,6 +492,7 @@ function renderizarDashboardGeral() {
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
                 <div style="position: relative; height: 250px; width: 100%;"><canvas id="grafico-geral-${ano}" class="esconder-valor"></canvas></div>
             </div>
+            ${htmlTabela}
         </div>`;
 
         setTimeout(() => {
