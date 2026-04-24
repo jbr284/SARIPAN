@@ -238,7 +238,7 @@ function renderizarApontamentosSaripan() {
     });
 }
 
-// === LÓGICA FINANCEIRO SARIPAN (RESTAURADA) ===
+// === LÓGICA FINANCEIRO SARIPAN ===
 function limparGraficos() {
     window.chartsAtivos.forEach(c => c.destroy());
     window.chartsAtivos = [];
@@ -546,14 +546,33 @@ window.gerarPDF = (chaveGrupo) => {
     doc.save(`Saripan_${MESES[mes]}_${ano}_Q${q}.pdf`);
 };
 
+// === PREENCHIMENTO AUTOMÁTICO DE DATAS ===
+function definirDatasAtuais() {
+    const localDate = new Date();
+    const ano = localDate.getFullYear();
+    const mes = String(localDate.getMonth() + 1).padStart(2, '0');
+    const dia = String(localDate.getDate()).padStart(2, '0');
+    
+    // Campo do Saripan (YYYY-MM-DD)
+    document.getElementById('dataServico').value = `${ano}-${mes}-${dia}`;
+    
+    // Campo da Modular (YYYY-MM)
+    document.getElementById('mesModular').value = `${ano}-${mes}`;
+}
+
 // === BOOTSTRAP INICIAL ===
 window.addEventListener('DOMContentLoaded', () => {
     const privSalva = localStorage.getItem('saripan_privacidade') === 'true';
     if(privSalva) { document.body.classList.add('modo-privacidade'); document.getElementById('btn-privacidade').innerHTML = iconeOlhoFechado; }
     else { document.getElementById('btn-privacidade').innerHTML = iconeOlhoAberto; }
 
+    // Roda a função para preencher a data de hoje logo que a página carrega
+    definirDatasAtuais();
+
     document.getElementById('dataServico').addEventListener('change', window.atualizarRodapeDinamico);
     ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', window.atualizarPreview));
     
+    window.atualizarPreview(); // Garante que a previsão já inicie calculada (R$ 130,00)
+
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 });
