@@ -1,5 +1,5 @@
-// Mudamos para v14 para forçar a limpeza do erro antigo
-const CACHE_NAME = 'saripan-v15-Atual. Med. Sal.'; 
+// Aumentamos a versão para forçar a atualização do cache com as novas Abas
+const CACHE_NAME = 'gestao-unificada-v16'; 
 
 const ASSETS = [
   './',
@@ -7,7 +7,6 @@ const ASSETS = [
   './style.css',     
   './app.js',        
   './manifest.json',
-  // Caminhos corrigidos apontando para a pasta icons
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',

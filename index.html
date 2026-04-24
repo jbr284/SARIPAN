@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SARIPAN</title>
+  <title>Gestão Unificada</title>
   
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
-  <meta name="theme-color" content="#d32f2f">
+  <meta name="theme-color" content="#002f6c">
 
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="toast">✅ Apontamento salvo com sucesso!</div>
+  <div id="toast">✅ Salvo com sucesso!</div>
 
   <div id="modal-login" class="modal-overlay hidden">
     <div class="modal-content">
@@ -26,111 +26,112 @@
   </div>
 
   <div id="inicio">
-    <h1 style="color:#d32f2f; font-size: 40px; margin-bottom: 5px;">SARIPAN</h1>
-    <p style="color:#666; margin-bottom: 40px;">Registro de Prestação de Serviços</p>
+    <h1 style="color:#002f6c; font-size: 35px; margin-bottom: 5px; text-align: center;">Painel de Gestão</h1>
+    <p style="color:#666; margin-bottom: 40px;">Selecione o modo de acesso</p>
     
-    <button class="btn-big btn-green" onclick="entrarModo('admin')">📋 APONTAMENTOS</button>
-    <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ VISUALIZAR</button>
+    <button class="btn-big btn-green" onclick="entrarModo('admin')">🔐 ACESSO RESTRITO</button>
+    <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ VISUALIZAR APONTAMENTOS</button>
   </div>
 
   <div id="app" class="container hidden">
     
-    <div class="fixed-area">
-        <div class="app-header">
-          <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
-          <div class="app-title">SARIPAN</div>
-          <button id="btn-privacidade" class="btn-nav-top" onclick="togglePrivacidade()" style="width: 44px; height: 36px; padding: 6px;"></button>
+    <div class="master-header">
+        <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
+        <div id="master-tabs-container" class="master-tabs">
+            <button id="m-tab-saripan" class="m-tab active" onclick="switchMasterModule('saripan')">SARIPAN</button>
+            <button id="m-tab-modular" class="m-tab" onclick="switchMasterModule('modular')">MODULAR</button>
+            <button id="m-tab-geral" class="m-tab" onclick="switchMasterModule('geral')">GERAL</button>
+        </div>
+        <button id="btn-privacidade" class="btn-nav-top" onclick="togglePrivacidade()"></button>
+    </div>
+
+    <div id="module-saripan" class="master-module active">
+        <div class="fixed-area">
+            <div class="tabs-container">
+              <button id="btn-tab-registrar" class="tab-btn active" onclick="mudarAba('registrar')">⏱️ Registrar</button>
+              <button id="btn-tab-historico" class="tab-btn" onclick="mudarAba('historico')">📋 Histórico</button>
+              <button id="btn-tab-financeiro" class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
+            </div>
         </div>
 
-        <div class="tabs-container">
-          <button id="btn-tab-registrar" class="tab-btn active" onclick="mudarAba('registrar')">⏱️ Registrar</button>
-          <button id="btn-tab-historico" class="tab-btn" onclick="mudarAba('historico')">📋 Histórico</button>
-          <button id="btn-tab-financeiro" class="tab-btn" onclick="mudarAba('financeiro')">💰 Financeiro</button>
+        <div class="scroll-content">
+            <div id="painel-registrar" class="panel active">
+              <div class="form-box">
+                <h3 class="form-title">Novo Apontamento</h3>
+                <label>Data do Serviço:</label>
+                <input type="date" id="dataServico" style="margin-bottom: 15px; padding: 15px; font-size: 16px;">
+                <div class="grid-input">
+                  <div>
+                    <label>Tipo:</label>
+                    <select id="tipoCarga"><option value="1">Normal</option><option value="2">Dupla</option></select>
+                  </div>
+                  <div>
+                    <label>Detalhes:</label>
+                    <select id="tipoDia"><option value="1">Dia Útil</option><option value="2">Domingo</option><option value="3">Feriado</option></select>
+                  </div>
+                </div>
+                <div class="grid-input">
+                  <div><label>Valor Base (R$):</label><input type="number" id="valorBase" value="130.00"></div>
+                  <div><label>Previsão:</label><input type="text" id="previewValor" class="esconder-valor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;"></div>
+                </div>
+                <button class="btn-action btn-green" id="btn-salvar-registro" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
+              </div>
+
+              <div id="rodape-dinamico" style="margin-top: 25px; padding: 0 10px;">
+                <table style="width: 100%; border-collapse: collapse; text-align: center; border: 1px solid #000; font-size: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <thead><tr style="background-color: #5b9bd5; color: white;"><th style="border: 1px solid #000; padding: 12px; font-weight: bold;">QTD de diárias</th><th style="border: 1px solid #000; padding: 12px; font-weight: bold;">Total (R$)</th></tr></thead>
+                    <tbody><tr><td id="rodape-qtd" style="border: 1px solid #000; padding: 12px; font-weight: bold; font-size: 18px; color: #333;">0</td><td id="rodape-total" class="esconder-valor" style="border: 1px solid #000; padding: 12px; font-weight: bold; font-size: 18px; color: #2e7d32;">R$ 0,00</td></tr></tbody>
+                </table>
+                <div id="rodape-ref" style="text-align: center; font-size: 13px; color: #666; margin-top: 8px; font-weight: bold;">Selecione uma data para ver o resumo.</div>
+              </div>
+            </div>
+
+            <div id="painel-historico" class="panel">
+                <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Registros e Relatórios</h3>
+                <div id="lista-quinzenas-container"></div>
+                <div id="msg-sem-dados" style="text-align:center; padding: 40px; color:#999; display:none;">Nenhum registro encontrado.</div>
+            </div>
+
+            <div id="painel-financeiro" class="panel">
+              <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Financeiro Saripan</h3>
+              <div id="financeiro-content"></div>
+            </div>
         </div>
     </div>
 
-    <div class="scroll-content">
-        
-        <div id="painel-registrar" class="panel active">
-          <div id="area-formulario" class="form-box">
-            <h3 class="form-title">Novo Apontamento</h3>
-            
-            <label>Data do Serviço:</label>
-            <input type="date" id="dataServico" style="margin-bottom: 15px; padding: 15px; font-size: 16px;">
+    <div id="module-modular" class="master-module scroll-content" style="padding: 15px; background: #f0f2f5;">
+        <div class="form-box">
+            <h3 class="form-title">Registrar Renda Fixa (Modular)</h3>
+            <label>Mês de Referência:</label>
+            <input type="month" id="mesModular" style="margin-bottom: 15px; padding: 12px;">
             
             <div class="grid-input">
-              <div>
-                <label>Tipo:</label>
-                <select id="tipoCarga">
-                  <option value="1">Normal</option>
-                  <option value="2">Dupla</option>
-                </select>
-              </div>
-              <div>
-                <label>Detalhes:</label>
-                <select id="tipoDia">
-                  <option value="1">Dia Útil</option>
-                  <option value="2">Domingo</option>
-                  <option value="3">Feriado</option>
-                </select>
-              </div>
+                <div>
+                    <label>Adiantamento (R$):</label>
+                    <input type="number" id="valorAdiantamento" placeholder="Ex: 1500.00">
+                </div>
+                <div>
+                    <label>Salário Líquido (R$):</label>
+                    <input type="number" id="valorSalario" placeholder="Ex: 2500.00">
+                </div>
             </div>
-
-            <div class="grid-input">
-              <div>
-                <label>Valor Base (R$):</label>
-                <input type="number" id="valorBase" value="130.00">
-              </div>
-              <div>
-                <label>Previsão:</label>
-                <input type="text" id="previewValor" class="esconder-valor" readonly style="background: #eee; font-weight: bold; color: #2e7d32;">
-              </div>
-            </div>
-
-            <button class="btn-action btn-green" id="btn-salvar-registro" onclick="adicionarRegistro()">✅ Confirmar Apontamento</button>
-          </div>
-
-          <div id="rodape-dinamico" style="margin-top: 25px; padding: 0 10px;">
-            <table style="width: 100%; border-collapse: collapse; text-align: center; border: 1px solid #000; font-size: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <thead>
-                    <tr style="background-color: #5b9bd5; color: white;">
-                        <th style="border: 1px solid #000; padding: 12px; font-weight: bold;">QTD de diárias</th>
-                        <th style="border: 1px solid #000; padding: 12px; font-weight: bold;">Total (R$)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="rodape-qtd" style="border: 1px solid #000; padding: 12px; background: white; font-weight: bold; font-size: 18px; color: #333;">0</td>
-                        <td id="rodape-total" class="esconder-valor" style="border: 1px solid #000; padding: 12px; background: white; font-weight: bold; font-size: 18px; color: #2e7d32;">R$ 0,00</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div id="rodape-ref" style="text-align: center; font-size: 13px; color: #666; margin-top: 8px; font-weight: bold;">
-                Selecione uma data para ver o resumo.
-            </div>
-          </div>
+            <button class="btn-action btn-green" id="btn-salvar-modular" onclick="adicionarRegistroModular()">💾 Salvar Mês</button>
         </div>
 
-        <div id="painel-historico" class="panel">
-            <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Registros e Relatórios</h3>
-            <div id="lista-quinzenas-container"></div>
-            <div id="msg-sem-dados" style="text-align:center; padding: 40px; color:#999; display:none;">
-              Nenhum registro encontrado.
-            </div>
-        </div>
-
-        <div id="painel-financeiro" class="panel">
-          <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Gestão e Resultados</h3>
-          <div id="financeiro-content"></div>
-        </div>
-
+        <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:20px;">Histórico Modular</h3>
+        <div id="lista-modular-container"></div>
     </div>
+
+    <div id="module-geral" class="master-module scroll-content" style="padding: 15px; background: #f0f2f5;">
+        <h3 style="color:#0d47a1; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top:0;">Visão Consolidada</h3>
+        <div id="dashboard-geral-content"></div>
+    </div>
+
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
-
   <script type="module" src="app.js"></script>
 
 </body>
