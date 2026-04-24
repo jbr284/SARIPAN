@@ -76,8 +76,8 @@ window.abrirModulo = (modulo) => {
     }
     if (modulo === 'modular') {
         renderizarHistoricoModular();
-        // Limpa campos extras ao abrir
         document.getElementById('valorOutras').value = "";
+        document.getElementById('nomeOutras').value = ""; // Limpa a descrição também
     }
     if (modulo === 'geral') renderizarDashboardGeral();
 };
@@ -114,7 +114,7 @@ async function carregarTodosOsDados() {
         window.atualizarRodapeDinamico(); 
     } catch (e) { 
         console.error("Erro fatal do Firebase:", e);
-        alert("Erro de conexão ao baixar os dados do Firebase. Verifique suas regras de segurança ou conexão.");
+        alert("Erro de conexão ao baixar dados. O App funcionará offline se tiver cache.");
     }
 }
 
@@ -364,21 +364,23 @@ window.adicionarRegistroModular = async () => {
     const adiantamento = parseFloat(document.getElementById('valorAdiantamento').value) || 0;
     const salario = parseFloat(document.getElementById('valorSalario').value) || 0;
     const outras = parseFloat(document.getElementById('valorOutras').value) || 0;
+    const nomeOutras = document.getElementById('nomeOutras').value.trim() || 'Extra';
 
     if (!mesStr) return alert("Selecione o Mês de Referência.");
     
     const [ano, mesNum] = mesStr.split('-').map(Number);
     const idUnico = `MOD-${ano}-${mesNum}`; 
-    const total = adiantamento + salario + outras; // Soma tudo agora
+    const total = adiantamento + salario + outras; 
 
-    const novoReg = { id: idUnico, ano: ano, mes: mesNum - 1, adiantamento, salario, outras, total };
+    const novoReg = { id: idUnico, ano: ano, mes: mesNum - 1, adiantamento, salario, outras, nomeOutras, total };
 
     try {
         await setDoc(doc(db, "renda_modular", idUnico), novoReg);
         window.registrosModular = window.registrosModular.filter(r => r.id !== idUnico);
         window.registrosModular.push(novoReg);
         renderizarHistoricoModular(); mostrarToast();
-        document.getElementById('valorOutras').value = ""; // Limpa após salvar
+        document.getElementById('valorOutras').value = "";
+        document.getElementById('nomeOutras').value = "";
     } catch(e) { alert("Erro ao salvar Modular."); }
 };
 
@@ -407,7 +409,10 @@ function renderizarHistoricoModular() {
     let tableHtml = `<table><thead><tr><th>Período</th><th style="text-align:right">Adiant/Liq</th><th style="text-align:right">Extras</th><th style="text-align:right; background:#002f6c; color:white;">Total</th><th></th></tr></thead><tbody>`;
     
     regs.forEach(r => {
-        const extrasStr = (r.outras && r.outras > 0) ? `R$ ${r.outras.toFixed(2)}` : "-";
+        // Se houver valor extra, mostra o nome salvo junto com o valor formatado
+        const nomeDoExtra = r.nomeOutras ? r.nomeOutras : 'Extra';
+        const extrasStr = (r.outras && r.outras > 0) ? `<div style="font-size:10px; color:#666; font-weight:bold;">${nomeDoExtra}</div>R$ ${r.outras.toFixed(2)}` : "-";
+        
         tableHtml += `<tr>
             <td>${MESES[r.mes]} ${r.ano}</td>
             <td class="esconder-valor" style="text-align:right; font-size:11px;">R$ ${(r.adiantamento + r.salario).toFixed(2)}</td>
@@ -560,10 +565,7 @@ function definirDatasAtuais() {
     const mes = String(localDate.getMonth() + 1).padStart(2, '0');
     const dia = String(localDate.getDate()).padStart(2, '0');
     
-    // Campo do Saripan (YYYY-MM-DD)
     if(document.getElementById('dataServico')) document.getElementById('dataServico').value = `${ano}-${mes}-${dia}`;
-    
-    // Campo da Modular (YYYY-MM)
     if(document.getElementById('mesModular')) document.getElementById('mesModular').value = `${ano}-${mes}`;
 }
 
