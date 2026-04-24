@@ -64,15 +64,12 @@ window.abrirModulo = (modulo) => {
     document.getElementById('tela-hub').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     
-    // Atualiza o Título do Cabeçalho
     const titulos = { 'saripan': 'MÓDULO SARIPAN', 'modular': 'MÓDULO MODULAR', 'geral': 'VISÃO GERAL' };
     document.getElementById('app-title').innerText = titulos[modulo];
 
-    // Esconde todos os painéis e mostra só o que clicou
     document.querySelectorAll('.master-module').forEach(m => m.classList.remove('active'));
     document.getElementById(`module-${modulo}`).classList.add('active');
 
-    // Executa as lógicas de carregamento específicas
     if (modulo === 'saripan') {
         window.mudarAba('registrar');
         window.atualizarRodapeDinamico();
@@ -86,7 +83,7 @@ window.voltarAoHub = () => {
     document.getElementById('tela-hub').classList.remove('hidden');
 };
 
-window.mudarAba = (aba) => { // Abas internas Saripan
+window.mudarAba = (aba) => { 
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.getElementById(`btn-tab-${aba}`).classList.add('active');
@@ -113,7 +110,7 @@ async function carregarTodosOsDados() {
         window.atualizarRodapeDinamico(); 
     } catch (e) { 
         console.error("Erro fatal do Firebase:", e);
-        alert("Erro de conexão ao baixar dados.");
+        alert("Erro de conexão ao baixar dados. O App funcionará offline se tiver cache.");
     }
 }
 
@@ -241,6 +238,122 @@ function renderizarApontamentosSaripan() {
     });
 }
 
+// === LÓGICA FINANCEIRO SARIPAN (RESTAURADA) ===
+function limparGraficos() {
+    window.chartsAtivos.forEach(c => c.destroy());
+    window.chartsAtivos = [];
+}
+
+function renderizarFinanceiroSaripan() {
+    limparGraficos();
+    const container = document.getElementById('financeiro-content');
+    
+    const dadosMes = {}, totaisAnuais = {};
+
+    window.registros.forEach(reg => {
+        const chaveMes = `${reg.ano}-${reg.mes}`;
+        if (!dadosMes[chaveMes]) dadosMes[chaveMes] = { ano: reg.ano, mes: reg.mes, q1: 0, q2: 0 };
+        reg.quinzena === 1 ? dadosMes[chaveMes].q1 += reg.total : dadosMes[chaveMes].q2 += reg.total;
+        
+        totaisAnuais[reg.ano] = (totaisAnuais[reg.ano] || 0) + reg.total;
+    });
+
+    const chavesMes = Object.keys(dadosMes).sort((a,b) => {
+         const [aA, aM] = a.split('-').map(Number); const [bA, bM] = b.split('-').map(Number);
+         if (aA !== bA) return bA - aA; return bM - aM;
+    });
+    const anosOrdenados = Object.keys(totaisAnuais).sort((a,b) => b-a); 
+
+    if (chavesMes.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding:20px;'>Sem dados financeiros no Saripan.</p>";
+        return;
+    }
+
+    let htmlFinal = '';
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear(), mesAtual = hoje.getMonth(), diaAtual = hoje.getDate(); 
+
+    anosOrdenados.forEach(ano => {
+        const mesesDesteAno = chavesMes.filter(k => k.startsWith(`${ano}-`));
+        let totalAcumuladoAno = 0, totalFechadoAno = 0, qtdMesesFechados = 0;
+        const labels = [], dadosQ1 = [], dadosQ2 = [];
+        
+        let htmlTabela = `<table class="fin-table" style="margin-bottom:30px;"><thead><tr><th>Mês</th><th style="text-align:right">1ª Q.</th><th style="text-align:right">2ª Q.</th><th style="text-align:right; background:#003c8f; color:white;">Total</th></tr></thead><tbody>`;
+
+        mesesDesteAno.forEach(k => {
+            const d = dadosMes[k]; 
+            const totalDoMes = d.q1 + d.q2;
+            totalAcumuladoAno += totalDoMes;
+            
+            if (d.ano < anoAtual || (d.ano === anoAtual && d.mes < mesAtual)) {
+                totalFechadoAno += totalDoMes;
+                qtdMesesFechados++;
+            }
+
+            labels.push(MESES[d.mes].substring(0, 3)); 
+            dadosQ1.push(d.q1); dadosQ2.push(d.q2);
+
+            htmlTabela += `<tr><td>${MESES[d.mes]}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q1.toFixed(2)}</td><td style="text-align:right" class="esconder-valor">R$ ${d.q2.toFixed(2)}</td><td style="text-align:right" class="fin-row-total esconder-valor">R$ ${totalDoMes.toFixed(2)}</td></tr>`;
+        });
+        htmlTabela += `</tbody></table>`;
+
+        const mediaTotal = qtdMesesFechados > 0 ? (totalFechadoAno / qtdMesesFechados) : 0;
+        let divisorProporcional = mesesDesteAno.length; 
+        
+        if (Number(ano) === anoAtual) {
+            const diasNoMesAtual = new Date(anoAtual, mesAtual + 1, 0).getDate();
+            const fracaoMes = diaAtual / diasNoMesAtual;
+            divisorProporcional = mesAtual + fracaoMes; 
+        }
+        const mediaParcial = divisorProporcional > 0 ? (totalAcumuladoAno / divisorProporcional) : 0;
+
+        const valTotalStr = totalAcumuladoAno.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        const valMediaTotalStr = mediaTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        const valMediaParcialStr = mediaParcial.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+
+        htmlFinal += `
+        <h4 style="margin-top: 10px; color: #555; border-bottom: 2px solid #ddd; padding-bottom: 5px; text-transform: uppercase;">Resumo de ${ano} (Saripan)</h4>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div class="year-summary" style="flex: 1; padding: 10px;">
+                <h4 style="font-size: 11px;">RENDIMENTO ANUAL</h4>
+                <div class="year-total-value esconder-valor" style="font-size: 17px; margin-top: 10px;">${valTotalStr}</div>
+            </div>
+            <div class="year-summary" style="flex: 1.8; padding: 10px; background: #e3f2fd; border-color: #90caf9;">
+                <h4 style="color: #1565c0; font-size: 11px; margin-bottom: 10px;">Média Salarial</h4>
+                <div style="display: flex; justify-content: space-around; font-size: 14px; color: #0d47a1;">
+                    <div style="text-align: center;"><span style="font-size: 10px; font-weight: bold;">PARCIAL</span><br><strong class="esconder-valor" style="font-size: 15px;">${valMediaParcialStr}</strong></div>
+                    <div style="width: 1px; background: #bbdefb; margin: 0 5px;"></div>
+                    <div style="text-align: center;"><span style="font-size: 10px; font-weight: bold;">TOTAL</span><br><strong class="esconder-valor" style="font-size: 15px;">${valMediaTotalStr}</strong></div>
+                </div>
+            </div>
+        </div>
+        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px;">
+            <div style="position: relative; height: 220px; width: 100%;"><canvas id="grafico-sari-${ano}" class="esconder-valor"></canvas></div>
+        </div>
+        ${htmlTabela}`;
+
+        setTimeout(() => {
+            const ctx = document.getElementById(`grafico-sari-${ano}`);
+            if (ctx) {
+                const myChart = new Chart(ctx, {
+                    type: 'bar', 
+                    data: {
+                        labels: labels, 
+                        datasets: [
+                            { label: '1ª Quinzena', data: dadosQ1, backgroundColor: '#81c784', borderRadius: 4 },
+                            { label: '2ª Quinzena', data: dadosQ2, backgroundColor: '#2e7d32', borderRadius: 4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } } } }, scales: { y: { beginAtZero: true } } }
+                });
+                window.chartsAtivos.push(myChart); 
+            }
+        }, 100);
+    });
+
+    container.innerHTML = htmlFinal;
+}
+
 // === LÓGICA MODULAR ===
 window.adicionarRegistroModular = async () => {
     const mesStr = document.getElementById('mesModular').value; 
@@ -300,17 +413,6 @@ function renderizarHistoricoModular() {
     container.innerHTML = tableHtml;
 }
 
-// === LIMPEZA DE GRÁFICOS ===
-function limparGraficos() {
-    window.chartsAtivos.forEach(c => c.destroy());
-    window.chartsAtivos = [];
-}
-
-function renderizarFinanceiroSaripan() {
-    limparGraficos();
-    document.getElementById('financeiro-content').innerHTML = `<p style="text-align:center; padding: 20px; color: #666;">Acesse a aba <b>GERAL</b> no menu principal para ver os gráficos consolidados.</p>`;
-}
-
 // === LÓGICA DASHBOARD GERAL ===
 function renderizarDashboardGeral() {
     limparGraficos();
@@ -353,7 +455,7 @@ function renderizarDashboardGeral() {
 
         htmlFinal += `
         <div style="margin-bottom: 30px;">
-            <h4 style="color: #f57c00; border-bottom: 2px solid #ffe0b2; padding-bottom: 5px;">ANÁLISE DE ${ano}</h4>
+            <h4 style="color: #f57c00; border-bottom: 2px solid #ffe0b2; padding-bottom: 5px;">ANÁLISE DE ${ano} (SOMA GLOBAL)</h4>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <div class="year-summary" style="flex: 1; padding: 10px;">
                     <h4 style="font-size: 11px;">RENDA BRUTA TOTAL</h4>
