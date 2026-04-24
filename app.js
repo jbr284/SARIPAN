@@ -248,7 +248,7 @@ window.adicionarRegistroModular = async () => {
     const salario = parseFloat(document.getElementById('valorSalario').value) || 0;
     const outras = parseFloat(document.getElementById('valorOutras').value) || 0;
     const nomeOutras = document.getElementById('nomeOutras').value.trim() || 'Extra';
-    if (!mesStr) return alert(\"Selecione o mês.\");
+    if (!mesStr) return alert("Selecione o mês.");
     const [ano, mesNum] = mesStr.split('-').map(Number);
     const idUnico = `MOD-${ano}-${mesNum}`; 
     const total = adiantamento + salario + outras; 
@@ -277,8 +277,8 @@ function renderizarHistoricoModular() {
     if (regs.length === 0) { container.innerHTML = "<p style='text-align:center;'>Sem dados.</p>"; return; }
     let tableHtml = `<table><thead><tr><th>Período</th><th style="text-align:right">Adiant.</th><th style="text-align:right">Sal. Líq.</th><th style="text-align:right">Extras</th><th style="text-align:right; background:#002f6c; color:white;">Total</th><th></th></tr></thead><tbody>`;
     regs.forEach(r => {
-        const extrasStr = (r.outras && r.outras > 0) ? `<div style=\"font-size:10px; color:#666;\">${r.nomeOutras}</div>R$ ${r.outras.toFixed(2)}` : \"-\";
-        tableHtml += `<tr><td>${MESES[r.mes]} ${r.ano}</td><td class=\"esconder-valor\" style=\"text-align:right\">R$ ${r.adiantamento.toFixed(2)}</td><td class=\"esconder-valor\" style=\"text-align:right\">R$ ${r.salario.toFixed(2)}</td><td class=\"esconder-valor\" style=\"text-align:right; color:#1565c0;\">${extrasStr}</td><td class=\"esconder-valor\" style=\"text-align:right; font-weight:bold; color:#0d47a1;\">R$ ${r.total.toFixed(2)}</td><td style=\"text-align:center;\"><span style=\"color:red; cursor:pointer;\" onclick=\"window.excluirRegistroModular('${r.id}')\">✖</span></td></tr>`;
+        const extrasStr = (r.outras && r.outras > 0) ? `<div style="font-size:10px; color:#666;">${r.nomeOutras}</div>R$ ${r.outras.toFixed(2)}` : "-";
+        tableHtml += `<tr><td>${MESES[r.mes]} ${r.ano}</td><td class="esconder-valor" style="text-align:right">R$ ${r.adiantamento.toFixed(2)}</td><td class="esconder-valor" style="text-align:right">R$ ${r.salario.toFixed(2)}</td><td class="esconder-valor" style="text-align:right; color:#1565c0;">${extrasStr}</td><td class="esconder-valor" style="text-align:right; font-weight:bold; color:#0d47a1;">R$ ${r.total.toFixed(2)}</td><td style="text-align:center;"><span style="color:red; cursor:pointer;" onclick="window.excluirRegistroModular('${r.id}')">✖</span></td></tr>`;
     });
     tableHtml += `</tbody></table>`;
     container.innerHTML = tableHtml;
@@ -304,15 +304,15 @@ function renderizarDashboardGeral() {
     anosOrdenados.forEach(ano => {
         const mesesDoAno = Object.values(dadosGerais).filter(d => d.ano === ano).sort((a,b) => a.mes - b.mes);
         let totalAno = 0; const labels = [], dataSari = [], dataMod = [];
-        let htmlTabela = `<table class=\"fin-table\" style=\"margin-top:20px; margin-bottom:30px;\"><thead><tr><th>Mês</th><th style=\"text-align:right\">Saripan</th><th style=\"text-align:right\">Modular</th><th style=\"text-align:right; background:#003c8f; color:white;\">Total</th></tr></thead><tbody>`;
+        let htmlTabela = `<table class="fin-table" style="margin-top:20px; margin-bottom:30px;"><thead><tr><th>Mês</th><th style="text-align:right">Saripan</th><th style="text-align:right">Modular</th><th style="text-align:right; background:#003c8f; color:white;">Total</th></tr></thead><tbody>`;
         mesesDoAno.forEach(m => {
             labels.push(MESES[m.mes].substring(0,3)); dataSari.push(m.saripan); dataMod.push(m.modular);
             const totalMes = m.saripan + m.modular; totalAno += totalMes;
-            htmlTabela += `<tr><td>${MESES[m.mes]}</td><td class=\"esconder-valor\" style=\"text-align:right\">R$ ${m.saripan.toFixed(2)}</td><td class=\"esconder-valor\" style=\"text-align:right\">R$ ${m.modular.toFixed(2)}</td><td class=\"esconder-valor fin-row-total\" style=\"text-align:right\">R$ ${totalMes.toFixed(2)}</td></tr>`;
+            htmlTabela += `<tr><td>${MESES[m.mes]}</td><td class="esconder-valor" style="text-align:right">R$ ${m.saripan.toFixed(2)}</td><td class="esconder-valor" style="text-align:right">R$ ${m.modular.toFixed(2)}</td><td class="esconder-valor fin-row-total" style="text-align:right">R$ ${totalMes.toFixed(2)}</td></tr>`;
         });
         htmlTabela += `</tbody></table>`;
         const media = mesesDoAno.length > 0 ? (totalAno / mesesDoAno.length) : 0;
-        htmlFinal += `<div style=\"margin-bottom: 30px;\"><h4 style=\"color: #f57c00; border-bottom: 2px solid #ffe0b2; padding-bottom: 5px;\">JB ANALYTICS ${ano}</h4><div style=\"display: flex; gap: 10px; margin-bottom: 15px;\"><div class=\"year-summary\" style=\"flex: 1; padding: 10px;\"><h4>RENDA TOTAL</h4><div class=\"year-total-value esconder-valor\" style=\"font-size: 17px; margin-top: 10px;\">${totalAno.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</div></div><div class=\"year-summary\" style=\"flex: 1; padding: 10px; background: #e3f2fd; border-color: #90caf9;\"><h4>MÉDIA MENSAL</h4><div class=\"year-total-value esconder-valor\" style=\"font-size: 17px; color: #0d47a1; margin-top: 10px;\">${media.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</div></div></div><div style=\"background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd;\"><div style=\"position: relative; height: 250px; width: 100%;\"><canvas id=\"grafico-geral-${ano}\" class=\"esconder-valor\"></canvas></div></div>${htmlTabela}</div>`;
+        htmlFinal += `<div style="margin-bottom: 30px;"><h4 style="color: #f57c00; border-bottom: 2px solid #ffe0b2; padding-bottom: 5px;">JB ANALYTICS ${ano}</h4><div style="display: flex; gap: 10px; margin-bottom: 15px;"><div class="year-summary" style="flex: 1; padding: 10px;"><h4>RENDA TOTAL</h4><div class="year-total-value esconder-valor" style="font-size: 17px; margin-top: 10px;">${totalAno.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</div></div><div class="year-summary" style="flex: 1; padding: 10px; background: #e3f2fd; border-color: #90caf9;"><h4>MÉDIA MENSAL</h4><div class="year-total-value esconder-valor" style="font-size: 17px; color: #0d47a1; margin-top: 10px;">${media.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</div></div></div><div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd;"><div style="position: relative; height: 250px; width: 100%;"><canvas id="grafico-geral-${ano}" class="esconder-valor"></canvas></div></div>${htmlTabela}</div>`;
         setTimeout(() => {
             const ctx = document.getElementById(`grafico-geral-${ano}`);
             if(ctx) {
