@@ -15,28 +15,28 @@
 
   <div id="toast">✅ Salvo com sucesso!</div>
 
-  <div id="modal-login" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="modal-title">🔐 Acesso Administrativo</div>
-        <input type="email" id="emailLogin" class="input-login" placeholder="E-mail" autocomplete="username">
-        <input type="password" id="senhaLogin" class="input-login" placeholder="Senha" autocomplete="current-password">
-        <button class="btn-action btn-green" onclick="fazerLogin()" style="margin-top: 5px;">Entrar</button>
-        <button class="btn-action btn-close-modal" onclick="fecharModalLogin()">Cancelar</button>
-    </div>
+  <div id="tela-login" class="container-center hidden">
+    <h1 style="color:#002f6c; font-size: 35px; margin-bottom: 5px;">Gestão Pessoal</h1>
+    <p style="color:#666; margin-bottom: 30px;">Acesso restrito</p>
+    <input type="email" id="emailLogin" class="input-login" placeholder="E-mail" autocomplete="username" style="max-width: 300px;">
+    <input type="password" id="senhaLogin" class="input-login" placeholder="Senha" autocomplete="current-password" style="max-width: 300px;">
+    <button class="btn-action btn-green" onclick="fazerLogin()" style="max-width: 300px;">Entrar</button>
   </div>
 
-  <div id="inicio">
-    <h1 style="color:#002f6c; font-size: 35px; margin-bottom: 5px; text-align: center;">Painel de Gestão</h1>
-    <p style="color:#666; margin-bottom: 40px;">Selecione o modo de acesso</p>
+  <div id="tela-hub" class="container-center hidden">
+    <h2 style="color:#002f6c; margin-bottom: 30px;">O que deseja acessar?</h2>
     
-    <button class="btn-big btn-green" onclick="entrarModo('admin')">🔐 ACESSO RESTRITO</button>
-    <button class="btn-big" style="background:#1976d2;" onclick="entrarModo('view')">👁️ VISUALIZAR APONTAMENTOS</button>
+    <button class="btn-big" style="background:#43a047;" onclick="abrirModulo('saripan')">🏢 Módulo SARIPAN</button>
+    <button class="btn-big" style="background:#1565c0;" onclick="abrirModulo('modular')">🏭 Módulo MODULAR</button>
+    <button class="btn-big" style="background:#f57c00; margin-top: 15px;" onclick="abrirModulo('geral')">📊 VISÃO GERAL</button>
+    
+    <button style="margin-top: 40px; padding: 10px 20px; background: transparent; border: 1px solid #ccc; color: #666; border-radius: 6px; cursor: pointer;" onclick="sairApp()">Sair da Conta</button>
   </div>
 
   <div id="app" class="container hidden">
     
     <div class="master-header">
-        <button class="btn-nav-top" onclick="sairApp()">⬅ Sair</button>
+        <button class="btn-nav-top" onclick="voltarAoHub()">🏠 Início</button>
         <div id="master-tabs-container" class="master-tabs">
             <button id="m-tab-saripan" class="m-tab active" onclick="switchMasterModule('saripan')">SARIPAN</button>
             <button id="m-tab-modular" class="m-tab" onclick="switchMasterModule('modular')">MODULAR</button>
