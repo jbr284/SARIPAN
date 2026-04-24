@@ -1,5 +1,5 @@
 // Aumentamos a versão para forçar a atualização do cache com as novas Abas
-const CACHE_NAME = 'gestao-unificada-v0'; 
+const CACHE_NAME = 'gestao-unificada-v1'; 
 
 const ASSETS = [
   './',
