@@ -1,10 +1,10 @@
 {
-  "name": "Saripan Gestão",
-  "short_name": "Saripan",
+  "name": "Remunerações JB",
+  "short_name": "Remun. JB",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f0f2f5",
-  "theme_color": "#0d47a1",
+  "theme_color": "#002f6c",
   "icons": [
     {
       "src": "icons/icon-192x192.png",
