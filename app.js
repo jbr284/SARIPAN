@@ -74,7 +74,11 @@ window.abrirModulo = (modulo) => {
         window.mudarAba('registrar');
         window.atualizarRodapeDinamico();
     }
-    if (modulo === 'modular') renderizarHistoricoModular();
+    if (modulo === 'modular') {
+        renderizarHistoricoModular();
+        // Limpa campos extras ao abrir
+        document.getElementById('valorOutras').value = "";
+    }
     if (modulo === 'geral') renderizarDashboardGeral();
 };
 
@@ -110,7 +114,7 @@ async function carregarTodosOsDados() {
         window.atualizarRodapeDinamico(); 
     } catch (e) { 
         console.error("Erro fatal do Firebase:", e);
-        alert("Erro de conexão ao baixar dados. O App funcionará offline se tiver cache.");
+        alert("Erro de conexão ao baixar os dados do Firebase. Verifique suas regras de segurança ou conexão.");
     }
 }
 
@@ -359,20 +363,22 @@ window.adicionarRegistroModular = async () => {
     const mesStr = document.getElementById('mesModular').value; 
     const adiantamento = parseFloat(document.getElementById('valorAdiantamento').value) || 0;
     const salario = parseFloat(document.getElementById('valorSalario').value) || 0;
+    const outras = parseFloat(document.getElementById('valorOutras').value) || 0;
 
     if (!mesStr) return alert("Selecione o Mês de Referência.");
     
     const [ano, mesNum] = mesStr.split('-').map(Number);
     const idUnico = `MOD-${ano}-${mesNum}`; 
-    const total = adiantamento + salario;
+    const total = adiantamento + salario + outras; // Soma tudo agora
 
-    const novoReg = { id: idUnico, ano: ano, mes: mesNum - 1, adiantamento, salario, total };
+    const novoReg = { id: idUnico, ano: ano, mes: mesNum - 1, adiantamento, salario, outras, total };
 
     try {
         await setDoc(doc(db, "renda_modular", idUnico), novoReg);
         window.registrosModular = window.registrosModular.filter(r => r.id !== idUnico);
         window.registrosModular.push(novoReg);
         renderizarHistoricoModular(); mostrarToast();
+        document.getElementById('valorOutras').value = ""; // Limpa após salvar
     } catch(e) { alert("Erro ao salvar Modular."); }
 };
 
@@ -398,13 +404,14 @@ function renderizarHistoricoModular() {
         return;
     }
 
-    let tableHtml = `<table><thead><tr><th>Período</th><th style="text-align:right">Adiant.</th><th style="text-align:right">Líquido</th><th style="text-align:right; background:#002f6c; color:white;">Total</th><th></th></tr></thead><tbody>`;
+    let tableHtml = `<table><thead><tr><th>Período</th><th style="text-align:right">Adiant/Liq</th><th style="text-align:right">Extras</th><th style="text-align:right; background:#002f6c; color:white;">Total</th><th></th></tr></thead><tbody>`;
     
     regs.forEach(r => {
+        const extrasStr = (r.outras && r.outras > 0) ? `R$ ${r.outras.toFixed(2)}` : "-";
         tableHtml += `<tr>
             <td>${MESES[r.mes]} ${r.ano}</td>
-            <td class="esconder-valor" style="text-align:right">R$ ${r.adiantamento.toFixed(2)}</td>
-            <td class="esconder-valor" style="text-align:right">R$ ${r.salario.toFixed(2)}</td>
+            <td class="esconder-valor" style="text-align:right; font-size:11px;">R$ ${(r.adiantamento + r.salario).toFixed(2)}</td>
+            <td class="esconder-valor" style="text-align:right; color:#1565c0;">${extrasStr}</td>
             <td class="esconder-valor" style="text-align:right; font-weight:bold; color:#0d47a1;">R$ ${r.total.toFixed(2)}</td>
             <td style="text-align:center;"><span style="color:red; cursor:pointer;" onclick="window.excluirRegistroModular('${r.id}')">✖</span></td>
         </tr>`;
@@ -554,10 +561,10 @@ function definirDatasAtuais() {
     const dia = String(localDate.getDate()).padStart(2, '0');
     
     // Campo do Saripan (YYYY-MM-DD)
-    document.getElementById('dataServico').value = `${ano}-${mes}-${dia}`;
+    if(document.getElementById('dataServico')) document.getElementById('dataServico').value = `${ano}-${mes}-${dia}`;
     
     // Campo da Modular (YYYY-MM)
-    document.getElementById('mesModular').value = `${ano}-${mes}`;
+    if(document.getElementById('mesModular')) document.getElementById('mesModular').value = `${ano}-${mes}`;
 }
 
 // === BOOTSTRAP INICIAL ===
@@ -566,13 +573,12 @@ window.addEventListener('DOMContentLoaded', () => {
     if(privSalva) { document.body.classList.add('modo-privacidade'); document.getElementById('btn-privacidade').innerHTML = iconeOlhoFechado; }
     else { document.getElementById('btn-privacidade').innerHTML = iconeOlhoAberto; }
 
-    // Roda a função para preencher a data de hoje logo que a página carrega
     definirDatasAtuais();
 
     document.getElementById('dataServico').addEventListener('change', window.atualizarRodapeDinamico);
     ['valorBase', 'tipoCarga', 'tipoDia'].forEach(id => document.getElementById(id).addEventListener('input', window.atualizarPreview));
     
-    window.atualizarPreview(); // Garante que a previsão já inicie calculada (R$ 130,00)
+    window.atualizarPreview();
 
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 });
