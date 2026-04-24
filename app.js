@@ -17,8 +17,8 @@ const db = getFirestore(appFire);
 const auth = getAuth(appFire);
 
 // === VARIÁVEIS GLOBAIS ===
-window.registros = []; // Saripan
-window.registrosModular = []; // Modular
+window.registros = []; 
+window.registrosModular = []; 
 window.chartsAtivos = []; 
 const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
@@ -32,18 +32,14 @@ window.togglePrivacidade = () => {
     document.getElementById('btn-privacidade').innerHTML = isHidden ? iconeOlhoFechado : iconeOlhoAberto;
 };
 
-// === AUTENTICAÇÃO E ROTEAMENTO AUTOMÁTICO ===
+// === AUTENTICAÇÃO E ROTEAMENTO ===
 auth.onAuthStateChanged((user) => {
     if (user) {
-        // Usuário logado -> Vai direto para o HUB (botões grandes)
         document.getElementById('tela-login').classList.add('hidden');
         document.getElementById('tela-hub').classList.remove('hidden');
         document.getElementById('app').classList.add('hidden');
-        
-        // Carrega dados em segundo plano para ficar rápido
         carregarTodosOsDados();
     } else {
-        // Usuário deslogado -> Tela de login
         document.getElementById('tela-login').classList.remove('hidden');
         document.getElementById('tela-hub').classList.add('hidden');
         document.getElementById('app').classList.add('hidden');
@@ -54,49 +50,40 @@ window.fazerLogin = async () => {
     const email = document.getElementById('emailLogin').value;
     const senha = document.getElementById('senhaLogin').value;
     if (!email || !senha) return alert("Preencha e-mail e senha.");
-    
     const btn = document.querySelector('#tela-login .btn-action');
     btn.innerText = "Entrando...";
-    
-    try {
-        await signInWithEmailAndPassword(auth, email, senha);
-        // Não precisa fazer mais nada aqui, o onAuthStateChanged assume o controle
-    } catch (e) { 
-        alert("Erro ao entrar: Verifique as credenciais."); 
-    } finally {
-        btn.innerText = "Entrar";
-    }
+    try { await signInWithEmailAndPassword(auth, email, senha); } 
+    catch (e) { alert("Erro ao entrar: Verifique as credenciais."); } 
+    finally { btn.innerText = "Entrar"; }
 };
 
-window.sairApp = async () => {
-    if (confirm("Deseja realmente sair da sua conta?")) {
-        await signOut(auth);
-    }
-};
+window.sairApp = async () => { if (confirm("Deseja realmente sair da sua conta?")) await signOut(auth); };
 
-// === NAVEGAÇÃO DE TELAS ===
+// === NAVEGAÇÃO DE MÓDULOS INDIVIDUAIS ===
 window.abrirModulo = (modulo) => {
     document.getElementById('tela-hub').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
-    window.switchMasterModule(modulo);
-    if (modulo === 'saripan') window.mudarAba('registrar');
+    
+    // Atualiza o Título do Cabeçalho
+    const titulos = { 'saripan': 'MÓDULO SARIPAN', 'modular': 'MÓDULO MODULAR', 'geral': 'VISÃO GERAL' };
+    document.getElementById('app-title').innerText = titulos[modulo];
+
+    // Esconde todos os painéis e mostra só o que clicou
+    document.querySelectorAll('.master-module').forEach(m => m.classList.remove('active'));
+    document.getElementById(`module-${modulo}`).classList.add('active');
+
+    // Executa as lógicas de carregamento específicas
+    if (modulo === 'saripan') {
+        window.mudarAba('registrar');
+        window.atualizarRodapeDinamico();
+    }
+    if (modulo === 'modular') renderizarHistoricoModular();
+    if (modulo === 'geral') renderizarDashboardGeral();
 };
 
 window.voltarAoHub = () => {
     document.getElementById('app').classList.add('hidden');
     document.getElementById('tela-hub').classList.remove('hidden');
-};
-
-window.switchMasterModule = (modulo) => {
-    document.querySelectorAll('.master-module').forEach(m => m.classList.remove('active'));
-    document.querySelectorAll('.m-tab').forEach(b => b.classList.remove('active'));
-    
-    document.getElementById(`module-${modulo}`).classList.add('active');
-    document.getElementById(`m-tab-${modulo}`).classList.add('active');
-
-    if (modulo === 'saripan') window.atualizarRodapeDinamico();
-    if (modulo === 'modular') renderizarHistoricoModular();
-    if (modulo === 'geral') renderizarDashboardGeral();
 };
 
 window.mudarAba = (aba) => { // Abas internas Saripan
@@ -125,11 +112,12 @@ async function carregarTodosOsDados() {
         renderizarApontamentosSaripan(); 
         window.atualizarRodapeDinamico(); 
     } catch (e) { 
-        alert("Erro de conexão ao baixar o histórico.");
+        console.error("Erro fatal do Firebase:", e);
+        alert("Erro de conexão ao baixar dados.");
     }
 }
 
-// === LÓGICA SARIPAN (MÓDULO 1) ===
+// === LÓGICA SARIPAN ===
 function obterPeriodo(dataStr) {
     const dateObj = new Date(dataStr);
     return { ano: dateObj.getUTCFullYear(), mes: dateObj.getUTCMonth(), dia: dateObj.getUTCDate(), quinzena: dateObj.getUTCDate() <= 15 ? 1 : 2 };
@@ -253,7 +241,7 @@ function renderizarApontamentosSaripan() {
     });
 }
 
-// === LÓGICA MODULAR (MÓDULO 2) ===
+// === LÓGICA MODULAR ===
 window.adicionarRegistroModular = async () => {
     const mesStr = document.getElementById('mesModular').value; 
     const adiantamento = parseFloat(document.getElementById('valorAdiantamento').value) || 0;
@@ -320,14 +308,13 @@ function limparGraficos() {
 
 function renderizarFinanceiroSaripan() {
     limparGraficos();
-    document.getElementById('financeiro-content').innerHTML = `<p style="text-align:center; padding: 20px; color: #666;">Acesse a aba <b>GERAL</b> no menu superior para ver os gráficos e métricas consolidadas (Saripan + Modular).</p>`;
+    document.getElementById('financeiro-content').innerHTML = `<p style="text-align:center; padding: 20px; color: #666;">Acesse a aba <b>GERAL</b> no menu principal para ver os gráficos consolidados.</p>`;
 }
 
-// === LÓGICA DASHBOARD GERAL (MÓDULO 3) ===
+// === LÓGICA DASHBOARD GERAL ===
 function renderizarDashboardGeral() {
     limparGraficos();
     const container = document.getElementById('dashboard-geral-content');
-    
     const dadosGerais = {}; 
     let anosEncontrados = new Set();
 
@@ -352,7 +339,6 @@ function renderizarDashboardGeral() {
 
     anosOrdenados.forEach(ano => {
         const mesesDoAno = Object.values(dadosGerais).filter(d => d.ano === ano).sort((a,b) => a.mes - b.mes);
-        
         let totalAno = 0;
         const labels = [], dataSari = [], dataMod = [];
 
