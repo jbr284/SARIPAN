@@ -1,5 +1,4 @@
-// Aumentamos a versão para forçar a atualização do cache com as novas Abas
-const CACHE_NAME = 'gestao-unificada-v7'; 
+const CACHE_NAME = 'remun-jb-v1'; 
 
 const ASSETS = [
   './',
@@ -14,29 +13,18 @@ const ASSETS = [
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', (e) => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
+  e.waitUntil(caches.open(CACHE_NAME).then((c) => c.addAll(ASSETS)));
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keyList) => {
-      return Promise.all(
-        keyList.map((key) => {
-          if (key !== CACHE_NAME) return caches.delete(key);
-        })
-      );
-    })
-  );
+self.addEventListener('activate', (e) => {
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.map((k) => {
+    if (k !== CACHE_NAME) return caches.delete(k);
+  }))));
   self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    fetch(event.request)
-      .catch(() => caches.match(event.request))
-  );
+self.addEventListener('fetch', (e) => {
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
